@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ことば · 日语单词手帖</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="description" content="一页一个日语词语，安静学习，主动回忆，双向默写。">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ことば">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-main">ことば</div>
+      <div class="brand-sub">Japanese Word Journal</div>
+    </div>
+    <button class="icon-btn ghost-btn" id="homeBtn" title="返回首页">⌂</button>
+  </header>
+
+  <section id="home">
+    <div class="hero">
+      <div class="kicker">Quiet study, elegant memory</div>
+      <h1>把陌生的词，<br>慢慢记进脑海。</h1>
+      <div class="subtitle">像翻小说一样，一页只专注一个词语。先看，再回忆，再用默写把它真正记住。</div>
+    </div>
+
+    <div class="glass panel">
+      <div class="grid-two">
+        <div class="metric">
+          <div class="label">My Vocabulary</div>
+          <div class="value" id="total">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">Need Review</div>
+          <div class="value" id="wrongTotal">0</div>
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label tiny" for="qty">本次学习词数</label>
+        <input class="field" type="number" id="qty" min="1" max="999" value="10" placeholder="例如 10">
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="start">开始今日学习</button>
+        <button class="btn btn-secondary" id="review">只复习错词</button>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <button class="btn btn-secondary" id="libraryBtn">词库管理</button>
+      <button class="btn btn-secondary" id="statsBtn">学习记录</button>
+    </div>
+  </section>
+
+  <section id="study" class="hidden stage">
+    <div class="stage-head">
+      <div>
+        <div class="tiny">Study Session</div>
+        <div class="subtitle" style="font-size:13px;margin-top:5px">沉浸式翻页记忆</div>
+      </div>
+      <div class="badge"><span class="dot"></span><span id="studyCount">1 / 10</span></div>
+    </div>
+    <div class="soft-progress"><span id="studyBar"></span></div>
+
+    <div class="book-shell">
+      <div class="page" id="card">
+        <div class="page-top">
+          <span id="cardIndex">KOTOBA / 01</span>
+          <span id="cardTag">VOCABULARY</span>
+        </div>
+        <div class="word" id="cardWord"></div>
+        <div class="reading" id="cardReading"></div>
+        <div class="mini-rule"></div><div class="meaning concealed" id="cardMeaning"></div><button class="reveal" id="revealMeaning" type="button">轻触显示释义</button>
+        <div class="page-bottom">
+          <span>Swipe or tap</span>
+          <span id="pageCount">01 — 10</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="text-btn" id="prev">← 上一页</button>
+      <button class="text-btn" id="next">下一页 →</button>
+    </div>
+    <div class="section-block">
+      <button class="btn btn-primary hidden" id="finishStudy">开始默写测试</button>
+    </div>
+  </section>
+
+  <section id="choose" class="hidden">
+    <button class="back-link" id="chooseBack">← 返回学习页</button>
+    <div class="hero" style="padding-top:18px">
+      <div class="kicker">Recall Practice</div>
+      <div class="section-title">真正记住了吗？</div>
+      <div class="subtitle">选择一个方向进行主动回忆。越费力地想起来，记忆通常越牢。</div>
+    </div>
+    <div class="paper panel">
+      <div class="tiny">默写模式</div>
+      <div class="mode-grid">
+        <button class="mode-card selected" data-mode="cn-jp">
+          <strong>中文 → 日语</strong>
+          <div class="note">看到中文，写出对应日语词汇。</div>
+        </button>
+        <button class="mode-card" data-mode="jp-cn">
+          <strong>日语 → 中文</strong>
+          <div class="note">看到日语，写出中文含义。</div>
+        </button>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="startTest">开始测试</button>
+      </div>
+      <div class="note">中文答案采用核心含义匹配；日语可输入汉字或假名。若答案合理但系统没识别，可以手动标记正确。</div>
+    </div>
+  </section>
+
+  <section id="test" class="hidden">
+    <button class="back-link" id="testBack">← 退出测试</button>
+    <div class="hero" style="padding-top:18px;padding-bottom:12px">
+      <div class="kicker" id="testCount">QUESTION 1 / 10</div>
+      <div class="section-title">默写时间。</div>
+    </div>
+    <div class="paper question-card">
+      <div class="question-head" id="promptLabel"></div>
+      <div class="question" id="promptWord"></div>
+      <div class="subtitle" id="promptReading"></div>
+      <div class="answer-field">
+        <input class="field" id="answer" autocomplete="off" autocapitalize="off" placeholder="在这里输入答案">
+      </div>
+      <div class="feedback hidden" id="feedback"></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="submitAnswer">确认答案</button>
+        <button class="btn btn-secondary hidden" id="override">我的答案也正确</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="done" class="hidden">
+    <div class="hero">
+      <div class="kicker">Session Complete</div>
+      <div class="section-title">今天这一轮，完成了。</div>
+      <div class="subtitle">成绩不是目的，能知道哪些词还不熟，反而更有价值。</div>
+    </div>
+    <div class="paper panel">
+      <div class="tiny">本轮正确率</div>
+      <div class="result-number" id="score">0%</div>
+      <div class="subtitle" id="scoreDetail"></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="again">复习本轮错词</button>
+        <button class="btn btn-secondary" id="otherMode">切换方向再测一次</button>
+        <button class="btn btn-secondary" id="doneHome">返回首页</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="library" class="hidden">
+    <button class="back-link" id="libBack">← 返回首页</button>
+    <div class="hero" style="padding-top:18px;padding-bottom:14px">
+      <div class="kicker">Your Vocabulary</div>
+      <div class="section-title">我的词库。</div>
+      <div class="subtitle">把日常遇到的陌生词留在这里。支持批量粘贴导入，也支持恢复旧版备份。</div>
+    </div>
+    <div class="paper panel">
+      <div class="tiny">批量添加（每行一个）</div>
+      <textarea id="importText" placeholder="单词 | 假名 | 中文意思 | 词性&#10;例如：経験 | けいけん | 经验 | 名词"></textarea>
+      <div class="actions">
+        <button class="btn btn-primary" id="importBtn">导入单词</button>
+      </div>
+      <div class="note" id="importMsg">支持 | 或制表符分隔。相同词条会自动跳过。</div>
+    </div>
+    <div class="paper panel">
+      <div class="tiny">数据与备份</div>
+      <div class="note" style="margin-top:10px">学习记录保存在当前浏览器。换设备或更换网站域名不会自动同步，建议定期导出备份。</div>
+      <div class="backup-row">
+        <button class="btn btn-secondary" id="backupBtn" type="button">导出 JSON 备份</button>
+        <button class="btn btn-secondary" id="restoreBtn" type="button">导入旧版备份</button>
+      </div>
+      <input type="file" id="restoreFile" accept=".json,application/json">
+      <div class="status" id="backupStatus" role="status"></div>
+    </div>
+    <div class="paper panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
+        <div class="tiny">已收录词语</div>
+        <button class="mini-link" id="exportBtn">导出词库 ↗</button>
+      </div>
+      <input class="field search-field" type="search" id="wordSearch" placeholder="搜索日语 / 假名 / 中文" aria-label="搜索词库"><div class="list" id="wordList"></div>
+      <div class="actions">
+        <button class="btn btn-secondary" id="resetWrong">清空错词标记</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="stats" class="hidden">
+    <button class="back-link" id="statsBack">← 返回首页</button>
+    <div class="hero" style="padding-top:18px;padding-bottom:14px">
+      <div class="kicker">Learning Log</div>
+      <div class="section-title">学习记录。</div>
+      <div class="subtitle">保存在当前浏览器里，用来回看自己的学习节奏和正确率。</div>
+    </div>
+    <div class="paper panel" id="statsContent"></div>
+  </section>
+
+  <div class="footer">KOTOBA · A SLOWER WAY TO REMEMBER</div>
+</div>
+
+<script src="./app.js" defer></script>
+</body>
+</html>
