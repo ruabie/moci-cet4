@@ -1,328 +1,343 @@
 (() => {
   'use strict';
-  const KEY = 'kotoba_pwa_v3';
-  const LEGACY_KEYS = ['kotoba_v2_ins', 'kotoba_v1'];
-  const $ = id => document.getElementById(id);
-  const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const seed = [
-    ['さまざま','さまざま','各种各样','形容动词'],
-    ['経験','けいけん','经验','名词'],
-    ['迷惑','めいわく','麻烦；困扰','名词'],
-    ['学ぶ','まなぶ','学习','动词'],
-    ['学び','まなび','学习；学问','名词'],
-    ['奢る','おごる','请客；奢侈','动词'],
-    ['謝る','あやまる','道歉','动词'],
-    ['許す','ゆるす','原谅；允许','动词'],
-    ['甘い','あまい','甜的；天真的','形容词'],
-    ['相手','あいて','对方；伙伴','名词'],
-    ['川','かわ','河流','名词'],
-    ['泳ぐ','およぐ','游泳','动词'],
-    ['伺う','うかがう','拜访；请教；询问','动词'],
-    ['平和','へいわ','和平','名词'],
-    ['僕','ぼく','我（男性常用）','代词'],
-    ['偉い','えらい','了不起的；地位高的','形容词'],
-    ['彼女','かのじょ','她；女朋友','代词'],
-    ['おぼつかない','おぼつかない','没把握的；不可靠的','形容词'],
-    ['しっかり','しっかり','牢固地；好好地','副词'],
-    ['ゆっくり','ゆっくり','慢慢地','副词'],
-    ['さまざまな','さまざまな','各种各样的','连体表达'],
-    ['詳しい','くわしい','详细的；熟悉的','形容词'],
-    ['大津波','おおつなみ','大海啸','名词'],
-    ['常に','つねに','经常；总是','副词'],
-    ['素晴らしい','すばらしい','非常出色的；精彩的','形容词'],
-    ['体','からだ','身体','名词'],
-    ['輸入車','ゆにゅうしゃ','进口车','名词'],
-    ['反省する','はんせいする','反省；检讨自己的行为','动词'],
-    ['中秋節','ちゅうしゅうせつ','中秋节','名词']
-  ];
-
-  const seedWords = () => seed.map((a, i) => ({ id: i+1, jp:a[0], kana:a[1], cn:a[2], pos:a[3] }));
-  const emptyDB = () => ({schema:3, words:seedWords(), mistakes:{}, logs:[]});
-  let db;
-  const isObject = v => v && typeof v === 'object' && !Array.isArray(v);
-  const readLS = key => { try {return JSON.parse(localStorage.getItem(key))} catch {return null} };
-  const safeWord = w => {
-    if (!w || typeof w.jp !== 'string' || typeof w.cn !== 'string') return null;
-    const jp = w.jp.trim().slice(0,100), cn = w.cn.trim().slice(0,220);
-    if (!jp || !cn) return null;
-    return {id: Number.isSafeInteger(Number(w.id)) && Number(w.id)>0 ? Number(w.id) : 0,
-      jp, cn, kana: typeof w.kana === 'string' ? w.kana.trim().slice(0,100) || jp : jp,
-      pos: typeof w.pos === 'string' ? w.pos.trim().slice(0,50) || '单词' : '单词'};
-  };
-  function normalizeDB(raw, withSeed = true) {
-    const result = {schema:3, words:withSeed ? seedWords() : [], mistakes:{}, logs:[]};
-    if(!raw || !Array.isArray(raw.words)) return result;
-    const seen = new Map(result.words.map(w=>[w.jp, w.id]));
-    let nextId = result.words.length ? Math.max(...result.words.map(w=>w.id))+1 : 1;
-    const idMap = new Map();
-    for(const item of raw.words.slice(0,5000)) {
-      const w = safeWord(item);
-      if(!w) continue;
-      let id;
-      if(seen.has(w.jp)) id = seen.get(w.jp);
-      else {id=nextId++;result.words.push({...w,id});seen.set(w.jp,id)}
-      if(w.id) idMap.set(w.id,id);
+  const KEY='kotoba_pwa_v4'; // preserve persisted V4 records; V5 changes UI only
+  const OLD_KEYS=['kotoba_pwa_v3','kotoba_v2_ins','kotoba_v1'];
+  const DAY=24*60*60*1000, MINUTE=60*1000;
+  const BOOK=window.KOTOBA_BOOK;
+  if(!BOOK || !Array.isArray(BOOK.words)) {document.body.innerHTML='词库数据未能加载，请刷新网页。';return;}
+  const $=id=>document.getElementById(id);
+  const BOOK_WORDS=BOOK.words.map(w=>({...w}));
+  const COURSE=new Map(BOOK.lessons.map(x=>[x.id,x]));
+  const STORAGE={get(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}},set(k,x){try{localStorage.setItem(k,JSON.stringify(x));return true}catch{return false}}};
+  const clean=s=>String(s??'').trim().slice(0,180);
+  const norm=s=>String(s??'').normalize('NFKC').trim().toLowerCase().replace(/[\s　。、，,.!?！？・（）()「」『』]/g,'');
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const uniq=arr=>[...new Set(arr)];
+  const randomize=a=>{let c=[...a];for(let j=c.length-1;j>0;j--){let k=Math.floor(Math.random()*(j+1));[c[j],c[k]]=[c[k],c[j]];}return c;};
+  const dateText=ts=>new Date(ts).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  function normalizeProgress(p){return {streak:Math.max(0,Math.min(100,Number(p?.streak)||0)),lapses:Math.max(0,Math.min(10000,Number(p?.lapses)||0)),dueAt:Math.max(0,Number(p?.dueAt)||0),lastAt:Math.max(0,Number(p?.lastAt)||0),seen:Math.max(0,Number(p?.seen)||0),lastGrade:p?.lastGrade==='good'?'good':'again'};}
+  function migrate(){
+    let original=STORAGE.get(KEY);
+    if(original && original.schema===4){
+      return {schema:4,custom:Array.isArray(original.custom)?original.custom.filter(w=>w&&clean(w.jp)&&clean(w.cn)).slice(0,5000).map(w=>({jp:clean(w.jp),kana:clean(w.kana)||clean(w.jp),cn:clean(w.cn),pos:clean(w.pos)||'单词',lesson:'extra',section:'自行添加',source:'custom'})):[],progress:original.progress&&typeof original.progress==='object'?Object.fromEntries(Object.entries(original.progress).map(([k,v])=>[k,normalizeProgress(v)])):{},logs:Array.isArray(original.logs)?original.logs.slice(-500):[],settings:{qty:Number(original.settings?.qty)||10}};
     }
-    if(isObject(raw.mistakes)) {
-      for(const [id, obj] of Object.entries(raw.mistakes)) {
-        const newId=idMap.get(Number(id)) ?? Number(id);
-        if(!result.words.some(w=>w.id===newId))continue;
-        if(isObject(obj)) result.mistakes[newId]={cnjp:!!obj.cnjp,jpcn:!!obj.jpcn};
+    const result={schema:4,custom:[],progress:{},logs:[],settings:{qty:10}};
+    const exists=new Set(BOOK_WORDS.map(w=>w.jp));
+    for(const key of OLD_KEYS){
+      const raw=STORAGE.get(key);
+      if(!raw||!Array.isArray(raw.words))continue;
+      const idToJP=new Map();
+      for(const w of raw.words.slice(0,5000)){
+        if(!w||!clean(w.jp)||!clean(w.cn))continue;
+        idToJP.set(String(w.id),clean(w.jp));
+        if(!exists.has(clean(w.jp))){result.custom.push({jp:clean(w.jp),kana:clean(w.kana)||clean(w.jp),cn:clean(w.cn),pos:clean(w.pos)||'单词',lesson:'extra',section:'旧词库',source:'custom'});exists.add(clean(w.jp));}
       }
-    }
-    if(Array.isArray(raw.wrong)) {
-      for(const oldId of raw.wrong) {
-        const newId=idMap.get(Number(oldId)) ?? Number(oldId);
-        if(result.words.some(w=>w.id===newId))result.mistakes[newId]={cnjp:true,jpcn:true};
+      if(raw.mistakes&&typeof raw.mistakes==='object'){
+        Object.entries(raw.mistakes).forEach(([id,p])=>{let word=idToJP.get(String(id));if(word&&(p?.cnjp||p?.jpcn))result.progress[word]={streak:0,lapses:1,seen:1,lastAt:Date.now(),dueAt:Date.now()-1,lastGrade:'again'};});
       }
-    }
-    if(Array.isArray(raw.logs)) {
-      result.logs=raw.logs.slice(-500).filter(l=>l&&typeof l==='object').map(l=>({
-        date:String(l.date??'' ).slice(0,50), mode:l.mode==='jp-cn'?'jp-cn':'cn-jp',
-        total:Math.max(0,Number(l.total)||0), right:Math.max(0,Number(l.right)||0)
-      }));
+      if(Array.isArray(raw.wrong))raw.wrong.forEach(id=>{let word=idToJP.get(String(id));if(word)result.progress[word]={streak:0,lapses:1,seen:1,lastAt:Date.now(),dueAt:Date.now()-1,lastGrade:'again'};});
+      if(Array.isArray(raw.logs))result.logs=raw.logs.slice(-500);
+      break;
     }
     return result;
   }
-  function initDB(){
-    const current=readLS(KEY);
-    if(current&&Array.isArray(current.words)) return normalizeDB(current,false);
-    for(const key of LEGACY_KEYS){const raw=readLS(key);if(raw&&Array.isArray(raw.words))return normalizeDB(raw,true)}
-    return emptyDB();
+  let db=migrate();
+  if(!STORAGE.set(KEY,db))console.warn('本地存储可能不可用');
+  const allWords=()=>{
+    let map=new Map(BOOK_WORDS.map(w=>[w.jp,{...w}]));
+    for(const w of db.custom)if(!map.has(w.jp))map.set(w.jp,{...w});
+    return [...map.values()];
+  };
+  const wordByJP=jp=>allWords().find(w=>w.jp===jp);
+  const progressFor=jp=>db.progress[jp]||{streak:0,lapses:0,dueAt:0,lastAt:0,seen:0,lastGrade:'again'};
+  const isDue=w=>!!db.progress[w.jp] && db.progress[w.jp].seen>0 && db.progress[w.jp].dueAt<=Date.now();
+  const isWeak=w=>(db.progress[w.jp]?.lapses||0)>0 && (db.progress[w.jp]?.streak||0)<3;
+  function save(){if(!STORAGE.set(KEY,db))toast('当前浏览器未能保存记录，请检查存储设置');}
+  let toastTimeout;
+  function toast(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>t.classList.add('hidden'),3600);}
+  /* Japanese speech: select ja-JP voice only, never fall back to a non-Japanese voice. */
+  let japaneseVoices=[];
+  const supportedSpeech=typeof window.speechSynthesis!=='undefined' && typeof window.SpeechSynthesisUtterance==='function';
+  let currentUtterance=null;
+  function getSpeechVoices(){
+    japaneseVoices=supportedSpeech?window.speechSynthesis.getVoices().filter(v=>String(v.lang||'').toLowerCase().startsWith('ja')):[];
+    const select=$('voiceSelect'),previous=select.value || db.settings?.voiceURI || '';
+    select.innerHTML='';
+    if(!japaneseVoices.length){const opt=document.createElement('option');opt.value='';opt.textContent='未检测到日语语音';select.appendChild(opt);$('voiceNotice').textContent='当前设备未提供可选的日语语音。请到系统语音设置添加日语音色；无法保证默认声音会读成标准日语。';return;}
+    for(const v of japaneseVoices){const opt=document.createElement('option');opt.value=v.voiceURI;opt.textContent=v.name+(v.localService?' · 本机':'');select.appendChild(opt);}
+    const preferred=japaneseVoices.find(v=>v.voiceURI===previous)||japaneseVoices.find(v=>/kyoko|otoya|nanami|siri|google|日本語/i.test(v.name))||japaneseVoices[0];
+    select.value=preferred.voiceURI;
+    $('voiceNotice').textContent='采用 ja-JP 日语语音；读音以词库中的假名为准。不同系统的音色和声调可能存在差异。';
   }
-  db=initDB();
-  function save(){
-    try{localStorage.setItem(KEY,JSON.stringify(db));return true}
-    catch(err){alert('无法保存学习记录。请检查浏览器是否启用了无痕模式，或存储空间是否已满。');return false}
+  function stopSpeech(){if(supportedSpeech){try{speechSynthesis.cancel()}catch{}}currentUtterance=null;}
+  function speakJP(w){
+    if(!supportedSpeech){toast('当前浏览器不支持系统朗读');return;}
+    if(!japaneseVoices.length)getSpeechVoices();
+    const selected=japaneseVoices.find(v=>v.voiceURI===$('voiceSelect').value);
+    if(!selected){toast('没有可用的日语语音，请先安装日语系统音色');return;}
+    const utterance=new SpeechSynthesisUtterance(w.kana||w.jp);
+    utterance.lang='ja-JP';utterance.voice=selected;utterance.rate=.88;utterance.pitch=1;utterance.volume=1;
+    currentUtterance=utterance;
+    utterance.onerror=()=>toast('朗读失败，请检查设备的日语语音设置');
+    try{speechSynthesis.cancel();speechSynthesis.speak(utterance)}catch{toast('朗读不可用，请检查浏览器权限')}
   }
-  save();
-  function wrongIds(){return db.words.filter(w=>{
-    const m=db.mistakes[w.id];return m&&(m.cnjp||m.jpcn);
-  }).map(w=>w.id)}
-  const screens=['home','study','choose','test','done','library','stats'];
-  let currentScreen='home';
-  function show(id){
-    currentScreen=id;
-    for(const s of screens)$(s).classList.toggle('hidden',s!==id);
-    window.scrollTo({top:0,behavior:'instant'});
-    if(id==='home') refresh();
-    if(id==='library') renderLib();
-    if(id==='stats') renderStats();
+  $('voiceSelect').onchange=()=>{db.settings.voiceURI=$('voiceSelect').value;save();};
+  $('testVoice').onclick=()=>speakJP({jp:'こんにちは',kana:'こんにちは'});
+  if(supportedSpeech){getSpeechVoices();speechSynthesis.addEventListener?.('voiceschanged',getSpeechVoices);}
+  else {$('voiceSelect').disabled=true;$('voiceNotice').textContent='浏览器不支持系统语音朗读';}
+  function updateHome(){let words=allWords();$('totalWords').textContent=words.length;$('reviewCount').textContent=words.filter(isDue).length;$('weakCount').textContent=words.filter(isWeak).length;}
+  const views=['home','lessons','setup','summary','choose','done','library','stats','guide','study','test'];
+  function view(name){stopSpeech();views.forEach(id=>$(id).classList.toggle('hidden',id!==name));document.body.classList.toggle('fake-landscape',false);window.scrollTo({top:0,left:0,behavior:'instant'});if(name==='home')updateHome();if(name==='lessons')renderLessons();if(name==='library')renderLibrary();if(name==='stats')renderStats();}
+  document.querySelectorAll('[data-nav]').forEach(btn=>btn.addEventListener('click',()=>view(btn.dataset.nav)));
+  $('openGuide').onclick=()=>view('guide');
+  $('openLessons').onclick=()=>view('lessons');
+  $('lessonToAll').onclick=()=>openSetup('all');
+  $('openAll').onclick=()=>openSetup('all');
+  $('openReview').onclick=()=>{
+    const due=allWords().filter(isDue);
+    if(due.length)openSetup('due');
+    else if(allWords().some(isWeak))openSetup('weak');
+    else toast('目前没有到期复习词。先学习几组新词吧。');
+  };
+  function renderLessons(){
+    $('lessonList').innerHTML=BOOK.lessons.map(lesson=>{
+      const count=allWords().filter(w=>w.lesson===lesson.id).length;
+      return `<button class="lesson-card" data-lesson="${lesson.id}"><span class="lesson-num">${lesson.id.padStart(2,'0')}</span><span class="lesson-name"><strong>${esc(lesson.name)}</strong><small>${esc(lesson.cn)}${lesson.isPartial?' · 照片仅含部分词汇':''}</small></span><span class="lesson-count">${count}<small>WORDS</small></span></button>`;
+    }).join('');
+    $('lessonList').querySelectorAll('[data-lesson]').forEach(btn=>btn.onclick=()=>openSetup('lesson',btn.dataset.lesson));
   }
-  function refresh(){
-    $('total').textContent=db.words.length;
-    $('wrongTotal').textContent=wrongIds().length;
-    $('review').disabled=wrongIds().length===0;
+  let setup={type:'all',lesson:null,pool:[]};
+  function getPool(type,lesson){const words=allWords();if(type==='lesson')return words.filter(w=>w.lesson===lesson);if(type==='due')return words.filter(isDue).sort((a,b)=>progressFor(a.jp).dueAt-progressFor(b.jp).dueAt);if(type==='weak')return words.filter(isWeak);return words;}
+  function openSetup(type,lesson=null,selected=null){
+    const pool=selected||getPool(type,lesson);
+    if(!pool.length){toast('这个分类目前没有可学词语');return;}
+    setup={type,lesson,pool};
+    const titles={all:'大词库学习',lesson:COURSE.get(lesson)?.name||'按课学习',due:'到期复习',weak:'薄弱词复习',selected:'继续巩固'};
+    const captions={all:'全部词语混合随机，每一轮聚焦少量内容。',lesson:`第 ${lesson} 课 · ${COURSE.get(lesson)?.cn||'教材词语'}`,due:'先回忆已经到复习时间的词。',weak:'这些是你过去标记过“不记得了”的词。',selected:'巩固刚才标记为遗忘的词。'};
+    $('setupKicker').textContent=type==='lesson'?'TEXTBOOK / LESSON '+String(lesson).padStart(2,'0'):'KOTOBA / COLLECTION';
+    $('setupTitle').textContent=titles[type]||titles.all;
+    $('setupDesc').textContent=captions[type]||captions.all;
+    $('poolSize').textContent=pool.length;
+    $('qty').value=Math.min(Math.max(1,db.settings.qty||10),pool.length);
+    $('setupBack').onclick=()=>view(type==='lesson'?'lessons':'home');
+    refreshQtyPills();view('setup');
   }
-  let session=[], idx=0, mode='cn-jp', testIndex=0, results=[], answered=false, revealed=false;
-  function shuffle(a){
-    const out=a.slice();
-    for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}
-    return out;
+  function refreshQtyPills(){let val=Number($('qty').value);document.querySelectorAll('[data-qty]').forEach(b=>b.classList.toggle('selected',Number(b.dataset.qty)===val));$('allQty').classList.toggle('selected',val===setup.pool.length);}
+  $('qty').addEventListener('input',refreshQtyPills);
+  document.querySelectorAll('[data-qty]').forEach(b=>b.onclick=()=>{$('qty').value=Math.min(+b.dataset.qty,setup.pool.length);refreshQtyPills();});
+  $('allQty').onclick=()=>{$('qty').value=setup.pool.length;refreshQtyPills();};
+  let session=null, quiz=null, lastWrong=[];
+  function beginSession(wordJPs,kind='all',lesson=null){
+    if(!wordJPs.length){toast('暂无词语');return;}
+    session={queue:[...wordJPs],unique:uniq(wordJPs),cursor:0,visited:new Set(),kind,lesson,revealed:false};
+    view('study');renderStudy();
   }
-  function makeSession(onlyWrong=false){
-    const wrong=new Set(wrongIds());
-    const pool=onlyWrong?db.words.filter(w=>wrong.has(w.id)):db.words;
-    if(!pool.length){alert(onlyWrong?'目前没有错词':'词库为空，请先添加单词');return}
-    const qty=Math.min(999,Math.max(1,Number.parseInt($('qty').value,10)||10));
-    session=shuffle(pool).slice(0,qty);
-    idx=0;
-    show('study');renderCard();
-  }
-  function reveal(){revealed=true;$('cardMeaning').classList.remove('concealed');$('revealMeaning').textContent='释义已显示';$('revealMeaning').setAttribute('aria-pressed','true')}
-  function renderCard(dir='next'){
-    const w=session[idx];if(!w){show('home');return}
-    revealed=false;
-    $('cardIndex').textContent='KOTOBA / '+String(idx+1).padStart(2,'0');
-    $('cardTag').textContent=w.pos||'VOCABULARY';
+  $('startSession').onclick=()=>{
+    const v=Math.floor(Number($('qty').value));
+    const qty=Math.min(setup.pool.length,Number.isFinite(v)&&v>0?v:10);
+    db.settings.qty=qty;save();
+    const chosen=setup.type==='due'?setup.pool.slice(0,qty):randomize(setup.pool).slice(0,qty);
+    beginSession(chosen.map(w=>w.jp),setup.type,setup.lesson);
+  };
+  function renderStudy(){
+    if(!session)return;
+    if(session.cursor>=session.queue.length){finishSession();return;}
+    const jp=session.queue[session.cursor],w=wordByJP(jp);if(!w){session.cursor++;renderStudy();return;}
+    stopSpeech();session.revealed=false;session.visited.add(jp);
     $('cardWord').textContent=w.jp;
-    $('cardReading').textContent=w.kana===w.jp?'':w.kana;
-    $('cardMeaning').textContent=w.cn;
-    $('cardMeaning').classList.add('concealed');
-    $('revealMeaning').textContent='轻触显示释义';
-    $('revealMeaning').setAttribute('aria-pressed','false');
-    $('studyCount').textContent=`${idx+1} / ${session.length}`;
-    $('pageCount').textContent=`${String(idx+1).padStart(2,'0')} — ${String(session.length).padStart(2,'0')}`;
-    $('studyBar').style.width=`${(idx+1)/session.length*100}%`;
-    $('prev').disabled=idx===0;
-    $('next').disabled=idx===session.length-1;
-    $('finishStudy').classList.toggle('hidden',idx!==session.length-1);
-    const card=$('card');
-    card.classList.remove('turn-next','turn-prev'); void card.offsetWidth;
-    card.classList.add(dir==='next'?'turn-next':'turn-prev');
+    $('cardWord').classList.toggle('long-word',[...w.jp].length>=7);
+    $('cardWord').classList.toggle('very-long-word',[...w.jp].length>=12);
+    $('cardKana').textContent=w.kana;$('cardCn').textContent=w.cn;
+    $('cardPos').textContent=w.pos||'单词';
+    $('cardLesson').textContent=w.lesson==='extra'?'个人词库':`第 ${w.lesson} 课 · P.${w.page}`;
+    $('studyLabel').textContent=session.kind==='lesson'?`LESSON ${String(session.lesson).padStart(2,'0')}`:'WORD COLLECTION';
+    $('cardNumber').textContent=String(session.cursor+1).padStart(3,'0');
+    $('studyPage').textContent=`${String(session.cursor+1).padStart(2,'0')} / ${String(session.queue.length).padStart(2,'0')}`;
+    $('studyProgressBar').style.width=`${((session.cursor+1)/session.queue.length)*100}%`;
+    $('cardReveal').classList.add('hidden');$('cardInvite').classList.remove('hidden');
+    $('prevCard').disabled=session.cursor===0;$('nextCard').disabled=false;
+    $('nextCard').setAttribute('aria-label',session.cursor===session.queue.length-1?'完成学习':'下一词');
   }
-  function page(d){const n=idx+d;if(n<0||n>=session.length)return;idx=n;renderCard(d>0?'next':'prev')}
-  $('start').addEventListener('click',()=>makeSession());
-  $('review').addEventListener('click',()=>makeSession(true));
-  $('prev').addEventListener('click',()=>page(-1));
-  $('next').addEventListener('click',()=>page(1));
-  $('revealMeaning').addEventListener('click',e=>{e.stopPropagation();reveal()});
-  $('card').addEventListener('click',e=>{if(e.target.closest('button'))return;if(!revealed)reveal()});
-  $('finishStudy').addEventListener('click',()=>show('choose'));
-  $('chooseBack').addEventListener('click',()=>show('study'));
-  $('homeBtn').addEventListener('click',()=>show('home'));
-  $('libraryBtn').addEventListener('click',()=>show('library'));
-  $('statsBtn').addEventListener('click',()=>show('stats'));
-  $('libBack').addEventListener('click',()=>show('home'));
-  $('statsBack').addEventListener('click',()=>show('home'));
-  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{
-    mode=b.dataset.mode;setModeButtons();
-  }));
-  function setModeButtons(){document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('selected',b.dataset.mode===mode))}
-  let startX=0,startY=0;
-  $('card').addEventListener('touchstart',e=>{startX=e.changedTouches[0].clientX;startY=e.changedTouches[0].clientY},{passive:true});
-  $('card').addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-startX,dy=e.changedTouches[0].clientY-startY;
-    if(Math.abs(dx)>48 && Math.abs(dx)>Math.abs(dy)*1.3)page(dx<0?1:-1);
-  },{passive:true});
-  document.addEventListener('keydown',e=>{
-    if(currentScreen!=='study'||['INPUT','TEXTAREA','BUTTON'].includes(document.activeElement.tagName))return;
-    if(e.key==='ArrowRight'){e.preventDefault();page(1)}
-    if(e.key==='ArrowLeft'){e.preventDefault();page(-1)}
-    if(e.key===' '){e.preventDefault();reveal()}
-  });
-
-  const normalizeText = s => String(s??'').trim().toLowerCase()
-    .replace(/[\s　。、，,.!！?？・]/g,'').replace(/[（）()]/g,'');
-  const hiragana = s => s.replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
-  function check(w,answer){
-    const x=normalizeText(answer);if(!x)return false;
-    if(mode==='cn-jp')return hiragana(x)===hiragana(normalizeText(w.jp))||hiragana(x)===hiragana(normalizeText(w.kana));
-    const options=w.cn.split(/[；;、/]/).map(normalizeText).filter(Boolean);
-    return options.some(v=>v===x||(v.includes(x)&&x.length>=2)||(x.includes(v)&&v.length>=2));
+  function reveal(){if(!session||session.revealed)return;session.revealed=true;$('cardReveal').classList.remove('hidden');$('cardInvite').classList.add('hidden');}
+  $('flashcard').onclick=()=>reveal();
+  $('flashcard').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();reveal();}});
+  $('speakStudy').onclick=()=>{const w=session&&wordByJP(session.queue[session.cursor]);if(w)speakJP(w);};
+  let touchX=0,touchY=0,skipClickUntil=0;
+  $('flashcard').addEventListener('touchstart',e=>{touchX=e.changedTouches[0].clientX;touchY=e.changedTouches[0].clientY;},{passive:true});
+  $('flashcard').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-touchX,dy=e.changedTouches[0].clientY-touchY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.2){skipClickUntil=Date.now()+450;if(dx<0)goNext();else goPrev();}},{passive:true});
+  $('flashcard').addEventListener('click',e=>{if(Date.now()<skipClickUntil)e.stopImmediatePropagation();},{capture:true});
+  function goNext(){if(!session)return;if(session.cursor>=session.queue.length-1){finishSession();return;}session.cursor++;renderStudy();}
+  function goPrev(){if(!session||session.cursor<=0)return;session.cursor--;renderStudy();}
+  $('nextCard').onclick=goNext;$('prevCard').onclick=goPrev;
+  document.addEventListener('keydown',e=>{if(!$('study').classList.contains('hidden')&&['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();e.key==='ArrowRight'?goNext():goPrev();}});
+  function grade(jp,kind){
+    const p=normalizeProgress(progressFor(jp));p.seen++;p.lastAt=Date.now();p.lastGrade=kind;
+    if(kind==='again'){p.lapses++;p.streak=0;p.dueAt=Date.now()+10*MINUTE;}
+    else {p.streak++;const days=[1,3,7,14,30,60,90][Math.min(p.streak-1,6)];p.dueAt=Date.now()+days*DAY;}
+    db.progress[jp]=p;save();
+  }
+  function finishSession(){
+    if(!session)return;
+    $('summaryCount').innerHTML=`${session.unique.length}<small>词</small>`;
+    $('summaryRemembered').textContent=session.visited.size;
+    $('summaryForgot').textContent=session.unique.length;
+    $('summaryReappear').textContent='—';
+    $('summaryText').textContent='学习只负责熟悉词汇。现在开始考核，再决定哪些单词需要高频复习。';
+    view('summary');
+  }
+  $('exitStudy').onclick=()=>finishSession();
+  $('goTest').onclick=()=>{if(session)view('choose');};
+  $('repeatWeak').onclick=()=>{if(session)beginSession([...session.unique],session.kind,session.lesson);};
+  $('landscapeBtn').onclick=()=>{
+    if(document.body.classList.contains('fake-landscape')){document.body.classList.remove('fake-landscape');return;}
+    if(window.matchMedia('(orientation:landscape)').matches){toast('当前已经是横屏，正在使用宽屏布局');return;}
+    document.body.classList.add('fake-landscape');
+  };
+  /* Written recall with explicit post-answer memory judgement. */
+  document.querySelectorAll('[data-mode]').forEach(btn=>btn.onclick=()=>startTest(btn.dataset.mode));
+  function startTest(mode){
+    if(!session)return;
+    quiz={mode,words:randomize([...session.unique]),index:0,results:[],answered:false,ok:false,forced:false,forgotSet:new Set(),repeats:{},sourceSize:session.unique.length};
+    view('test');renderTest();
   }
   function renderTest(){
-    const w=session[testIndex];answered=false;
-    $('testCount').textContent=`Question ${testIndex+1} / ${session.length}`;
-    $('promptLabel').textContent=mode==='cn-jp'?'根据中文，写出日语':'根据日语，写出中文';
-    $('promptWord').textContent=mode==='cn-jp'?w.cn:w.jp;
-    $('promptReading').textContent='';
-    $('answer').value='';$('answer').disabled=false;
-    $('feedback').classList.add('hidden');
-    $('override').classList.add('hidden');
-    $('submitAnswer').textContent='确认答案';
+    stopSpeech();
+    const w=wordByJP(quiz.words[quiz.index]);if(!w)return finishTest();
+    quiz.answered=false;quiz.ok=false;quiz.forced=false;
+    $('testModeLabel').textContent=quiz.mode==='cn-jp'?'中文 → 日语':'日语 → 中文';
+    $('testCount').textContent=`${String(quiz.index+1).padStart(2,'0')} / ${String(quiz.words.length).padStart(2,'0')}`;
+    $('testProgressBar').style.width=`${(quiz.index+1)/quiz.words.length*100}%`;
+    $('questionWord').textContent=quiz.mode==='cn-jp'?w.cn:w.jp;
+    $('questionWord').classList.toggle('long-question',[...$('questionWord').textContent].length>=10);
+    $('testPrompt').textContent=quiz.mode==='cn-jp'?'写出日语词语 / 假名':'写出中文含义';
+    $('answer').value='';$('answer').disabled=false;$('answer').classList.remove('hidden');
+    $('answer').placeholder=quiz.mode==='cn-jp'?'输入日语或假名':'输入中文';
+    $('testFeedback').classList.add('hidden');$('answerActions').classList.remove('hidden');
+    $('testGradeRow').classList.add('hidden');$('overrideBtn').classList.add('hidden');$('testMemoryHint').classList.add('hidden');
+    $('testRemember').disabled=false;
+    $('speakTest').classList.toggle('hidden',quiz.mode==='cn-jp');
   }
-  function startTest(){testIndex=0;results=[];show('test');renderTest()}
-  $('startTest').addEventListener('click',startTest);
-  $('testBack').addEventListener('click',()=>show('choose'));
-  function commit(ok){
-    const w=session[testIndex];results.push({id:w.id,ok});
-    const m=db.mistakes[w.id]||{cnjp:false,jpcn:false};
-    m[mode==='cn-jp'?'cnjp':'jpcn']=!ok;
-    db.mistakes[w.id]=m;save();
+  function isCorrect(w,answer){
+    const value=norm(answer);if(!value)return false;
+    if(quiz.mode==='cn-jp')return value===norm(w.jp)||value===norm(w.kana);
+    const cn=w.cn.split(/[；;，,、/]/).map(s=>norm(s.replace(/（.*?）/g,''))).filter(Boolean);
+    return cn.some(item=>value===item);
   }
-  function submit(){
-    if(answered){testIndex++;if(testIndex>=session.length)finish();else renderTest();return}
-    const answer=$('answer').value;if(!answer.trim()){$('answer').focus();return}
-    const w=session[testIndex],ok=check(w,answer);
-    commit(ok);answered=true;$('answer').disabled=true;
-    $('feedback').classList.remove('hidden');
-    $('feedback').innerHTML=`<strong class="${ok?'good':'bad'}">${ok?'✓ 回答正确':'✕ 需要复习'}</strong><div style="margin-top:8px">日语：${escapeHtml(w.jp)}（${escapeHtml(w.kana)}）<br>中文：${escapeHtml(w.cn)}</div>`;
-    $('override').classList.toggle('hidden',ok);
-    $('submitAnswer').textContent=testIndex===session.length-1?'查看学习结果':'下一题 →';
+  function revealTestAnswer(forced=false){
+    if(!quiz||quiz.answered)return;
+    const w=wordByJP(quiz.words[quiz.index]);if(!w)return;
+    const a=$('answer').value.trim();if(!forced&&!a){toast('请输入答案，或选择“想不起来”');return;}
+    quiz.answered=true;quiz.forced=forced;quiz.ok=!forced&&isCorrect(w,a);
+    $('answer').disabled=true;$('answer').classList.add('hidden');$('answerActions').classList.add('hidden');
+    const fb=$('testFeedback');fb.classList.remove('hidden');
+    fb.innerHTML=`<strong class="${quiz.ok?'correct':'wrong'}">${quiz.ok?'✓ 答案正确':forced?'已经显示答案':'答案需要核对'}</strong><div>${esc(w.jp)} · ${esc(w.kana)}</div><div>${esc(w.cn)}</div>`;
+    $('testGradeRow').classList.remove('hidden');$('testMemoryHint').classList.remove('hidden');
+    $('testRemember').disabled=!quiz.ok;
+    $('testMemoryHint').textContent=quiz.ok?'现在判断自己是否真正记得。':'若答案正确但未识别，可手动修正；否则选择“不记得了”。';
+    $('overrideBtn').classList.toggle('hidden',quiz.ok||forced);
+    $('speakTest').classList.remove('hidden');
   }
-  $('submitAnswer').addEventListener('click',submit);
-  $('answer').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();submit()}});
-  $('override').addEventListener('click',()=>{
-    const r=results[results.length-1];if(!r)return;
-    r.ok=true;const m=db.mistakes[r.id]||{cnjp:false,jpcn:false};
-    m[mode==='cn-jp'?'cnjp':'jpcn']=false;db.mistakes[r.id]=m;save();
-    const strong=$('feedback').querySelector('strong');
-    strong.textContent='✓ 已手动判定正确';strong.className='good';
-    $('override').classList.add('hidden');
-  });
-  function finish(){
-    const right=results.filter(r=>r.ok).length;
-    db.logs.push({date:new Date().toLocaleString('zh-CN'),mode,total:results.length,right});
+  $('answerBtn').onclick=()=>revealTestAnswer(false);
+  $('skipAnswer').onclick=()=>revealTestAnswer(true);
+  $('answer').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();revealTestAnswer(false);}};
+  $('overrideBtn').onclick=()=>{
+    if(!quiz?.answered||quiz.forced)return;
+    quiz.ok=true;$('testRemember').disabled=false;
+    const fb=$('testFeedback');fb.querySelector('strong').textContent='✓ 已手动判定答案正确';fb.querySelector('strong').className='correct';
+    $('overrideBtn').classList.add('hidden');$('testMemoryHint').textContent='请根据实际记忆情况评价。';
+  };
+  $('speakTest').onclick=()=>{const w=quiz&&wordByJP(quiz.words[quiz.index]);if(w)speakJP(w);};
+  function commitMemory(remembered){
+    if(!quiz||!quiz.answered)return;
+    if(remembered&&!quiz.ok){toast('请先核对或修正答案');return;}
+    const jp=quiz.words[quiz.index];
+    const repeat=quiz.index>=quiz.sourceSize || quiz.forgotSet.has(jp);
+    quiz.results.push({jp,ok:quiz.ok,remembered,repeat});
+    if(!remembered){
+      quiz.forgotSet.add(jp);grade(jp,'again');
+      const count=quiz.repeats[jp]||0;
+      if(count<2){const insert=Math.min(quiz.index+4,quiz.words.length);quiz.words.splice(insert,0,jp);quiz.repeats[jp]=count+1;}
+    }else if(!quiz.forgotSet.has(jp)){grade(jp,'good');}
+    // Recalling a word again within this test does not erase its short-term review obligation.
+    quiz.index++;
+    if(quiz.index>=quiz.words.length)finishTest();else renderTest();
+  }
+  $('testRemember').onclick=()=>commitMemory(true);
+  $('testForgot').onclick=()=>commitMemory(false);
+  $('exitTest').onclick=()=>{stopSpeech();view('choose')};
+  function finishTest(){
+    if(!quiz)return;
+    const uniqueFirst=new Map();
+    for(const x of quiz.results)if(!uniqueFirst.has(x.jp))uniqueFirst.set(x.jp,x);
+    const original=[...uniqueFirst.values()];
+    const right=original.filter(r=>r.ok).length,total=original.length;
+    lastWrong=uniq([...quiz.forgotSet,...original.filter(x=>!x.ok).map(x=>x.jp)]);
+    db.logs.push({date:Date.now(),mode:quiz.mode,total,right,lesson:session?.lesson||null,forgot:quiz.forgotSet.size,repeat:quiz.results.length-total});
     db.logs=db.logs.slice(-500);save();
-    $('score').textContent=Math.round(right/results.length*100)+'%';
-    $('scoreDetail').textContent=`${results.length} 个词语 · 正确 ${right} 个 · 错误 ${results.length-right} 个`;
-    $('again').disabled=results.every(r=>r.ok);
-    show('done');
+    $('score').textContent=`${total?Math.round(100*right/total):0}%`;
+    $('scoreDetails').textContent=`原始题 ${total} · 答对 ${right} · 标记不记得 ${quiz.forgotSet.size} · 额外重现 ${Math.max(0,quiz.results.length-total)}`;
+    $('doneReview').disabled=!lastWrong.length;
+    view('done');
   }
-  $('again').addEventListener('click',()=>{
-    const ids=new Set(results.filter(r=>!r.ok).map(r=>r.id));
-    session=session.filter(w=>ids.has(w.id));
-    if(!session.length){show('home');return}
-    idx=0;show('study');renderCard();
-  });
-  $('otherMode').addEventListener('click',()=>{mode=mode==='cn-jp'?'jp-cn':'cn-jp';setModeButtons();startTest()});
-  $('doneHome').addEventListener('click',()=>show('home'));
-
-  function nextId(){return db.words.reduce((acc,w)=>Math.max(acc,w.id),0)+1}
-  $('importBtn').addEventListener('click',()=>{
+  $('swapMode').onclick=()=>startTest(quiz?.mode==='cn-jp'?'jp-cn':'cn-jp');
+  $('doneReview').onclick=()=>{if(lastWrong.length)beginSession([...lastWrong],'weak');else toast('本轮没有薄弱词');};
+  /* Word library + backups */
+  $('wordSearch').oninput=renderLibrary;
+  $('libLesson').onchange=renderLibrary;
+  function renderLibrary(){
+    const term=norm($('wordSearch').value),lesson=$('libLesson').value;
+    const words=allWords().filter(w=>(lesson==='all'||w.lesson===lesson)&&(!term||norm(w.jp).includes(term)||norm(w.kana).includes(term)||norm(w.cn).includes(term)));
+    $('libCount').textContent=`显示 ${words.length} / ${allWords().length} 条`;
+    $('wordList').innerHTML=words.length?words.map(w=>`<div class="word-line"><div class="word-line-main"><strong>${esc(w.jp)}</strong><span class="line-kana">${esc(w.kana)}</span><span class="line-cn">${esc(w.cn)}</span></div>${w.source==='custom'?`<button class="delete-word" data-delete="${encodeURIComponent(w.jp)}">删除</button>`:`<span class="line-source">${w.lesson==='extra'?'原词库':`第${w.lesson}课 · ${w.page}页`}</span>`}</div>`).join(''):'<div class="empty-state">没有符合条件的单词。</div>';
+    $('wordList').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{
+      const jp=decodeURIComponent(b.dataset.delete);if(!confirm(`删除自定义单词“${jp}”？`))return;
+      db.custom=db.custom.filter(w=>w.jp!==jp);delete db.progress[jp];save();renderLibrary();updateHome();
+    });
+  }
+  $('importBtn').onclick=()=>{
     const lines=$('importText').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-    let added=0,skipped=0, id=nextId();
-    const known=new Set(db.words.map(w=>w.jp));
-    for(const line of lines.slice(0,5000)){
-      const parts=(line.includes('|')?line.split('|'):line.split('\t')).map(s=>s.trim());
-      if(parts.length<3||!parts[0]||!parts[2]||known.has(parts[0])){skipped++;continue}
-      const w=safeWord({id:id++,jp:parts[0],kana:parts[1],cn:parts[2],pos:parts[3]||'单词'});
-      if(!w){skipped++;continue}db.words.push(w);known.add(w.jp);added++;
+    let added=0,skipped=0;const seen=new Set(allWords().map(w=>w.jp));
+    for(const line of lines.slice(0,1000)){
+      const parts=(line.includes('|')?line.split('|'):line.split('\t')).map(clean);
+      if(parts.length<3||!parts[0]||!parts[2]||seen.has(parts[0])){skipped++;continue;}
+      const [jp,kana,cn,pos]=parts;db.custom.push({jp,kana:kana||jp,cn,pos:pos||'单词',lesson:'extra',section:'自行添加',source:'custom'});seen.add(jp);added++;
     }
-    save();$('importMsg').textContent=`已加入 ${added} 个；跳过 ${skipped} 行。`;
-    $('importText').value='';renderLib();refresh();
-  });
-  function renderLib(){
-    const q=normalizeText($('wordSearch').value);
-    const list=db.words.filter(w=>!q||[w.jp,w.kana,w.cn,w.pos].some(x=>normalizeText(x).includes(q)));
-    $('wordList').innerHTML=list.length?list.map(w=>`<div class="word-row"><div class="word-meta"><strong>${escapeHtml(w.jp)}</strong><div class="kana">${escapeHtml(w.kana)}</div><div class="cn">${escapeHtml(w.cn)} · ${escapeHtml(w.pos)}</div></div><button class="mini-link" data-delete="${w.id}" aria-label="删除${escapeHtml(w.jp)}">删除</button></div>`).join(''):'<div class="empty">没有找到匹配的词语。</div>';
-    $('wordList').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>{
-      const id=Number(b.dataset.delete);
-      if(!confirm('确定删除这个词吗？'))return;
-      db.words=db.words.filter(w=>w.id!==id);delete db.mistakes[id];save();renderLib();refresh();
-    }));
-  }
-  $('wordSearch').addEventListener('input',renderLib);
-  $('resetWrong').addEventListener('click',()=>{
-    if(!confirm('确定清空全部错词标记吗？这不会删除词语和测试历史。'))return;
-    db.mistakes={};save();refresh();alert('已清空错词标记');
-  });
-  function backup(){
-    const data={...db,exportedAt:new Date().toISOString(),app:'kotoba'};
-    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-    const url=URL.createObjectURL(blob),a=document.createElement('a');
-    a.href=url;a.download=`kotoba-backup-${new Date().toISOString().slice(0,10)}.json`;
-    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
-    $('backupStatus').textContent='备份文件已生成。请保存到 iPhone「文件」或电脑的可靠位置。';
-  }
-  $('backupBtn').addEventListener('click',backup);
-  $('exportBtn').addEventListener('click',backup);
-  $('restoreBtn').addEventListener('click',()=>$('restoreFile').click());
-  $('restoreFile').addEventListener('change',async e=>{
-    const file=e.target.files?.[0];if(!file)return;
+    save();$('importStatus').textContent=`成功添加 ${added} 条，跳过 ${skipped} 条。`;$('importText').value='';renderLibrary();updateHome();
+  };
+  $('exportBtn').onclick=()=>{
+    const data=JSON.stringify({...db,exportedAt:new Date().toISOString()},null,2);
+    const a=document.createElement('a'),url=URL.createObjectURL(new Blob([data],{type:'application/json'}));
+    a.href=url;a.download=`kotoba-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    toast('已导出备份，请保存到 iCloud 或电脑');
+  };
+  $('restoreFile').onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
     try{
-      if(file.size>2_000_000)throw Error('文件超过 2MB，暂不支持');
-      const raw=JSON.parse(await file.text());
-      if(!raw||!Array.isArray(raw.words))throw Error('文件格式不是支持的词库备份');
-      const incoming=normalizeDB(raw,false);
-      if(!incoming.words.length)throw Error('备份里没有有效词条');
-      const keep=db.words.length, existing=new Map(db.words.map(w=>[w.jp,w.id]));
-      const mapped=new Map();let n=nextId();
-      for(const w of incoming.words){
-        let id=existing.get(w.jp);
-        if(id===undefined){id=n++;db.words.push({...w,id});existing.set(w.jp,id)}
-        mapped.set(w.id,id);
+      if(file.size>3*1024*1024)throw Error('备份文件超过 3MB');
+      const data=JSON.parse(await file.text());
+      if(!data||![3,4].includes(Number(data.schema)))throw Error('不是兼容的词库备份');
+      if(Number(data.schema)===3&&Array.isArray(data.words)){
+        const known=new Set(allWords().map(w=>w.jp));
+        for(const w of data.words.slice(0,5000))if(clean(w?.jp)&&clean(w?.cn)&&!known.has(clean(w.jp))){db.custom.push({jp:clean(w.jp),kana:clean(w.kana)||clean(w.jp),cn:clean(w.cn),pos:clean(w.pos)||'单词',lesson:'extra',section:'旧备份',source:'custom'});known.add(clean(w.jp));}
+        let map=new Map(data.words.map(w=>[String(w.id),w.jp]));
+        for(const [id,m] of Object.entries(data.mistakes||{}))if(m?.cnjp||m?.jpcn){const jp=map.get(String(id));if(jp&&!db.progress[jp])db.progress[jp]={streak:0,lapses:1,dueAt:Date.now()-1,lastAt:Date.now(),seen:1,lastGrade:'again'};}
+      } else {
+        const known=new Set(allWords().map(w=>w.jp));
+        for(const w of (Array.isArray(data.custom)?data.custom:[]).slice(0,5000))if(clean(w?.jp)&&clean(w?.cn)&&!known.has(clean(w.jp))){db.custom.push({jp:clean(w.jp),kana:clean(w.kana)||clean(w.jp),cn:clean(w.cn),pos:clean(w.pos)||'单词',lesson:'extra',section:'备份导入',source:'custom'});known.add(clean(w.jp));}
+        for(const [jp,p] of Object.entries(data.progress||{}))if(known.has(jp)&&!db.progress[jp])db.progress[jp]=normalizeProgress(p);
       }
-      for(const [id,val] of Object.entries(incoming.mistakes)){
-        const targetId=mapped.get(Number(id));if(targetId!==undefined)db.mistakes[targetId]={
-          cnjp:!!val.cnjp||!!db.mistakes[targetId]?.cnjp,
-          jpcn:!!val.jpcn||!!db.mistakes[targetId]?.jpcn
-        };
-      }
-      db.logs=[...db.logs,...incoming.logs].slice(-500);
-      save();renderLib();refresh();
-      $('backupStatus').textContent=`导入完成：新增 ${db.words.length-keep} 个词，合并 ${incoming.words.length-(db.words.length-keep)} 个已有词。旧备份中的错词记录也已合并。`;
-    }catch(err){$('backupStatus').textContent=`导入失败：${err.message}`}
-    finally{e.target.value=''}
-  });
+      if(Array.isArray(data.logs))db.logs=[...db.logs,...data.logs].slice(-500);
+      save();renderLibrary();updateHome();toast('备份合并完成，已有学习记录已保留');
+    }catch(err){toast('导入失败：'+err.message)}finally{e.target.value=''}
+  };
   function renderStats(){
-    const logs=[...db.logs].reverse();
-    $('statsContent').innerHTML=`<div class="tiny">累计测试次数</div><div class="result-number" style="font-size:46px">${logs.length}</div><div class="subtitle" style="margin-bottom:10px">错词 ${wrongIds().length} 个 · 词库 ${db.words.length} 个</div>` +
-      (logs.length?logs.slice(0,30).map(x=>`<div class="word-row"><div class="word-meta"><strong>${escapeHtml(x.date)}</strong><div class="cn">${x.mode==='cn-jp'?'中文 → 日语':'日语 → 中文'}</div></div><div style="font-family:Georgia,serif;font-size:20px">${x.right}/${x.total}</div></div>`).join(''):'<div class="empty">还没有默写记录。完成一轮测试后会显示在这里。</div>');
+    const words=allWords();
+    $('attemptsCount').textContent=db.logs.reduce((a,x)=>a+(Number(x.total)||0),0);
+    $('learnedCount').textContent=words.filter(w=>progressFor(w.jp).seen>0).length;
+    $('logsList').innerHTML=db.logs.length?[...db.logs].reverse().slice(0,35).map(x=>`<div class="log-row"><span>${esc(typeof x.date==='number'?dateText(x.date):x.date)}<small>${x.mode==='cn-jp'?'中文 → 日语':'日语 → 中文'}${x.lesson?' · 第'+esc(x.lesson)+'课':''}</small></span><strong>${Number(x.right)||0} / ${Number(x.total)||0}</strong></div>`).join(''):'<div class="empty-state">暂时还没有默写记录。</div>';
   }
-  if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')) {
+  if('serviceWorker' in navigator&&location.protocol==='https:'){
     window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
   }
-  refresh();
+  updateHome();
 })();

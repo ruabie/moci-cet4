@@ -2,7 +2,7 @@
   "id": "./",
   "name": "ことば · 日语单词手帖",
   "short_name": "ことば",
-  "description": "简洁的日语单词记忆手帖：按课背诵、大词库、全屏翻页、间隔复习。",
+  "description": "简洁的日语单词记忆手帖：按课背词、沉浸式全屏、日语朗读、考核后间隔复习。",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -10,12 +10,5 @@
   "background_color": "#f5f2eb",
   "theme_color": "#f5f2eb",
   "lang": "zh-CN",
-  "icons": [
-    {
-      "src": "./icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
+  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
 }
