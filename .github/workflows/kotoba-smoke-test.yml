@@ -1,0 +1,30 @@
+name: Kotoba published-site check
+on:
+  push:
+    branches: [main]
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Verify live GitHub Pages URL
+        shell: bash
+        run: |
+          set -eu
+          url="https://ruabie.github.io/moci-cet4/kotoba/"
+          for i in $(seq 1 20); do
+            code=$(curl -L -sS --max-time 10 -o /tmp/kotoba.html -w '%{http_code}' "$url" || echo 000)
+            echo "Attempt $i: HTTP $code for $url"
+            if [ "$code" = "200" ] && grep -q 'ことば' /tmp/kotoba.html; then
+              echo "LIVE SITE VERIFIED"
+              exit 0
+            fi
+            sleep 6
+          done
+          echo "Live site is not returning Kotoba HTML"
+          exit 1
