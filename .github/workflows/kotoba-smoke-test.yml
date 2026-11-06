@@ -10,21 +10,27 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 5
     steps:
-      - name: Verify live GitHub Pages URL
+      - name: Verify HTML, vocabulary data and app scripts load
         shell: bash
         run: |
           set -eu
-          url="https://ruabie.github.io/moci-cet4/kotoba/"
-          for i in $(seq 1 20); do
-            code=$(curl -L -sS --max-time 10 -o /tmp/kotoba.html -w '%{http_code}' "$url" || echo 000)
-            echo "Attempt $i: HTTP $code for $url"
-            if [ "$code" = "200" ] && grep -q 'ことば' /tmp/kotoba.html; then
-              echo "LIVE SITE VERIFIED"
+          base="https://ruabie.github.io/moci-cet4/kotoba"
+          for i in $(seq 1 25); do
+            html=$(curl -L -sS --max-time 10 -o /tmp/kotoba-index.html -w '%{http_code}' "$base/?check=20261106" || echo 000)
+            data=$(curl -L -sS --max-time 10 -o /tmp/kotoba-book-data.js -w '%{http_code}' "$base/book-data.js?v=5.1" || echo 000)
+            app=$(curl -L -sS --max-time 10 -o /tmp/kotoba-app.js -w '%{http_code}' "$base/app.js?v=5.1" || echo 000)
+            echo "Attempt $i: html=$html data=$data app=$app"
+            if [ "$html" = 200 ] && [ "$data" = 200 ] && [ "$app" = 200 ] &&
+               grep -q 'book-data.js?v=5.1' /tmp/kotoba-index.html &&
+               grep -q 'window.KOTOBA_BOOK' /tmp/kotoba-book-data.js &&
+               grep -q '"lessons"' /tmp/kotoba-book-data.js &&
+               grep -q 'window.KOTOBA_BOOK' /tmp/kotoba-app.js; then
+              echo "KOTOBA LIVE ASSETS VERIFIED"
               exit 0
             fi
             sleep 6
           done
-          echo "Live site is not returning Kotoba HTML"
+          echo "Kotoba live HTML/scripts are not consistent"
           exit 1
