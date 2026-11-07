@@ -152,7 +152,7 @@
     // An exhausted course starts a fresh pass only when the user explicitly starts it.
     const newCycle=!!scope&&remaining.length===0;
     const pool=scope?(newCycle?fullPool:remaining):fullPool;
-    setup={type,lesson,pool,fullSize:fullPool.length,scope,newCycle};
+    setup={type,lesson,pool,fullSize:fullPool.length,scope,newCycle,qtyTouched:false};
     const titles={all:'大词库学习',lesson:COURSE.get(lesson)?.name||'按课学习',due:'到期复习',weak:'薄弱词复习',selected:'继续巩固'};
     const captions={all:'大词库按未学词轮换；看完整个词库前，不重复上一轮的词。',lesson:`第 ${lesson} 课 · ${COURSE.get(lesson)?.cn||'教材词语'}`,due:'先回忆已经到复习时间的词。',weak:'这些是你过去标记过“不记得了”的词。',selected:'巩固刚才标记为遗忘的词。'};
     $('setupKicker').textContent=type==='lesson'?'TEXTBOOK / LESSON '+String(lesson).padStart(2,'0'):'KOTOBA / COLLECTION';
@@ -165,9 +165,9 @@
     refreshQtyPills();view('setup');
   }
   function refreshQtyPills(){let val=Number($('qty').value);document.querySelectorAll('[data-qty]').forEach(b=>b.classList.toggle('selected',Number(b.dataset.qty)===val));$('allQty').classList.toggle('selected',val===setup.pool.length);}
-  $('qty').addEventListener('input',refreshQtyPills);
-  document.querySelectorAll('[data-qty]').forEach(b=>b.onclick=()=>{$('qty').value=Math.min(+b.dataset.qty,setup.pool.length);refreshQtyPills();});
-  $('allQty').onclick=()=>{$('qty').value=setup.pool.length;refreshQtyPills();};
+  $('qty').addEventListener('input',()=>{setup.qtyTouched=true;refreshQtyPills();});
+  document.querySelectorAll('[data-qty]').forEach(b=>b.onclick=()=>{setup.qtyTouched=true;$('qty').value=Math.min(+b.dataset.qty,setup.pool.length);refreshQtyPills();});
+  $('allQty').onclick=()=>{setup.qtyTouched=true;$('qty').value=setup.pool.length;refreshQtyPills();};
   let session=null, quiz=null, lastWrong=[];
   function beginSession(wordJPs,kind='all',lesson=null){
     if(!wordJPs.length){toast('暂无词语');return;}
@@ -177,7 +177,7 @@
   $('startSession').onclick=()=>{
     const v=Math.floor(Number($('qty').value));
     const qty=Math.min(setup.pool.length,Number.isFinite(v)&&v>0?v:10);
-    db.settings.qty=qty;
+    if(setup.qtyTouched)db.settings.qty=qty;
     if(setup.newCycle&&setup.scope)db.coverage[setup.scope]=[];
     save();
     const chosen=setup.type==='due'?setup.pool.slice(0,qty):randomize(setup.pool).slice(0,qty);
