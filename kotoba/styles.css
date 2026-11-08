@@ -72,3 +72,29 @@ body.fake-landscape #study .card-cn{font-size:clamp(20px,4vh,35px)}
 body.fake-landscape #study .overlay-icon{top:8px}
 body.fake-landscape #study .minimal-nav{bottom:3px}
 @media(prefers-reduced-motion:reduce){.word-stage,.question-word{animation:none!important;transition:none!important}}
+
+
+/* V6: textbook grammar tags are shown only after revealing a learning card. */
+.word-stage .card-pos{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  max-width:min(90vw,660px);
+  padding:8px 17px;
+  margin-top:2px;
+  border-radius:999px;
+  background:rgba(112,125,113,.075);
+  color:#748078;
+  font-family:var(--font-zh);
+  font-size:clamp(12px,2.5vw,16px);
+  line-height:1.55;
+  letter-spacing:.035em;
+  font-weight:400;
+  white-space:normal;
+  text-wrap:balance;
+}
+.word-stage .card-reveal{gap:clamp(11px,2.4vh,22px)}
+@media (orientation:landscape) and (max-height:580px){
+  .word-stage .card-pos{font-size:13px;padding:5px 13px;margin-top:0}
+  .word-stage .card-reveal{gap:7px}
+}
