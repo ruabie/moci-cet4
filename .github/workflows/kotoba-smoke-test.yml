@@ -10,35 +10,37 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Check JavaScript syntax and nonrepeating study rounds
+      - name: Validate JavaScript and consecutive learning rounds
         shell: bash
         run: |
-          node --check kotoba/app.js
-          node --check kotoba/book-data.js
+          set -eu
+          for f in kotoba/app.js kotoba/book-data.js kotoba/vocab-{13,14,15,16}.js kotoba/sw.js; do node --check "$f"; done
           node .github/tests/kotoba-rotation.test.cjs
-      - name: Verify live HTML, vocabulary and updated app
+          node .github/tests/kotoba-catalog-v6.test.cjs
+      - name: Verify published HTML and all vocabulary files
         shell: bash
         run: |
           set -eu
           base="https://ruabie.github.io/moci-cet4/kotoba"
           for i in $(seq 1 30); do
-            html=$(curl -L -sS --max-time 10 -o /tmp/kotoba-index.html -w '%{http_code}' "$base/?check=20261107rotation" || echo 000)
-            data=$(curl -L -sS --max-time 10 -o /tmp/kotoba-book-data.js -w '%{http_code}' "$base/book-data.js?v=5.1" || echo 000)
-            app=$(curl -L -sS --max-time 10 -o /tmp/kotoba-app.js -w '%{http_code}' "$base/app.js?v=5.2" || echo 000)
-            echo "Attempt $i: html=$html data=$data app=$app"
-            if [ "$html" = 200 ] && [ "$data" = 200 ] && [ "$app" = 200 ] &&
-               grep -q 'app.js?v=5.2' /tmp/kotoba-index.html &&
-               grep -q 'window.KOTOBA_BOOK' /tmp/kotoba-book-data.js &&
-               grep -q 'remainingNewWords' /tmp/kotoba-app.js &&
-               grep -q 'markIntroduced' /tmp/kotoba-app.js; then
-              node --check /tmp/kotoba-app.js
-              echo "KOTOBA LIVE ROTATION BUILD VERIFIED"
+            html=$(curl -L -sS --max-time 10 -o /tmp/kotoba-index.html -w '%{http_code}' "$base/?accept=v6" || echo 000)
+            echo "Attempt $i: HTML HTTP $html"
+            if [ "$html" != 200 ] || ! grep -q 'vocab-16.js?v=6.0' /tmp/kotoba-index.html; then sleep 6; continue; fi
+            good=1
+            for file in 'book-data.js?v=5.1' 'vocab-13.js?v=6.0' 'vocab-14.js?v=6.0' 'vocab-15.js?v=6.0' 'vocab-16.js?v=6.0' 'app.js?v=6.0' 'styles.css?v=6.0' 'sw.js'; do
+              output=$(printf '%s' "$file" | cut -d '?' -f 1)
+              code=$(curl -L -sS --max-time 10 -o "/tmp/$output" -w '%{http_code}' "$base/$file" || echo 000)
+              echo "$file => HTTP $code"
+              [ "$code" = "200" ] || good=0
+            done
+            if [ "$good" = 1 ] && grep -q 'SUPPLEMENT_WORDS' /tmp/app.js && grep -q 'KOTOBA_SUPPLEMENTS' /tmp/vocab-16.js && grep -q 'cardPos' /tmp/kotoba-index.html; then
+              echo "KOTOBA V6 LIVE SITE AND ALL LESSON FILES VERIFIED"
               exit 0
             fi
             sleep 6
           done
-          echo "Kotoba published assets do not match the expected release"
+          echo "Current live site does not have complete V6 assets"
           exit 1
