@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="ことば">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./styles.css?v=5.0">
+<link rel="stylesheet" href="./styles.css?v=6.0">
 <title>ことば · 日语单词手帖</title>
 </head>
 <body>
@@ -55,7 +55,7 @@
 <section id="library" class="view hidden">
   <button class="back" data-nav="home">← 返回首页</button><div class="page-intro"><span class="eyebrow">YOUR COLLECTION</span><h1>我的词库。</h1><p>教材词、旧词库与自定义词都在这里。可以搜索和备份。</p></div>
   <input class="search-field" id="wordSearch" placeholder="查找日语、假名或中文…" autocomplete="off">
-  <div class="library-toolbar"><span id="libCount">—</span><select id="libLesson" aria-label="按课次筛选"><option value="all">全部课次</option><option value="1">第1课</option><option value="2">第2课</option><option value="3">第3课</option><option value="12">第12课</option><option value="13">第13课</option><option value="extra">其他词汇</option></select></div>
+  <div class="library-toolbar"><span id="libCount">—</span><select id="libLesson" aria-label="按课次筛选"><option value="all">全部课次</option><option value="1">第1课</option><option value="2">第2课</option><option value="3">第3课</option><option value="12">第12课</option><option value="13">第13课</option><option value="14">第14课</option><option value="15">第15课</option><option value="16">第16课</option><option value="extra">其他词汇</option></select></div>
   <div class="word-list" id="wordList"></div>
   <details class="add-panel"><summary>＋ 添加自己的单词</summary><p>每行：日语 | 假名 | 中文释义 | 词性</p><textarea id="importText" rows="4" placeholder="例えば：経験 | けいけん | 经验 | 名词"></textarea><button class="outline-btn" id="importBtn">添加到词库</button><p class="micro" id="importStatus"></p></details>
   <div class="backup-row"><button id="exportBtn">导出学习备份 ↗</button><label class="file-label">导入备份 ↗<input id="restoreFile" type="file" accept=".json,application/json" hidden></label></div><p class="micro">记录保存在当前浏览器。清理网站数据或更换手机可能丢失，请定期导出备份。</p>
@@ -72,7 +72,7 @@
   <article id="flashcard" class="word-stage" tabindex="0" role="button" aria-label="点击显示单词读音和释义">
     <div class="word-core">
       <div class="card-word" id="cardWord">ことば</div>
-      <div class="card-reveal hidden" id="cardReveal"><div class="card-kana" id="cardKana">ことば</div><div class="card-cn" id="cardCn">单词</div></div>
+      <div class="card-reveal hidden" id="cardReveal"><div class="card-kana" id="cardKana">ことば</div><div class="card-cn" id="cardCn">单词</div><div class="card-pos" id="cardPos">词性 · 名词</div></div>
       <div class="reveal-hint" id="cardInvite">轻触显示释义</div>
     </div>
   </article>
@@ -81,7 +81,7 @@
     <span id="studyPage">01 / 10</span>
     <button id="nextCard" aria-label="下一词">›</button>
   </nav>
-  <div id="studyLabel" class="sr-only"></div><div id="cardPos" class="sr-only"></div><div id="cardLesson" class="sr-only"></div><div id="cardNumber" class="sr-only"></div>
+  <div id="studyLabel" class="sr-only"></div><div id="cardLesson" class="sr-only"></div><div id="cardNumber" class="sr-only"></div>
 </section>
 <section id="test" class="immersion test-immersion hidden" aria-label="全屏日语考核">
   <div class="immersive-progress"><div id="testProgressBar"></div></div>
@@ -99,5 +99,5 @@
   <div class="test-bottom" id="testCount">01 / 10</div><div id="testModeLabel" class="sr-only">中文 → 日语</div>
 </section>
 <div id="toast" class="toast hidden" role="status"></div>
-<script src="./book-data.js?v=5.1"></script><script src="./app.js?v=5.2"></script>
+<script src="./book-data.js?v=5.1"></script><script src="./vocab-13.js?v=6.0"></script><script src="./vocab-14.js?v=6.0"></script><script src="./vocab-15.js?v=6.0"></script><script src="./vocab-16.js?v=6.0"></script><script src="./app.js?v=6.0"></script>
 </body></html>
