@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#070b1a"><title>WORDRIDE 3D V2.1 · TOKYO AFTER RAIN</title>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#070b1a"><title>WORDRIDE 3D V2.2 · TOKYO AFTER RAIN</title>
 <style>
 :root{--blue:#295cfd;--sky:#6dedff;--white:#f8fbff;--dim:#99a8c7;--ink:#0b1127}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080d22;color:#fff;font-family:Inter,"SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}button{font:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}button:focus-visible{outline:2px solid #76eaff;outline-offset:3px}#app{width:100%;height:100%;height:100dvh;overflow:hidden;position:relative;isolation:isolate}#gl{position:absolute;inset:0;width:100%;height:100%;display:block}#vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 48%,transparent 22%,#0306178a 100%),linear-gradient(180deg,#03081977 0%,transparent 25%,transparent 65%,#030616c9 100%)}#rainCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.54}.topbar{position:absolute;inset:18px 22px auto;z-index:5;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;pointer-events:none}.topbar>*{pointer-events:auto}.heading{display:flex;flex-direction:column;gap:4px;text-shadow:0 3px 8px #0008}.heading b{font-weight:950;letter-spacing:-.06em;font-size:27px;line-height:1}.heading b span{color:#5ee5ff}.heading small{font-size:10px;color:#9bc2ff;letter-spacing:.22em;font-weight:850}.stats{display:flex;gap:6px}.stat{background:linear-gradient(155deg,#122352e8,#0b1537e8);border:1px solid #7296eb7b;box-shadow:0 5px 18px #02050d75;padding:7px 12px;min-width:87px;transform:skewX(-5deg);border-radius:2px 3px 7px 2px}.stat>*{display:block;transform:skewX(5deg)}.stat label{font-size:9px;color:#b2c4f8;letter-spacing:.08em;font-weight:800}.stat strong{font-size:23px;font-weight:950;letter-spacing:-.06em;line-height:1.14}.stat strong small{font-size:10px;color:#b9d4ff;margin-left:3px}.stat.progress-stat{min-width:144px}.meter{height:4px;background:#273a70;margin-top:4px;transform:skewX(5deg)}.meter i{display:block;background:#70eaff;width:0;height:100%}.pause{background:#f5f9ff;color:#173273;border:2px solid #447afc;font-weight:900;padding:9px 12px;box-shadow:3px 4px 0 #1c48b8;transform:skewX(-5deg)}.rightHUD{position:absolute;z-index:4;right:27px;top:118px;text-align:right;filter:drop-shadow(3px 5px 1px #142a65)}.rightHUD strong{font-size:70px;font-style:italic;font-weight:1000;line-height:1;letter-spacing:-.09em}.rightHUD small{display:block;background:#234dca;padding:3px 9px;transform:skewX(-10deg);font-size:11px;font-weight:950;letter-spacing:.15em}.phase{position:absolute;top:115px;left:22px;z-index:3;border-left:3px solid #6cddff;padding:4px 10px;color:#c6deff;font-size:11px;font-weight:800;text-shadow:0 2px 3px #000}.phase b{display:block;font-size:13px;color:white;margin-top:4px}.lower{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:64px max(22px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));background:linear-gradient(0deg,#07112bef 0%,#0b1b3be6 38%,#07152e00 100%)}.prompt{max-width:940px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.phrase{display:flex;gap:11px;align-items:center;flex-wrap:wrap}.meaning{background:#fff;color:#142859;padding:8px 14px;box-shadow:4px 4px 0 #2264fb;font-size:19px;font-weight:950;white-space:nowrap}.pos{font-size:12px;font-weight:850;background:#2957d9;padding:7px 9px;letter-spacing:.1em}.prompts{display:flex;gap:6px}.pill{background:#2358d9;color:#fff;border:1px solid #5785ff;box-shadow:2px 3px 0 #112c6c;padding:7px 10px;font-size:11px;font-weight:900;white-space:nowrap}.pill.outline{background:#13264d}.tiles{max-width:980px;margin:13px auto 6px;display:flex;justify-content:center;gap:clamp(2px,.5vw,6px);min-height:57px}.tile{flex:0 1 51px;min-width:0;height:53px;display:grid;place-items:center;background:#142c53c9;border-bottom:4px solid #c8ddff;color:#d6dffc;font-size:clamp(17px,2.6vw,31px);font-weight:950;line-height:1;box-shadow:inset 0 1px #a9ceff4d;transition:transform .15s,background .15s}.tile.fixed{background:#12294a50;border-bottom-color:#55709d;color:#8a9dc2}.tile.filled{background:#2f61de;color:#fff;border-bottom-color:#99efff;animation:in .18s ease-out}.tile.current{box-shadow:0 0 0 2px #88e4ff,0 0 22px #46caff80;background:#225cc7}.tile.bad{animation:shake .2s}.explain{min-height:20px;margin:5px auto 9px;text-align:center;font-weight:700;font-size:11px;color:#a9c2e2}.keyboard{display:grid;gap:5px;max-width:570px;margin:auto}.kb-row{display:flex;justify-content:center;gap:5px}.key{height:35px;flex:1;max-width:51px;border:1px solid #4568a8;border-bottom:3px solid #102451;color:#edf7ff;background:#172f5b;font-weight:900;border-radius:3px;font-size:15px;box-shadow:inset 0 1px #8eb9ff3f}.key:hover,.key:active{background:#376bda;transform:translateY(1px)}.bottomMeta{max-width:940px;margin:9px auto 0;display:flex;justify-content:space-between;align-items:center;gap:10px;color:#94add0;font-size:10px;font-weight:800}.bottomMeta button{font-size:10px;letter-spacing:.05em;color:#b2ddff;border:0;background:none;font-weight:900;padding:2px}.toast{position:absolute;z-index:9;top:40%;left:50%;transform:translate(-50%,-30%);font-size:34px;color:#cbfbff;font-weight:1000;font-style:italic;text-shadow:4px 4px 0 #2859d9,0 8px 17px #0009;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}.toast.show{transform:translate(-50%,-50%);opacity:1}.overlay{position:absolute;inset:0;z-index:15;display:grid;place-items:center;background:#050a1bb3;backdrop-filter:blur(9px);padding:18px}.overlay.hide{display:none}.modal{width:min(540px,100%);max-height:calc(100dvh - 36px);overflow-y:auto;border:1px solid #729be2aa;box-shadow:0 22px 70px #000a,7px 8px 0 #1a4dd5;background:linear-gradient(140deg,#142651f7,#09142cf7);padding:29px}.pre{color:#65e7ff;letter-spacing:.25em;font-size:11px;font-weight:950}.modal h1{font-size:clamp(38px,7vw,65px);line-height:1.02;letter-spacing:-.07em;margin:16px 0 10px;font-weight:1000}.modal h1 i{font-style:normal;color:#70e8ff}.modal h2{font-size:29px;font-weight:950;margin:14px 0}.modal p{font-size:13px;line-height:1.75;color:#b7c9e7}.route{display:flex;gap:10px;align-items:center;margin:17px 0;padding:12px 0;border-block:1px solid #546eaa66;color:white;font-size:12px;font-weight:850}.route .line{height:1px;border-top:2px dotted #6187c4;flex:1}.route small{color:#91a6c9;font-weight:800}.modes{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}.mode{background:#112349;border:1px solid #3f65a1;color:#cadcf4;padding:12px;text-align:left;min-height:74px}.mode.selected{border:2px solid #70dcff;background:#214779}.mode b{display:block;color:#f5faff;font-size:14px}.mode small{display:block;margin-top:5px;color:#99b4df;font-size:11px;line-height:1.4}.go{width:100%;padding:14px;background:#f7fbff;border:0;color:#0e2a68;box-shadow:4px 5px 0 #2e66ec;font-weight:1000;font-size:17px;letter-spacing:.05em}.micro{margin-bottom:0!important;font-size:11px!important;color:#7e97bd!important;text-align:center}.endStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.endStats div{background:#122754;border:1px solid #5074ad;padding:11px 6px;text-align:center}.endStats strong{display:block;font-size:24px}.endStats small{color:#a4c0e2;font-size:10px}.wronglist{color:#bbd9ec;background:#0c1c3e;padding:10px 14px;font-size:12px;max-height:106px;overflow-y:auto;margin:13px 0;line-height:1.65}.error{position:absolute;z-index:30;inset:0;display:none;align-items:center;justify-content:center;padding:30px;background:#071227;color:#fff;text-align:center;font-size:15px;line-height:1.8}.error.show{display:flex}#loading{position:absolute;z-index:17;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;font-size:11px;font-weight:900;letter-spacing:.2em;color:#74daff}#loading.hide{display:none}@keyframes in{from{transform:scale(1.08) translateY(-4px)}}@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 @media(min-width:950px){.keyboard{display:none}.lower{padding-bottom:27px}.tiles{margin-top:22px}.explain{font-size:12px}.bottomMeta{margin-top:16px}}
@@ -14,16 +14,23 @@
 @media(max-width:680px){.speedHud{right:15px;top:160px}.speedHud strong{font-size:18px}.speedHud small{font-size:8px}#speedFx{opacity:.3} }
 @media(prefers-reduced-motion:reduce){#speedFx{display:none}.tile.current{animation:none}}
 
+/* V2.2: feedback begins on the same pointer/keyboard input; no delayed CSS fade-in. */
+#impact{transition:opacity .14s ease-out}#impact.hit{transition:none;opacity:.65}
+#impact.miss{transition:none;opacity:.7;background:radial-gradient(ellipse at 50% 69%,transparent 25%,rgba(255,92,104,.35) 100%)}
+.key.synced-good{background:#307eba;border-color:#7ae8ff;box-shadow:0 0 14px #68dafa80}
+.key.synced-bad{background:#a34158;border-color:#ffc0cd}
+.meaning.synced-good{background:#d5f9ff}.meaning.synced-bad{background:#ffdddf}
+@media(prefers-reduced-motion:reduce){#impact{display:none}.key{transition:none}}
 /* V2.1 low-overhead quality/FPS controls */
 .perf-toggle{display:block;min-width:100px;text-align:right;margin:7px 0 0 auto;border:1px solid rgba(155,204,250,.25);border-radius:7px;padding:5px 7px;background:rgba(5,16,35,.52);color:#b5cde6;font-size:9px;font-weight:700;letter-spacing:.05em;backdrop-filter:none}
 .perf-toggle:active{background:rgba(40,82,129,.75)}
 @media(max-width:680px){.perf-toggle{font-size:8px;padding:4px 6px;min-width:85px}}
 </style></head><body><div id="app"><canvas id="gl"></canvas><canvas id="rainCanvas"></canvas><div id="speedFx"></div><div id="vignette"></div><div id="impact"></div><div id="loading">BUILDING TOKYO 3D...</div>
-<div class="topbar"><div class="heading"><small>TOKYO AFTER RAIN / 東京都</small><b>WORD<span>RIDE</span> <sup style="font-size:11px;vertical-align:top;color:#b6d8fa">V2.1</sup></b></div><div class="stats"><div class="stat"><label>骑行距离 · GAP</label><strong id="distance">0<small>m</small></strong></div><div class="stat progress-stat"><label>章节 · CHAPTER 01</label><strong><span id="completed">0</span><small>/ 12</small></strong><div class="meter"><i id="bar"></i></div></div><div class="stat"><label>准确率</label><strong id="accuracy">100<small>%</small></strong></div><button class="pause" id="pause">Ⅱ</button></div></div>
+<div class="topbar"><div class="heading"><small>TOKYO AFTER RAIN / 東京都</small><b>WORD<span>RIDE</span> <sup style="font-size:11px;vertical-align:top;color:#b6d8fa">V2.2</sup></b></div><div class="stats"><div class="stat"><label>骑行距离 · GAP</label><strong id="distance">0<small>m</small></strong></div><div class="stat progress-stat"><label>章节 · CHAPTER 01</label><strong><span id="completed">0</span><small>/ 12</small></strong><div class="meter"><i id="bar"></i></div></div><div class="stat"><label>准确率</label><strong id="accuracy">100<small>%</small></strong></div><button class="pause" id="pause">Ⅱ</button></div></div>
 <div class="rightHUD" id="comboHUD"><strong id="combo">0</strong><small>COMBO / FLOW</small></div><div class="speedHud"><strong id="speed">0</strong><small>KM/H</small><button class="perf-toggle" id="qualityToggle" title="切换画质：自动 / 流畅 / 高清">AUTO · FPS --</button></div><div class="phase">NIGHT RIDE · 23:45<b>東京 / SHIBUYA LOOP</b></div>
-<div class="lower"><div class="prompt"><div class="phrase"><div class="meaning" id="meaning">探索；探究</div><div class="pos" id="pos">v.</div></div><div class="prompts"><button class="pill" id="speak">♫ READ</button><button class="pill outline" id="hint">✧ 提示</button></div></div><div class="tiles" id="tiles"></div><div class="explain" id="explain">点击键盘或使用实体键盘输入字母</div><div class="keyboard" id="keyboard"></div><div class="bottomMeta"><span>街景：TOKYO V2 · 空格暂停 · 连击加速</span><div><button id="rainBtn">☂ 雨天 / ON</button><button id="soundBtn">♪ 声音 / ON</button></div></div></div>
+<div class="lower"><div class="prompt"><div class="phrase"><div class="meaning" id="meaning">探索；探究</div><div class="pos" id="pos">v.</div></div><div class="prompts"><button class="pill" id="speak">♫ READ</button><button class="pill outline" id="hint">✧ 提示</button></div></div><div class="tiles" id="tiles"></div><div class="explain" id="explain">点击键盘或使用实体键盘输入字母</div><div class="keyboard" id="keyboard"></div><div class="bottomMeta"><span>街景：TOKYO V2.2 · 空格暂停 · 连击加速</span><div><button id="rainBtn">☂ 雨天 / ON</button><button id="soundBtn">♪ 声音 / ON</button></div></div></div>
 <div class="toast" id="toast">NICE RIDE!</div>
-<div class="overlay" id="startOverlay"><section class="modal"><div class="pre">TOKYO MIDNIGHT / ENGLISH QUEST</div><h1>边骑行，<br/><i>边记单词。</i></h1><p>穿过立体东京街道，用正确的字母为骑行充能。今晚的路线是 12 个单词，一路向前。</p><div class="route"><span>渋谷 · SHIBUYA</span><span class="line"></span><small>12 WORDS</small><span class="line"></span><span>新宿 · SHINJUKU</span></div><div class="modes"><button class="mode selected" data-mode="casual"><b>◈ 补全单词</b><small>部分字母已给出 · 适合新词学习</small></button><button class="mode" data-mode="hard"><b>◇ 完整默写</b><small>只有中文提示 · 更适合复习</small></button></div><button class="go" id="start">开始夜骑　→</button><p class="micro">V2 · 立体东京雨夜街景 · 36 个试玩词 · 支持手机</p></section></div>
+<div class="overlay" id="startOverlay"><section class="modal"><div class="pre">TOKYO MIDNIGHT / ENGLISH QUEST</div><h1>边骑行，<br/><i>边记单词。</i></h1><p>穿过立体东京街道，用正确的字母为骑行充能。今晚的路线是 12 个单词，一路向前。</p><div class="route"><span>渋谷 · SHIBUYA</span><span class="line"></span><small>12 WORDS</small><span class="line"></span><span>新宿 · SHINJUKU</span></div><div class="modes"><button class="mode selected" data-mode="casual"><b>◈ 补全单词</b><small>部分字母已给出 · 适合新词学习</small></button><button class="mode" data-mode="hard"><b>◇ 完整默写</b><small>只有中文提示 · 更适合复习</small></button></div><button class="go" id="start">开始夜骑　→</button><p class="micro">V2.2 · 九种街景主题 · 正向骑行 · 同步输入反馈</p></section></div>
 <div class="overlay hide" id="endOverlay"><section class="modal"><div class="pre">ROUTE FINISHED / 旅程完成</div><h2 id="endTitle">今晚骑得不错。</h2><p>你的街景之旅已经完成，这些词需要下次再巩固。</p><div class="endStats"><div><strong id="endWords">12</strong><small>完成词数</small></div><div><strong id="endAcc">100%</strong><small>准确率</small></div><div><strong id="endDist">0m</strong><small>骑行距离</small></div></div><div class="wronglist" id="wronglist">没有错题</div><button class="go" id="restart">再骑一程　→</button></section></div>
 <div class="error" id="error"><div><b>3D 场景加载失败</b><p>请使用支持 WebGL 的最新版 Safari、Chrome 或 Edge 打开。<br/>如果启用了省电或限制图形加速的设置，请关闭后重新尝试。</p></div></div></div>
 <script>
@@ -37,17 +44,30 @@ function sampleWords(){return DATA.map((x,i)=>({en:x[0],zh:x[1],pos:x[2],i})).so
 function show(){const w=state.words[state.index];if(!w){finish();return}state.filled=Array(w.en.length).fill(false);state.fixed=Array(w.en.length).fill(false);state.gaps=[];let n=w.en.length;for(let i=0;i<n;i++){let fixed=state.mode==='casual'&&(i===0||(i===n-1&&n>7)||((i===3||i===4)&&n>9));state.fixed[i]=fixed;state.filled[i]=fixed;if(!fixed)state.gaps.push(i)}state.cursor=0;$('#meaning').textContent=w.zh;$('#pos').textContent=w.pos;$('#explain').textContent='输入正确字母，继续前进';renderTiles()}
 function renderTiles(){let w=state.words[state.index];if(!w)return;const where=state.gaps[state.cursor];$('#tiles').innerHTML=w.en.split('').map((ch,i)=>`<div class="tile ${state.fixed[i]?'fixed':state.filled[i]?'filled':''} ${where===i?'current':''}">${state.filled[i]?ch:'·'}</div>`).join('')}
 function hud(){const t=state.correct+state.wrong;$('#distance').innerHTML=Math.floor(state.distance)+'<small>m</small>';$('#completed').textContent=state.completed;$('#bar').style.width=(state.completed/12*100)+'%';$('#accuracy').innerHTML=(t?Math.round(state.correct/t*100):100)+'<small>%</small>';$('#combo').textContent=state.combo}
-function flashImpact(){const el=$('#impact');el.classList.add('hit');const n=++hitToken;setTimeout(()=>{if(n===hitToken)el.classList.remove('hit')},105)}
+function inputFeedback(kind,letter){
+ // Identical originating event for video, sound and best-effort vibration.
+ const good=kind==='good',n=++hitToken,el=$('#impact');
+ el.classList.remove('hit','miss');el.classList.add(good?'hit':'miss');
+ const target=$(`.key[data-k="${letter.toLowerCase()}"]`),meaning=$('#meaning');
+ const cls=good?'synced-good':'synced-bad';
+ if(target)target.classList.add(cls);meaning.classList.add(cls);
+ // iOS Safari does not support the Vibration API; never claim phone haptics there.
+ if(navigator.vibrate){try{navigator.vibrate(good?9:[14,22,20])}catch(_){}}
+ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+   meaning.animate([{transform:'scale(1)'},{transform:good?'scale(1.035)':'translateX(-3px)'},{transform:'scale(1)'}],{duration:130,easing:'ease-out'});
+ }
+ setTimeout(()=>{if(n===hitToken)el.classList.remove('hit','miss');if(target)target.classList.remove(cls);meaning.classList.remove(cls)},110);
+}
 function toast(str){const el=$('#toast');el.textContent=str;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),700)}
 function tone(freq=490,dur=.09){if(!state.sound)return;try{const ac=window.__AC||(window.__AC=new (window.AudioContext||window.webkitAudioContext)());let osc=ac.createOscillator(),g=ac.createGain();osc.type='triangle';osc.frequency.value=freq;g.gain.setValueAtTime(.045,ac.currentTime);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+dur);osc.connect(g);g.connect(ac.destination);osc.start();osc.stop(ac.currentTime+dur)}catch(e){}}
-function key(k){if(!state.running||state.paused||state.done||state.pending||!(/^[a-z]$/i.test(k)))return;const w=state.words[state.index],idx=state.gaps[state.cursor];if(idx==null)return;if(k.toLowerCase()===w.en[idx]){state.filled[idx]=true;state.cursor++;state.combo++;state.correct++;state.speed=Math.min(20,8.5+state.combo*.34);impact=Math.min(1.4,impact+.36);pedalKick=Math.min(.9,pedalKick+.21);flashImpact();state.distance+=1.5;state.energy=Math.min(100,state.energy+1);tone(530+Math.min(250,state.combo*20),.05);if(state.cursor===state.gaps.length){state.pending=true;state.completed++;state.distance+=15+state.combo*2;toast(state.combo>8?'PERFECT FLOW!':'NICE RIDE!');tone(770,.18);$('#explain').textContent=`✓ ${w.en} · ${w.zh}`;hud();renderTiles();setTimeout(()=>{if(state.done)return;state.index++;state.pending=false;show();hud()},680)}else{renderTiles();hud()}}else{state.wrong++;state.combo=0;state.speed=4.2;stumble=1;state.energy=Math.max(0,state.energy-8);state.wrongSet.add(w.en);tone(180,.12);$('#explain').textContent='拼写有误，再试一次';const el=$('#tiles').children[idx];if(el){el.classList.add('bad');setTimeout(()=>el.classList.remove('bad'),220)}hud()}}
+function key(k){if(!state.running||state.paused||state.done||state.pending||!(/^[a-z]$/i.test(k)))return;const w=state.words[state.index],idx=state.gaps[state.cursor];if(idx==null)return;if(k.toLowerCase()===w.en[idx]){state.filled[idx]=true;state.cursor++;state.combo++;state.correct++;state.speed=Math.min(20,8.5+state.combo*.34);impact=Math.min(1.4,impact+.36);pedalKick=Math.min(.9,pedalKick+.21);inputFeedback('good',k);state.distance+=1.5;state.energy=Math.min(100,state.energy+1);tone(530+Math.min(250,state.combo*20),.05);if(state.cursor===state.gaps.length){state.pending=true;state.completed++;state.distance+=15+state.combo*2;toast(state.combo>8?'PERFECT FLOW!':'NICE RIDE!');tone(770,.18);$('#explain').textContent=`✓ ${w.en} · ${w.zh}`;hud();renderTiles();setTimeout(()=>{if(state.done)return;state.index++;state.pending=false;show();hud()},680)}else{renderTiles();hud()}}else{state.wrong++;state.combo=0;state.speed=4.2;stumble=1;state.energy=Math.max(0,state.energy-8);state.wrongSet.add(w.en);inputFeedback('bad',k);tone(180,.12);$('#explain').textContent='拼写有误，再试一次';const el=$('#tiles').children[idx];if(el){el.classList.add('bad');setTimeout(()=>el.classList.remove('bad'),220)}hud()}}
 function finish(){state.done=true;state.running=false;$('#endWords').textContent=state.completed;$('#endAcc').textContent=state.correct+state.wrong?Math.round(100*state.correct/(state.correct+state.wrong))+'%':'100%';$('#endDist').textContent=Math.floor(state.distance)+'m';$('#endTitle').textContent=state.wrongSet.size?'旅程结束，继续练习。':'完美完成今晚的夜骑。';$('#wronglist').textContent=state.wrongSet.size?'复习单词：'+[...state.wrongSet].join(' · '):'全程无错题，表现出色。';$('#endOverlay').classList.remove('hide')}
 function begin(){Object.assign(state,{running:true,paused:false,done:false,words:sampleWords(),index:0,completed:0,correct:0,wrong:0,combo:0,distance:0,energy:100,pending:false,speed:8.5,wrongSet:new Set()});$('#startOverlay').classList.add('hide');$('#endOverlay').classList.add('hide');$('#pause').textContent='Ⅱ';show();hud();tone(690,.17)}
 function speak(){let w=state.words[state.index];if(!w||!('speechSynthesis'in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(w.en);u.lang='en-US';u.rate=.83;speechSynthesis.speak(u)}catch(e){}}
 function hint(){if(!state.running||state.paused||state.pending)return;const w=state.words[state.index],idx=state.gaps[state.cursor];if(idx==null)return;state.wrongSet.add(w.en);state.combo=0;state.filled[idx]=true;state.cursor++;state.energy=Math.max(0,state.energy-5);state.wrong++;if(state.cursor>=state.gaps.length){state.pending=true;state.completed++;state.distance+=8;$('#explain').textContent='已使用提示完成：'+w.en;toast('KEEP GOING!');hud();renderTiles();setTimeout(()=>{state.index++;state.pending=false;show();hud()},750)}else{renderTiles();hud();$('#explain').textContent='已提示一个字母 · 计入复习列表'}}
 function pause(){if(!state.running)return;state.paused=!state.paused;$('#pause').textContent=state.paused?'▶':'Ⅱ';toast(state.paused?'PAUSED':'LET’S RIDE!')}
 $$('.mode').forEach(b=>b.addEventListener('click',()=>{$$('.mode').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.mode=b.dataset.mode}));$('#start').onclick=begin;$('#restart').onclick=begin;$('#pause').onclick=pause;$('#speak').onclick=speak;$('#hint').onclick=hint;$('#rainBtn').onclick=()=>{state.rain=!state.rain;$('#rainBtn').textContent=state.rain?'☂ 雨天 / ON':'☀ 晴夜 / OFF'};$('#soundBtn').onclick=()=>{state.sound=!state.sound;$('#soundBtn').textContent=state.sound?'♪ 声音 / ON':'♪ 声音 / OFF'};
-$('#keyboard').innerHTML=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'].map(row=>`<div class="kb-row">${[...row].map(c=>`<button class="key" data-k="${c.toLowerCase()}">${c}</button>`).join('')}</div>`).join('');$$('.key').forEach(b=>b.onclick=()=>key(b.dataset.k));window.addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();pause()}else if(e.key==='Tab'&&state.running){e.preventDefault();speak()}else if(e.key.length===1&&/[a-z]/i.test(e.key)){key(e.key)}});
+$('#keyboard').innerHTML=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'].map(row=>`<div class="kb-row">${[...row].map(c=>`<button class="key" data-k="${c.toLowerCase()}">${c}</button>`).join('')}</div>`).join('');$$('.key').forEach(b=>b.onclick=()=>key(b.dataset.k));window.addEventListener('keydown',e=>{if(e.repeat&&e.key.length===1)return;if(e.key===' '){e.preventDefault();pause()}else if(e.key==='Tab'&&state.running){e.preventDefault();speak()}else if(e.key.length===1&&/[a-z]/i.test(e.key)){key(e.key)}});
 // ------------------- self-contained genuine WebGL 3D engine -------------------
 const canvas=$('#gl');let gl;try{gl=canvas.getContext('webgl2',{alpha:false,antialias:innerWidth>720,powerPreference:'high-performance'});if(!gl)throw Error('WebGL2 unsupported')}catch(e){$('#error').classList.add('show');$('#loading').classList.add('hide');return}
 const vs=`#version 300 es
@@ -104,17 +124,49 @@ for(let j=0;j<10;j++){const gg=V(),z0=-j*laneLen;for(let q=0;q<5;q++){let z=z0+1
  for(let side of [-1,1]){const seed=j*40+q*7+side, x=side*(1.3+rnd(seed,3)*3.8);box(gg,x,.012,z+rnd(seed,6)*1.1,.07+rnd(seed,7)*.17,.008,1.0+rnd(seed,5)*2.4,seed%3===0?'#926960':seed%2?'#447790':'#887e6f',.13);}
 }laneSegments.push(gpu(gg))}
 const tileLen=26,tileMeshes=[],tileTex=[],tileDots=[];
-const colors=['#384760','#3c3b57','#374c59','#4b3d56','#38445b','#45485e','#3a5063','#384252'];
+const DISTRICT_NAMES=['商店街','老街小巷','车站前','住宅区','霓虹十字路','公园沿街','河岸路口','便利店街','深夜食堂'];
+const districtPalettes=[
+ ['#3f4f70','#46556e','#4c4e67','#3e5964'], // shopping street
+ ['#62534e','#47515c','#675a58','#43505a'], // old neighbourhood
+ ['#3f5664','#3a4a67','#405d6b','#4f5366'], // station
+ ['#566067','#505463','#59576a','#3e5662'], // apartments
+ ['#363d69','#47416c','#384b69','#514169'], // neon junction
+ ['#485953','#52615b','#475d67','#4e575c'], // pocket park
+ ['#365767','#485569','#416370','#3a5662'], // waterside
+ ['#405770','#334e69','#46556b','#465e68'], // convenience stores
+ ['#665252','#5b4d5d','#604e4f','#3e5866']  // late-night eateries
+];
 for(let t=0;t<9;t++){let g=V(),tt=V(),dg=V();const Z=-t*tileLen;for(let side of [-1,1])for(let j=0;j<4;j++){
-  const k=t*11+j*3+(side+1),px=side*(10.4+(.5-rnd(k,1))*.7),pz=Z+10-j*6.4,ww=3.7+rnd(k,2)*2.7,dep=5.1+rnd(k,3)*1.5,h=7+rnd(k,4)*13,baseCol=colors[Math.floor(rnd(k,5)*colors.length)];
+  const k=t*11+j*3+(side+1),px=side*(10.4+(.5-rnd(k,1))*.7),pz=Z+10-j*6.4;
+  const district=t%DISTRICT_NAMES.length,kind=(j+3*t+(side+1)*2)%5;
+  const ww=3.7+rnd(k,2)*2.7,dep=5.1+rnd(k,3)*1.5;
+  const h=(kind===3?6.4:kind===1?11:7)+rnd(k,4)*(kind===3?4:13);
+  const palette=districtPalettes[district],baseCol=palette[Math.floor(rnd(k,5)*palette.length)];
   box(g,px,h/2-.1,pz,ww,h,dep,baseCol);box(g,px,h+.17,pz,ww+.25,.36,dep+.15,'#27344d');
+  // Individual rooflines and shop silhouettes, not only a change of facade colour.
+  if(kind===0){ // modern corner store: tall glass strips and metal vertical fins
+    for(let n=0;n<3;n++)box(g,px-side*(ww*.48+.04),h*.60,pz-dep*.31+n*dep*.31,.14,h*.54,.095,'#8aa6ad');
+    box(g,px,h+.72,pz,ww*.62,.88,dep*.6,'#253c4b');
+  }else if(kind===1){ // apartments with parapet and open terraces
+    box(g,px,h+.50,pz,ww+.16,.68,dep+.20,'#455765');
+    for(let q=0;q<2;q++)box(g,px+side*ww*.27,4.3+q*3.3,pz+dep*.34,.66,.13,dep*.26,'#7d8e9a');
+  }else if(kind===2){ // slim sign tower
+    box(g,px,h+1.15,pz-dep*.22,ww*.31,2.1,.16,'#2f5070');
+    box(g,px,h+1.15,pz-dep*.32,ww*.25,1.82,.1,district===4?'#d16bae':'#63b4bb',.75);
+  }else if(kind===3){ // traditional low roof / noren facade
+    box(g,px,h+.24,pz,ww+.65,.48,dep+.54,'#304653');
+    for(let q=0;q<4;q++)box(g,px-side*(ww*.49+.22),1.55,pz-dep*.36+q*dep*.24,.05,.76,dep*.18,q%2?'#c0a0a0':'#dfd3b8');
+  }else{ // office rooftop AC grid and layered glass wall
+    for(let q=0;q<3;q++)box(g,px-side*(ww*.49+.06),3.4+q*3.7,pz,.09,1.32,dep*.82,'#728eae',.08);
+    box(g,px,h+.65,pz,ww*.48,.8,dep*.38,'#304554');
+  }
   const frontX=px-side*(ww/2+.04);const frontZ=pz+(dep/2+.055);
   // glass windows and decorative ledges
   for(let row=1;row<Math.floor(h/2.2);row++)for(let col=0;col<3;col++){const wz=pz-dep*.31+col*(dep*.31),wy=1.7+row*2.05,on=rnd(k*13+row*9+col,6)>.3;box(g,frontX,wy,wz,.08,1.08,1.18,on?'#e8bb7a':'#263957',on?.49:0);box(g,frontX-side*.015,wy+0.64,wz,.13,.12,1.4,'#172741');box(g,frontX,wy-.61,wz,.13,.08,1.39,'#566178')}
   // front shop windows facing street
   box(g,frontX,.67,pz,.12,1.2,dep*.7,'#65b4c4',.65);box(g,frontX,.7,pz-dep*.24,.22,1.5,.15,'#17283c');box(g,frontX,.7,pz+dep*.24,.22,1.5,.15,'#17283c');box(g,frontX,1.54,pz,.35,.3,dep*.82,'#29334a');
   // painted arcade shop awning
-  box(g,frontX-side*.55,2.7,pz,1.25,.14,dep*.89,j%2?'#415fa8':'#b15e5a');for(let v=0;v<5;v++)box(g,frontX-side*1.03,2.55,pz-dep*.39+v*dep*.19,.08,.24,.3,j%2?'#ddd9d3':'#f0c9a8');
+  box(g,frontX-side*.55,2.7,pz,1.25,.14,dep*.89,['#4c668b','#94675a','#507b88','#586c79','#855b92','#597a66','#4b8292','#4476a1','#aa6e60'][district]);for(let v=0;v<5;v++)box(g,frontX-side*1.03,2.55,pz-dep*.39+v*dep*.19,.08,.24,.3,j%2?'#ddd9d3':'#f0c9a8');
   // sign facing the road: the actual geometry has texture atlas
   sign(tt,frontX-side*.12,3.4,pz,2.2,1.15,((t*4+j+Math.max(side,0))%12),'side');
   // shop side window signs visible from camera along z
@@ -166,6 +218,49 @@ for(let t=0;t<9;t++){let g=V(),tt=V(),dg=V();const Z=-t*tileLen;for(let side of 
       polyline(g,[-8.55+17.1*a,8.2-.52*Math.sin(a*Math.PI),zz+.4],[-8.55+17.1*b,8.2-.52*Math.sin(b*Math.PI),zz+.4],.012,'#344758',4);
     }
   }
+  // Each stretch has one recognizable landmark and spatial rhythm.
+  // All fixtures are merged into the existing block mesh; no new draw calls.
+  if(t===0){ // shopping street with layered lantern gateway and neon vending alcove
+    const z=Z+4,x=7.5;
+    for(let v=0;v<5;v++){const vz=z-v*1.6;box(g,x,.9,vz,.63,1.72,1.05,v%2?'#d45c6b':'#3886b2');box(g,x-.38,1.22,vz,.06,.76,.8,'#f7f1d4',.83);box(g,x-.38,.44,vz,.09,.16,.74,'#a8ccd9');}
+    for(let side of [-1,1]){let bx=side*8.2;polyline(g,[bx,.2,Z-4],[bx,5.3,Z-4],.19,'#ad5c4c',7);}
+    box(g,0,5.27,Z-4,17.0,.39,.40,'#c86a4b');box(g,0,4.85,Z-4,17.6,.14,.48,'#e1a46d');
+  }else if(t===1){ // old lane: small shrine torii and stone lanterns
+    let x=-8.6,z=Z+5;
+    for(let sx of [-1,1]){box(g,x+sx*1.05,1.7,z,.24,3.4,.24,'#a64b43');box(g,x+sx*1.45,.65,z,.35,1.3,.38,'#7a756d')}
+    box(g,x,3.42,z,3.3,.3,.45,'#d16b4d');box(g,x,3.11,z,2.8,.18,.3,'#743e41');
+    for(let v of [-1,1]){const lx=x+v*2.3;box(g,lx,.60,z,.55,1.12,.52,'#7a807b');box(g,lx,1.28,z,.68,.16,.6,'#a6a99d');box(g,lx,1.5,z,.37,.35,.40,'#ebc591',.5);}
+  }else if(t===2){ // station bus stop with waiting bench / glass canopy
+    let x=7.1,z=Z+3;
+    for(let q of [-1,1]){polyline(g,[x,.2,z+q*2.5],[x,3.0,z+q*2.5],.065,'#a9bfcd');}
+    box(g,x,3.12,z,2.5,.17,6.1,'#456378');box(g,x-1,1.7,z,.11,2.3,4.7,'#73a8b7',.23);
+    box(g,x-.2,.78,z,.62,.12,2.9,'#adb9b9');for(let q of [-1,1])box(g,x-.2,.41,z+q*1.1,.11,.65,.12,'#506475');
+    box(g,x+1.25,2.1,z+1.8,.15,2.1,.8,'#d2e8f2',.65);
+  }else if(t===3){ // compact residential courtyard / planters
+    for(let v=0;v<5;v++){let z=Z+9-v*3.9,x=-7.2-(v%2)*.42;
+      box(g,x,.25,z,1.25,.5,1.25,'#6f7779');blob(g,x,1.0,z,1.0,.96,1.0,v%2?'#42786c':'#346f60',v*7);}
+    for(let v=0;v<5;v++)polyline(g,[7.25,.7,Z+8-v*4],[7.25,.7,Z+6-v*4],.047,'#c1ccd1',5);
+  }else if(t===4){ // neon crossroad: tall vertical signs and taxi at curb
+    for(let v=0;v<3;v++){const x=7.9,z=Z+7-v*6;box(g,x,5.1,z,.20,5,1.1,['#b368cc','#e8a16d','#5abfc3'][v],.9);box(g,x,2.38,z,1.5,.15,.75,'#435d6e');}
+    let tx=4.8,tz=Z-2;box(g,tx,.52,tz,1.8,.78,3.5,'#448c9d');box(g,tx,1.10,tz-.15,1.57,.57,1.82,'#425b6e');
+    for(let w of [-1,1])for(let side of [-1,1])box(g,tx+side*.92,.4,tz+w*1.18,.24,.72,.5,'#131e2b');
+    box(g,tx,.56,tz+1.77,1.22,.17,.10,'#f0a3a5',.8);
+  }else if(t===5){ // small neighbourhood park / pocket plaza
+    let x=-7.6,z=Z+2;for(let a=0;a<4;a++){let zz=z+(a-1.5)*3.4;box(g,x,.25,zz,2.1,.48,1.5,'#555d64');blob(g,x,1.65,zz,1.25,1.2,1.20,a%2?'#2f735e':'#336f67',a);}
+    for(let v=0;v<8;v++){let zz=Z+11-v*2.8;polyline(g,[-6.4,.3,zz],[-6.4,1.2,zz],.055,'#8997a0');}
+  }else if(t===6){ // water-side blue bridge railings and utility lights
+    for(let v=0;v<9;v++){const z=Z+11-v*2.7;box(g,7.15,.79,z,.16,1.5,.18,'#8cacbd');box(g,7.15,1.41,z,.24,.09,2.6,'#a4c5d3');}
+    for(let v=0;v<3;v++){let z=Z+8-v*7;box(g,8.15,.12,z,1.2,.20,4.3,'#426a81',.05)}
+  }else if(t===7){ // convenience store / bicycle rack
+    let x=-8.0,z=Z+5;box(g,x,2.6,z,2.4,.32,6.2,'#f0f5e8',.7);box(g,x,2.25,z,2.1,.24,6.25,'#3b9dca',.42);
+    for(let v=0;v<4;v++){const zz=Z+4-v*1.8;polyline(g,[-7.4,.35,zz],[-7.4,.86,zz],.062,'#a5bdc9');polyline(g,[-7.4,.86,zz],[-7.4,.86,zz-1.0],.062,'#a5bdc9');}
+  }else{ // late-night eateries with fabric curtains and street seats
+    let x=7.1,z=Z+4;for(let v=0;v<5;v++){
+      const zz=z-v*3.0;box(g,x,2.25,zz,.07,.84,1.1,v%2?'#a94f52':'#c28b59');
+      box(g,x-.55,.53,zz,.65,.12,.54,'#91766e');box(g,x-.56,.37,zz,.09,.38,.11,'#5b4e4a');
+      box(g,x-.1,2.83,zz,.36,.49,.35,'#eec78b',.76);
+    }
+  }
   tileMeshes.push(gpu(g));tileTex.push(gpuTex(tt));tileDots.push(gpuDots(dg))}
 // V2 hero model: detailed city bike + rider, isolated limb mesh for dynamic inverse-kinematics pedalling.
 const bikeG=V(),riderG=V(),wheelsG=V();const BX=-1.55,BZ=3.85;const CYAN='#67d7e9';
@@ -212,15 +307,27 @@ cube(bikeG,0,1.58,1.92,.21,.15,.08,'#f66f68',1.2);cube(bikeG,0,1.57,-1.85,.28,.2
 pipe(riderG,[-.23,2.52,.83],[.23,2.52,.83],.033,'#a9dae3',8,.16);
 const riderMesh=gpu(riderG),bikeMesh=gpu(bikeG),wheelMesh=gpu(wheelsG);
 const pedalMesh=gpuDynamic(2100);
-function updatePedals(time){const dyn=V();const phase=time*8.9;for(let side of [-1,1]){
- const a=phase+(side>0?0:Math.PI),foot=[side*.28,1.04+Math.cos(a)*.34,.06+Math.sin(a)*.35];
- const hip=[side*.23,1.96,.4],knee=[side*.26,1.52+.10*Math.sin(a),.14+.27*Math.sin(a+1.0)];
- pipe(dyn,hip,knee,.22,side>0?'#28466c':'#365c83',10);
- pipe(dyn,knee,foot,.146,'#405169',10);
- pipe(dyn,foot,[foot[0],foot[1]-.13,foot[2]-.23],.145,'#d6dce2',10);
- cube(dyn,foot[0],foot[1]-.13,foot[2]-.18,.29,.17,.39,'#e6e4db');
- pipe(dyn,[0,1.04,.06],[side*.27,1.04+Math.cos(a)*.34,.06+Math.sin(a)*.35],.055,'#9da9b0',8);
- cube(dyn,side*.34,foot[1]-.09,foot[2],.20,.06,.37,'#253645');
+// Bike faces -Z. At top-dead-centre a forward stroke MUST move into -Z.
+// The old +sin(a) moved the pedal towards the rear (+Z), which looked like reverse cycling.
+function pedalPose(phase,side){
+ const a=phase+(side>0?0:Math.PI),r=.35;
+ const foot=[side*.28,1.04+r*Math.cos(a),.06-r*Math.sin(a)];
+ const hip=[side*.23,2.02,.40];
+ const dy=foot[1]-hip[1],dz=foot[2]-hip[2];
+ const L1=.76,L2=.85,dist=Math.max(.01,Math.min(L1+L2-.0001,Math.hypot(dy,dz)));
+ const along=(L1*L1-L2*L2+dist*dist)/(2*dist);
+ const bend=Math.sqrt(Math.max(0,L1*L1-along*along));
+ const knee=[side*.26,hip[1]+dy*along/dist-dz*bend/dist,hip[2]+dz*along/dist+dy*bend/dist];
+ return {hip,knee,foot,phase:a};
+}
+function updatePedals(phase){const dyn=V();for(let side of [-1,1]){
+ const {hip,knee,foot}=pedalPose(phase,side);
+ pipe(dyn,hip,knee,.19,side>0?'#28466c':'#365c83',8);
+ pipe(dyn,knee,foot,.128,'#405169',8);
+ pipe(dyn,foot,[foot[0],foot[1]-.1,foot[2]-.21],.09,'#d6dce2',7);
+ cube(dyn,foot[0],foot[1]-.12,foot[2]-.13,.27,.15,.37,'#e6e4db');
+ pipe(dyn,[0,1.04,.06],foot,.047,'#9da9b0',7);
+ cube(dyn,side*.34,foot[1]-.08,foot[2],.20,.06,.34,'#253645');
  }updateDynamic(pedalMesh,dyn)}
 // Background skyline, plus poles and city horizon
 const backG=V();for(let i=0;i<33;i++){let x=(i-16)*4.8,z=-120-rnd(i,8)*28,h=15+rnd(i,4)*32;box(backG,x,h/2-1,z,3+rnd(i,1)*4,h,7,'#293850');for(let yy=4;yy<h-1;yy+=3)for(let xx=-1;xx<2;xx++){let on=rnd(i+xx*39+yy*7,2)>.45;if(on)box(backG,x+xx*.7,yy,z+3.52,.37,.55,.04,'#d9bc93',.27)}}const backMesh=gpu(backG);
@@ -263,10 +370,10 @@ function frame(ms){requestAnimationFrame(frame);if(document.hidden){last=ms;retu
  // Conserve GPU while the start screen is shown or the game is paused.
  if((!state.running||state.paused)&&ms-lastRender<31)return;
  lastRender=ms;monitorFPS(ms);let dt=Math.max(0,Math.min((ms-last)/1000,.065));last=ms;tim+=dt;
- if(!state.paused){anim+=dt;const pace=state.running?state.speed:3.7;realSpeed+=(pace-realSpeed)*(1-Math.exp(-dt*(stumble>0?8:2.1)));drive+=dt*realSpeed*1.55;wheelAngle-=dt*realSpeed*1.55/.67;pedalPhase+=dt*(4.8+realSpeed*.36);if(state.running&&!state.pending)state.distance+=dt*realSpeed*.65;impact=Math.max(0,impact-dt*1.7);stumble=Math.max(0,stumble-dt*2.1);pedalKick=Math.max(0,pedalKick-dt*1.35)}
+ if(!state.paused){anim+=dt;const pace=state.running?state.speed:3.7;realSpeed+=(pace-realSpeed)*(1-Math.exp(-dt*(stumble>0?8:2.1)));drive+=dt*realSpeed*1.55;wheelAngle-=dt*realSpeed*1.55/.67;pedalPhase+=dt*realSpeed*.87;if(state.running&&!state.pending)state.distance+=dt*realSpeed*.65;impact=Math.max(0,impact-dt*1.7);stumble=Math.max(0,stumble-dt*2.1);pedalKick=Math.max(0,pedalKick-dt*1.35)}
  const rapid=Math.max(0,Math.min(1,(realSpeed-5)/15));const portrait=w/h<.85;
  let sway=(state.running?.10:.035)*Math.sin(anim*1.85);camLean+=(sway-camLean)*Math.min(1,dt*2.8);camKick+=(impact*.38-stumble*.25-camKick)*Math.min(1,dt*5);
- let sh=rapid*(.035*Math.sin(anim*15)+.028*Math.sin(anim*22));
+ let sh=rapid*.012*Math.sin(anim*6);
  const eye=portrait?[2.8+camLean,7.0+camKick*.27,17.4-rapid*.6]:[8.8+camLean,6.0+camKick*.24+sh,15.9-rapid*.75];
  const target=portrait?[-2.1,1.55,-5.7]:[-1.05,1.85,-8.5];
  const view=mat4.look(eye,target),fov=(portrait?64:56)+rapid*6+impact*2;
@@ -277,10 +384,10 @@ function frame(ms){requestAnimationFrame(frame);if(document.hidden){last=ms;retu
  // All street elements and markings share the same movement, restoring parallax.
  for(let i=0;i<laneSegments.length;i++){const off=roadOffsets[i];off[2]=recycleOffset(drive,i,laneLen,laneSegments.length);const centre=off[2]-i*laneLen;if(centre>-210&&centre<48)draw(laneSegments[i],off)}
  for(let i=0;i<tileMeshes.length;i++){const off=blockOffsets[i];off[2]=recycleOffset(drive,i,tileLen,tileMeshes.length);const centre=off[2]-i*tileLen;blockVisible[i]=centre>-148&&centre<46;if(blockVisible[i])draw(tileMeshes[i],off)}
- const bikeBob=Math.sin(anim*16)*(.024+rapid*.016),lean=rapid*.012*Math.sin(anim*6);
+ const bikeBob=Math.sin(pedalPhase*2)*(.011+rapid*.009),lean=rapid*.01*Math.sin(pedalPhase);
  draw(bikeMesh,[0,bikeBob,0]);draw(riderMesh,[lean,bikeBob+Math.sin(anim*8)*.016,0]);
  draw(wheelMesh,[0,bikeBob,0],2,wheelAngle);
- if(!state.paused)updatePedals(pedalPhase/8.9);draw(pedalMesh,[0,bikeBob,0]);
+ if(!state.paused)updatePedals(pedalPhase);draw(pedalMesh,[0,bikeBob,0]);
  gl.useProgram(PT);gl.uniformMatrix4fv(uniformLoc(PT,'uProj'),false,proj);gl.uniformMatrix4fv(uniformLoc(PT,'uView'),false,view);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);gl.uniform1i(uniformLoc(PT,'uTex'),0);
  for(let i=0;i<tileMeshes.length;i++)if(blockVisible[i])drawTex(tileTex[i],blockOffsets[i]);
  gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.depthMask(false);gl.useProgram(PD);gl.uniformMatrix4fv(uniformLoc(PD,'uProj'),false,proj);gl.uniformMatrix4fv(uniformLoc(PD,'uView'),false,view);
@@ -291,6 +398,6 @@ function frame(ms){requestAnimationFrame(frame);if(document.hidden){last=ms;retu
  $('#speedFx').classList.toggle('active',rapid>.46&&state.running);
  hudClock+=dt;if(hudClock>.16){hudClock=0;hud();$('#speed').textContent=state.running?Math.round(realSpeed*2.85):Math.round(realSpeed*1.4)}
 }
-updatePedals(0);$('#loading').classList.add('hide');requestAnimationFrame(frame);document.addEventListener('visibilitychange',()=>{last=performance.now();fpsWindow=last;fpsFrames=0;lastRender=last});
+window.WORDRIDE_DIAGNOSTICS={pedalPose,sceneThemes:DISTRICT_NAMES.slice(),version:'2.2'};updatePedals(0);$('#loading').classList.add('hide');requestAnimationFrame(frame);document.addEventListener('visibilitychange',()=>{last=performance.now();fpsWindow=last;fpsFrames=0;lastRender=last});
 })();
 </script></body></html>
