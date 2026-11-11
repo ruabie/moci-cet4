@@ -1,0 +1,261 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#070b1a"><title>WORDRIDE 3D V2 · TOKYO AFTER RAIN</title>
+<style>
+:root{--blue:#295cfd;--sky:#6dedff;--white:#f8fbff;--dim:#99a8c7;--ink:#0b1127}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080d22;color:#fff;font-family:Inter,"SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}button{font:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}button:focus-visible{outline:2px solid #76eaff;outline-offset:3px}#app{width:100%;height:100%;height:100dvh;overflow:hidden;position:relative;isolation:isolate}#gl{position:absolute;inset:0;width:100%;height:100%;display:block}#vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 48%,transparent 22%,#0306178a 100%),linear-gradient(180deg,#03081977 0%,transparent 25%,transparent 65%,#030616c9 100%)}#rainCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.54}.topbar{position:absolute;inset:18px 22px auto;z-index:5;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;pointer-events:none}.topbar>*{pointer-events:auto}.heading{display:flex;flex-direction:column;gap:4px;text-shadow:0 3px 8px #0008}.heading b{font-weight:950;letter-spacing:-.06em;font-size:27px;line-height:1}.heading b span{color:#5ee5ff}.heading small{font-size:10px;color:#9bc2ff;letter-spacing:.22em;font-weight:850}.stats{display:flex;gap:6px}.stat{background:linear-gradient(155deg,#122352e8,#0b1537e8);border:1px solid #7296eb7b;box-shadow:0 5px 18px #02050d75;padding:7px 12px;min-width:87px;transform:skewX(-5deg);border-radius:2px 3px 7px 2px}.stat>*{display:block;transform:skewX(5deg)}.stat label{font-size:9px;color:#b2c4f8;letter-spacing:.08em;font-weight:800}.stat strong{font-size:23px;font-weight:950;letter-spacing:-.06em;line-height:1.14}.stat strong small{font-size:10px;color:#b9d4ff;margin-left:3px}.stat.progress-stat{min-width:144px}.meter{height:4px;background:#273a70;margin-top:4px;transform:skewX(5deg)}.meter i{display:block;background:#70eaff;width:0;height:100%}.pause{background:#f5f9ff;color:#173273;border:2px solid #447afc;font-weight:900;padding:9px 12px;box-shadow:3px 4px 0 #1c48b8;transform:skewX(-5deg)}.rightHUD{position:absolute;z-index:4;right:27px;top:118px;text-align:right;filter:drop-shadow(3px 5px 1px #142a65)}.rightHUD strong{font-size:70px;font-style:italic;font-weight:1000;line-height:1;letter-spacing:-.09em}.rightHUD small{display:block;background:#234dca;padding:3px 9px;transform:skewX(-10deg);font-size:11px;font-weight:950;letter-spacing:.15em}.phase{position:absolute;top:115px;left:22px;z-index:3;border-left:3px solid #6cddff;padding:4px 10px;color:#c6deff;font-size:11px;font-weight:800;text-shadow:0 2px 3px #000}.phase b{display:block;font-size:13px;color:white;margin-top:4px}.lower{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:64px max(22px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));background:linear-gradient(0deg,#07112bef 0%,#0b1b3be6 38%,#07152e00 100%)}.prompt{max-width:940px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.phrase{display:flex;gap:11px;align-items:center;flex-wrap:wrap}.meaning{background:#fff;color:#142859;padding:8px 14px;box-shadow:4px 4px 0 #2264fb;font-size:19px;font-weight:950;white-space:nowrap}.pos{font-size:12px;font-weight:850;background:#2957d9;padding:7px 9px;letter-spacing:.1em}.prompts{display:flex;gap:6px}.pill{background:#2358d9;color:#fff;border:1px solid #5785ff;box-shadow:2px 3px 0 #112c6c;padding:7px 10px;font-size:11px;font-weight:900;white-space:nowrap}.pill.outline{background:#13264d}.tiles{max-width:980px;margin:13px auto 6px;display:flex;justify-content:center;gap:clamp(2px,.5vw,6px);min-height:57px}.tile{flex:0 1 51px;min-width:0;height:53px;display:grid;place-items:center;background:#142c53c9;border-bottom:4px solid #c8ddff;color:#d6dffc;font-size:clamp(17px,2.6vw,31px);font-weight:950;line-height:1;box-shadow:inset 0 1px #a9ceff4d;transition:transform .15s,background .15s}.tile.fixed{background:#12294a50;border-bottom-color:#55709d;color:#8a9dc2}.tile.filled{background:#2f61de;color:#fff;border-bottom-color:#99efff;animation:in .18s ease-out}.tile.current{box-shadow:0 0 0 2px #88e4ff,0 0 22px #46caff80;background:#225cc7}.tile.bad{animation:shake .2s}.explain{min-height:20px;margin:5px auto 9px;text-align:center;font-weight:700;font-size:11px;color:#a9c2e2}.keyboard{display:grid;gap:5px;max-width:570px;margin:auto}.kb-row{display:flex;justify-content:center;gap:5px}.key{height:35px;flex:1;max-width:51px;border:1px solid #4568a8;border-bottom:3px solid #102451;color:#edf7ff;background:#172f5b;font-weight:900;border-radius:3px;font-size:15px;box-shadow:inset 0 1px #8eb9ff3f}.key:hover,.key:active{background:#376bda;transform:translateY(1px)}.bottomMeta{max-width:940px;margin:9px auto 0;display:flex;justify-content:space-between;align-items:center;gap:10px;color:#94add0;font-size:10px;font-weight:800}.bottomMeta button{font-size:10px;letter-spacing:.05em;color:#b2ddff;border:0;background:none;font-weight:900;padding:2px}.toast{position:absolute;z-index:9;top:40%;left:50%;transform:translate(-50%,-30%);font-size:34px;color:#cbfbff;font-weight:1000;font-style:italic;text-shadow:4px 4px 0 #2859d9,0 8px 17px #0009;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}.toast.show{transform:translate(-50%,-50%);opacity:1}.overlay{position:absolute;inset:0;z-index:15;display:grid;place-items:center;background:#050a1bb3;backdrop-filter:blur(9px);padding:18px}.overlay.hide{display:none}.modal{width:min(540px,100%);max-height:calc(100dvh - 36px);overflow-y:auto;border:1px solid #729be2aa;box-shadow:0 22px 70px #000a,7px 8px 0 #1a4dd5;background:linear-gradient(140deg,#142651f7,#09142cf7);padding:29px}.pre{color:#65e7ff;letter-spacing:.25em;font-size:11px;font-weight:950}.modal h1{font-size:clamp(38px,7vw,65px);line-height:1.02;letter-spacing:-.07em;margin:16px 0 10px;font-weight:1000}.modal h1 i{font-style:normal;color:#70e8ff}.modal h2{font-size:29px;font-weight:950;margin:14px 0}.modal p{font-size:13px;line-height:1.75;color:#b7c9e7}.route{display:flex;gap:10px;align-items:center;margin:17px 0;padding:12px 0;border-block:1px solid #546eaa66;color:white;font-size:12px;font-weight:850}.route .line{height:1px;border-top:2px dotted #6187c4;flex:1}.route small{color:#91a6c9;font-weight:800}.modes{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}.mode{background:#112349;border:1px solid #3f65a1;color:#cadcf4;padding:12px;text-align:left;min-height:74px}.mode.selected{border:2px solid #70dcff;background:#214779}.mode b{display:block;color:#f5faff;font-size:14px}.mode small{display:block;margin-top:5px;color:#99b4df;font-size:11px;line-height:1.4}.go{width:100%;padding:14px;background:#f7fbff;border:0;color:#0e2a68;box-shadow:4px 5px 0 #2e66ec;font-weight:1000;font-size:17px;letter-spacing:.05em}.micro{margin-bottom:0!important;font-size:11px!important;color:#7e97bd!important;text-align:center}.endStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.endStats div{background:#122754;border:1px solid #5074ad;padding:11px 6px;text-align:center}.endStats strong{display:block;font-size:24px}.endStats small{color:#a4c0e2;font-size:10px}.wronglist{color:#bbd9ec;background:#0c1c3e;padding:10px 14px;font-size:12px;max-height:106px;overflow-y:auto;margin:13px 0;line-height:1.65}.error{position:absolute;z-index:30;inset:0;display:none;align-items:center;justify-content:center;padding:30px;background:#071227;color:#fff;text-align:center;font-size:15px;line-height:1.8}.error.show{display:flex}#loading{position:absolute;z-index:17;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;font-size:11px;font-weight:900;letter-spacing:.2em;color:#74daff}#loading.hide{display:none}@keyframes in{from{transform:scale(1.08) translateY(-4px)}}@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media(min-width:950px){.keyboard{display:none}.lower{padding-bottom:27px}.tiles{margin-top:22px}.explain{font-size:12px}.bottomMeta{margin-top:16px}}
+@media(max-width:680px){.topbar{top:12px;left:12px;right:12px}.heading b{font-size:17px}.heading small{font-size:7px}.stat{min-width:54px;padding:6px 7px}.stat label{font-size:8px}.stat strong{font-size:18px}.stat strong small{font-size:8px}.stat.progress-stat{min-width:77px}.stats{gap:3px}.pause{padding:5px 7px;font-size:11px}.rightHUD{top:98px;right:14px}.rightHUD strong{font-size:48px}.rightHUD small{font-size:8px}.phase{top:105px;left:10px;font-size:9px}.phase b{font-size:10px}.lower{padding:38px 10px max(13px,env(safe-area-inset-bottom))}.prompt{gap:5px}.meaning{font-size:16px;padding:6px 9px}.pos{font-size:9px;padding:6px}.phrase{gap:5px}.pill{font-size:9px;padding:5px 7px}.tiles{margin-top:12px;gap:3px;min-height:40px}.tile{height:38px;font-size:clamp(13px,4.2vw,21px);border-bottom-width:3px}.explain{font-size:10px;margin:4px auto 7px;min-height:13px;max-width:96%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.keyboard{gap:4px}.kb-row{gap:3px}.key{height:34px;font-size:13px}.bottomMeta{margin-top:7px;font-size:9px}.modal{padding:23px}.toast{font-size:23px}}
+@media(max-width:380px){.stats .stat:first-child{display:none}.stat.progress-stat{min-width:67px}.heading b{font-size:16px}.meaning{font-size:14px}.pill{font-size:8px;padding:6px}.tile{height:33px}.key{height:30px}}
+@media(max-height:650px) and (min-width:700px){.keyboard{display:none}.lower{padding:28px 18px 15px}.tiles{min-height:34px;margin:10px auto}.tile{height:34px}.explain{margin:3px auto}.bottomMeta{margin-top:5px}.modal{padding:15px}.modal h1{font-size:34px}}
+
+/* V2 · visual polish and motion hierarchy */
+#vignette{background:linear-gradient(180deg,rgba(4,8,18,.20) 0%,transparent 23%,transparent 57%,rgba(4,7,18,.52) 100%),radial-gradient(ellipse at 50% 44%,transparent 30%,rgba(0,3,12,.29) 100%)}
+#speedFx{position:absolute;inset:0;pointer-events:none;z-index:2;opacity:0;transition:opacity .35s;background:repeating-linear-gradient(104deg,transparent 0 19%,rgba(135,214,255,.045) 19.1% 19.3%,transparent 19.5% 29%);mix-blend-mode:screen;animation:speedDrift 2.3s linear infinite;mask-image:linear-gradient(90deg,black,transparent 28%,transparent 75%,black)}
+#speedFx.active{opacity:.75}#impact{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 70%,transparent 18%,rgba(88,230,255,.35) 100%);transition:opacity .17s}#impact.hit{opacity:1}
+@keyframes speedDrift{to{background-position:150px 0}}.speedHud{position:absolute;top:170px;right:27px;z-index:4;color:#bddbfc;text-align:right;text-shadow:0 2px 9px #02102c}.speedHud strong{font-size:24px;font-style:italic;font-weight:950;color:#e7fcff}.speedHud small{font-size:10px;letter-spacing:.2em;font-weight:900}.lower{background:linear-gradient(0deg,rgba(5,13,33,.95),rgba(7,21,43,.83) 38%,rgba(8,20,41,0) 100%)}.meaning{border:1px solid #cbdcfd}.tile{backdrop-filter:blur(4px)}.tile.current{animation:focusPulse 1.2s infinite}@keyframes focusPulse{50%{box-shadow:0 0 0 1px #b9fcff,0 0 26px #46caffaf}}
+@media(max-width:680px){.speedHud{right:15px;top:160px}.speedHud strong{font-size:18px}.speedHud small{font-size:8px}#speedFx{opacity:.3} }
+@media(prefers-reduced-motion:reduce){#speedFx{display:none}.tile.current{animation:none}}
+</style></head><body><div id="app"><canvas id="gl"></canvas><canvas id="rainCanvas"></canvas><div id="speedFx"></div><div id="vignette"></div><div id="impact"></div><div id="loading">BUILDING TOKYO 3D...</div>
+<div class="topbar"><div class="heading"><small>TOKYO AFTER RAIN / 東京都</small><b>WORD<span>RIDE</span> <sup style="font-size:11px;vertical-align:top;color:#b6d8fa">V2</sup></b></div><div class="stats"><div class="stat"><label>骑行距离 · GAP</label><strong id="distance">0<small>m</small></strong></div><div class="stat progress-stat"><label>章节 · CHAPTER 01</label><strong><span id="completed">0</span><small>/ 12</small></strong><div class="meter"><i id="bar"></i></div></div><div class="stat"><label>准确率</label><strong id="accuracy">100<small>%</small></strong></div><button class="pause" id="pause">Ⅱ</button></div></div>
+<div class="rightHUD" id="comboHUD"><strong id="combo">0</strong><small>COMBO / FLOW</small></div><div class="speedHud"><strong id="speed">0</strong><small>KM/H</small></div><div class="phase">NIGHT RIDE · 23:45<b>東京 / SHIBUYA LOOP</b></div>
+<div class="lower"><div class="prompt"><div class="phrase"><div class="meaning" id="meaning">探索；探究</div><div class="pos" id="pos">v.</div></div><div class="prompts"><button class="pill" id="speak">♫ READ</button><button class="pill outline" id="hint">✧ 提示</button></div></div><div class="tiles" id="tiles"></div><div class="explain" id="explain">点击键盘或使用实体键盘输入字母</div><div class="keyboard" id="keyboard"></div><div class="bottomMeta"><span>街景：TOKYO V2 · 空格暂停 · 连击加速</span><div><button id="rainBtn">☂ 雨天 / ON</button><button id="soundBtn">♪ 声音 / ON</button></div></div></div>
+<div class="toast" id="toast">NICE RIDE!</div>
+<div class="overlay" id="startOverlay"><section class="modal"><div class="pre">TOKYO MIDNIGHT / ENGLISH QUEST</div><h1>边骑行，<br/><i>边记单词。</i></h1><p>穿过立体东京街道，用正确的字母为骑行充能。今晚的路线是 12 个单词，一路向前。</p><div class="route"><span>渋谷 · SHIBUYA</span><span class="line"></span><small>12 WORDS</small><span class="line"></span><span>新宿 · SHINJUKU</span></div><div class="modes"><button class="mode selected" data-mode="casual"><b>◈ 补全单词</b><small>部分字母已给出 · 适合新词学习</small></button><button class="mode" data-mode="hard"><b>◇ 完整默写</b><small>只有中文提示 · 更适合复习</small></button></div><button class="go" id="start">开始夜骑　→</button><p class="micro">V2 · 立体东京雨夜街景 · 36 个试玩词 · 支持手机</p></section></div>
+<div class="overlay hide" id="endOverlay"><section class="modal"><div class="pre">ROUTE FINISHED / 旅程完成</div><h2 id="endTitle">今晚骑得不错。</h2><p>你的街景之旅已经完成，这些词需要下次再巩固。</p><div class="endStats"><div><strong id="endWords">12</strong><small>完成词数</small></div><div><strong id="endAcc">100%</strong><small>准确率</small></div><div><strong id="endDist">0m</strong><small>骑行距离</small></div></div><div class="wronglist" id="wronglist">没有错题</div><button class="go" id="restart">再骑一程　→</button></section></div>
+<div class="error" id="error"><div><b>3D 场景加载失败</b><p>请使用支持 WebGL 的最新版 Safari、Chrome 或 Edge 打开。<br/>如果启用了省电或限制图形加速的设置，请关闭后重新尝试。</p></div></div></div>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const DATA=[
+['explore','探索；探究','v.'],['improve','改善；提高','v.'],['highlight','强调；突出','v.'],['efficient','高效的','adj.'],['approach','方法；接近','n./v.'],['reliable','可靠的','adj.'],['confident','自信的','adj.'],['creative','有创造力的','adj.'],['essential','必不可少的','adj.'],['potential','潜力；潜在的','n./adj.'],['perspective','视角；观点','n.'],['comprehensive','全面的','adj.'],['achieve','实现','v.'],['accurate','准确的','adj.'],['challenge','挑战','n./v.'],['consider','考虑','v.'],['develop','发展；培养','v.'],['experience','经验；经历','n./v.'],['flexible','灵活的','adj.'],['observe','观察','v.'],['maintain','维持；维护','v.'],['participate','参与','v.'],['practical','实用的','adj.'],['recommend','推荐','v.'],['strategy','策略','n.'],['evaluate','评估','v.'],['significant','显著的','adj.'],['independent','独立的','adj.'],['opportunity','机会','n.'],['environment','环境','n.'],['concentrate','集中注意力','v.'],['meaningful','有意义的','adj.'],['consequence','后果','n.'],['gradually','逐渐地','adv.'],['convenient','方便的','adj.'],['determine','决定','v.'] ];
+const state={running:false,paused:false,done:false,mode:'casual',rain:true,sound:true,words:[],index:0,gaps:[],fixed:[],filled:[],cursor:0,completed:0,correct:0,wrong:0,combo:0,distance:0,energy:100,pending:false,wrongSet:new Set(),speed:6.8};let last=performance.now(),tim=0,toastTimer,impact=0,stumble=0,pedalKick=0,hitToken=0;
+const rnd=(a,b=0)=>{const n=Math.sin(a*127.1+b*311.7+78.233)*43758.5453;return n-Math.floor(n)};
+function sampleWords(){return DATA.map((x,i)=>({en:x[0],zh:x[1],pos:x[2],i})).sort(()=>Math.random()-.5).slice(0,12)}
+function show(){const w=state.words[state.index];if(!w){finish();return}state.filled=Array(w.en.length).fill(false);state.fixed=Array(w.en.length).fill(false);state.gaps=[];let n=w.en.length;for(let i=0;i<n;i++){let fixed=state.mode==='casual'&&(i===0||(i===n-1&&n>7)||((i===3||i===4)&&n>9));state.fixed[i]=fixed;state.filled[i]=fixed;if(!fixed)state.gaps.push(i)}state.cursor=0;$('#meaning').textContent=w.zh;$('#pos').textContent=w.pos;$('#explain').textContent='输入正确字母，继续前进';renderTiles()}
+function renderTiles(){let w=state.words[state.index];if(!w)return;const where=state.gaps[state.cursor];$('#tiles').innerHTML=w.en.split('').map((ch,i)=>`<div class="tile ${state.fixed[i]?'fixed':state.filled[i]?'filled':''} ${where===i?'current':''}">${state.filled[i]?ch:'·'}</div>`).join('')}
+function hud(){const t=state.correct+state.wrong;$('#distance').innerHTML=Math.floor(state.distance)+'<small>m</small>';$('#completed').textContent=state.completed;$('#bar').style.width=(state.completed/12*100)+'%';$('#accuracy').innerHTML=(t?Math.round(state.correct/t*100):100)+'<small>%</small>';$('#combo').textContent=state.combo}
+function flashImpact(){const el=$('#impact');el.classList.add('hit');const n=++hitToken;setTimeout(()=>{if(n===hitToken)el.classList.remove('hit')},105)}
+function toast(str){const el=$('#toast');el.textContent=str;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),700)}
+function tone(freq=490,dur=.09){if(!state.sound)return;try{const ac=window.__AC||(window.__AC=new (window.AudioContext||window.webkitAudioContext)());let osc=ac.createOscillator(),g=ac.createGain();osc.type='triangle';osc.frequency.value=freq;g.gain.setValueAtTime(.045,ac.currentTime);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+dur);osc.connect(g);g.connect(ac.destination);osc.start();osc.stop(ac.currentTime+dur)}catch(e){}}
+function key(k){if(!state.running||state.paused||state.done||state.pending||!(/^[a-z]$/i.test(k)))return;const w=state.words[state.index],idx=state.gaps[state.cursor];if(idx==null)return;if(k.toLowerCase()===w.en[idx]){state.filled[idx]=true;state.cursor++;state.combo++;state.correct++;state.speed=Math.min(20,8.5+state.combo*.34);impact=Math.min(1.4,impact+.36);pedalKick=Math.min(.9,pedalKick+.21);flashImpact();state.distance+=1.5;state.energy=Math.min(100,state.energy+1);tone(530+Math.min(250,state.combo*20),.05);if(state.cursor===state.gaps.length){state.pending=true;state.completed++;state.distance+=15+state.combo*2;toast(state.combo>8?'PERFECT FLOW!':'NICE RIDE!');tone(770,.18);$('#explain').textContent=`✓ ${w.en} · ${w.zh}`;hud();renderTiles();setTimeout(()=>{if(state.done)return;state.index++;state.pending=false;show();hud()},680)}else{renderTiles();hud()}}else{state.wrong++;state.combo=0;state.speed=4.2;stumble=1;state.energy=Math.max(0,state.energy-8);state.wrongSet.add(w.en);tone(180,.12);$('#explain').textContent='拼写有误，再试一次';const el=$('#tiles').children[idx];if(el){el.classList.add('bad');setTimeout(()=>el.classList.remove('bad'),220)}hud()}}
+function finish(){state.done=true;state.running=false;$('#endWords').textContent=state.completed;$('#endAcc').textContent=state.correct+state.wrong?Math.round(100*state.correct/(state.correct+state.wrong))+'%':'100%';$('#endDist').textContent=Math.floor(state.distance)+'m';$('#endTitle').textContent=state.wrongSet.size?'旅程结束，继续练习。':'完美完成今晚的夜骑。';$('#wronglist').textContent=state.wrongSet.size?'复习单词：'+[...state.wrongSet].join(' · '):'全程无错题，表现出色。';$('#endOverlay').classList.remove('hide')}
+function begin(){Object.assign(state,{running:true,paused:false,done:false,words:sampleWords(),index:0,completed:0,correct:0,wrong:0,combo:0,distance:0,energy:100,pending:false,speed:8.5,wrongSet:new Set()});$('#startOverlay').classList.add('hide');$('#endOverlay').classList.add('hide');$('#pause').textContent='Ⅱ';show();hud();tone(690,.17)}
+function speak(){let w=state.words[state.index];if(!w||!('speechSynthesis'in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(w.en);u.lang='en-US';u.rate=.83;speechSynthesis.speak(u)}catch(e){}}
+function hint(){if(!state.running||state.paused||state.pending)return;const w=state.words[state.index],idx=state.gaps[state.cursor];if(idx==null)return;state.wrongSet.add(w.en);state.combo=0;state.filled[idx]=true;state.cursor++;state.energy=Math.max(0,state.energy-5);state.wrong++;if(state.cursor>=state.gaps.length){state.pending=true;state.completed++;state.distance+=8;$('#explain').textContent='已使用提示完成：'+w.en;toast('KEEP GOING!');hud();renderTiles();setTimeout(()=>{state.index++;state.pending=false;show();hud()},750)}else{renderTiles();hud();$('#explain').textContent='已提示一个字母 · 计入复习列表'}}
+function pause(){if(!state.running)return;state.paused=!state.paused;$('#pause').textContent=state.paused?'▶':'Ⅱ';toast(state.paused?'PAUSED':'LET’S RIDE!')}
+$$('.mode').forEach(b=>b.addEventListener('click',()=>{$$('.mode').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.mode=b.dataset.mode}));$('#start').onclick=begin;$('#restart').onclick=begin;$('#pause').onclick=pause;$('#speak').onclick=speak;$('#hint').onclick=hint;$('#rainBtn').onclick=()=>{state.rain=!state.rain;$('#rainBtn').textContent=state.rain?'☂ 雨天 / ON':'☀ 晴夜 / OFF'};$('#soundBtn').onclick=()=>{state.sound=!state.sound;$('#soundBtn').textContent=state.sound?'♪ 声音 / ON':'♪ 声音 / OFF'};
+$('#keyboard').innerHTML=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'].map(row=>`<div class="kb-row">${[...row].map(c=>`<button class="key" data-k="${c.toLowerCase()}">${c}</button>`).join('')}</div>`).join('');$$('.key').forEach(b=>b.onclick=()=>key(b.dataset.k));window.addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();pause()}else if(e.key==='Tab'&&state.running){e.preventDefault();speak()}else if(e.key.length===1&&/[a-z]/i.test(e.key)){key(e.key)}});
+// ------------------- self-contained genuine WebGL 3D engine -------------------
+const canvas=$('#gl');let gl;try{gl=canvas.getContext('webgl2',{alpha:false,antialias:true,powerPreference:'high-performance'});if(!gl)throw Error('WebGL2 unsupported')}catch(e){$('#error').classList.add('show');$('#loading').classList.add('hide');return}
+const vs=`#version 300 es
+precision highp float;in vec3 aPos;in vec3 aNorm;in vec3 aCol;in float aGlow;uniform mat4 uProj,uView;uniform vec3 uOffset;uniform float uWheel;uniform float uRole;out vec3 vCol;out float vGlow;out float vDepth;out vec3 vNormal;out vec3 vWorld;
+void main(){vec3 p=aPos;if(uRole>1.5){float a=uWheel;float centerZ=p.z>3.8?5.07:2.50;float yy=p.y-.67,zz=p.z-centerZ;p.y=.67+yy*cos(a)-zz*sin(a);p.z=centerZ+yy*sin(a)+zz*cos(a);}p+=uOffset;vec4 vv=uView*vec4(p,1.0);gl_Position=uProj*vv;vDepth=-vv.z;vCol=aCol;vGlow=aGlow;vNormal=aNorm;vWorld=p;}`;
+const fs=`#version 300 es
+precision highp float;in vec3 vCol;in float vGlow;in float vDepth;in vec3 vNormal;in vec3 vWorld;uniform float uTime;uniform float uRain;out vec4 FragColor;
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+void main(){vec3 n=normalize(vNormal);float l=max(0.,dot(n,normalize(vec3(.58,.9,.22))));float shade=.56+l*.44;float emission=max(vGlow,0.);vec3 color=vCol*shade + vCol*emission*.93;
+float road=1.-step(-.25,vGlow);
+if(road>.5){vec2 p=vWorld.xz;float grit=hash(floor(p*23.));float asphalt=(grit-.5)*.049;float wet=pow(max(0.,1.-abs(fract((p.x+p.y*.03)*.32)-.5)*2.),5.);float stripe=pow(max(0.,1.-abs(fract(p.y*.11)-.5)*2.),6.);color=vCol*(.72+asphalt)+vec3(.075,.092,.13)*uRain*(.25+wet*.5+stripe*.21);float glimmer=hash(floor(p*4.))*step(.975,hash(floor(p*13.)));color+=vec3(.17,.22,.29)*glimmer*uRain;}
+float edge=pow(1.-abs(dot(n,normalize(vec3(.23,.66,.6)))),2.);color+=vec3(.065,.082,.11)*edge;
+float fog=1.-exp(-pow(max(0.,vDepth-18.)*.012,1.5));color=mix(color,vec3(.088,.105,.151),clamp(fog,0.,.83));color=pow(color,vec3(.92));FragColor=vec4(color,1.);}`;
+const bgvs=`#version 300 es\nprecision highp float;out vec2 uv;void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);uv=p;gl_Position=vec4(p*2.-1.,0.,1.);}`;
+const bgfs=`#version 300 es\nprecision highp float;in vec2 uv;uniform float uTime;out vec4 FragColor;void main(){vec2 t=uv*.5;vec3 top=vec3(.025,.05,.12),mid=vec3(.11,.17,.29),base=vec3(.13,.20,.32);vec3 c=mix(base,mid,smoothstep(.3,.7,t.y));c=mix(c,top,smoothstep(.55,1.,t.y));float haze=exp(-pow((t.y-.43)*6.,2.));c+=vec3(.045,.045,.08)*haze;float moon=length((t-vec2(.75,.79))*vec2(1.4,1.));c+=vec3(.7,.69,.57)*(1.-smoothstep(.023,.027,moon))*.8;c+=vec3(.14,.13,.11)*exp(-moon*50.);FragColor=vec4(c,1.);}`;
+const texvs=`#version 300 es\nprecision highp float;in vec3 aPos;in vec2 aUV;uniform mat4 uProj,uView;uniform vec3 uOffset;out vec2 vUV;out float vDepth;void main(){vec4 v=uView*vec4(aPos+uOffset,1.);gl_Position=uProj*v;vUV=aUV;vDepth=-v.z;}`;
+const texfs=`#version 300 es\nprecision highp float;in vec2 vUV;in float vDepth;uniform sampler2D uTex;out vec4 FragColor;void main(){vec4 c=texture(uTex,vUV);if(c.a<.3)discard;float f=clamp((vDepth-22.)*.009,0.,.65);c.rgb=mix(c.rgb,vec3(.1,.14,.25),f);FragColor=c;}`;
+const dotvs=`#version 300 es\nprecision highp float;in vec3 aPos;in vec3 aCol;in float aSize;uniform mat4 uProj,uView;uniform vec3 uOffset;out vec3 vCol;void main(){vec4 p=uView*vec4(aPos+uOffset,1.);gl_Position=uProj*p;gl_PointSize=clamp(aSize*100./max(5.,-p.z),2.,80.);vCol=aCol;}`;
+const dotfs=`#version 300 es\nprecision highp float;in vec3 vCol;out vec4 FragColor;void main(){float r=length(gl_PointCoord-.5)*2.;float a=(1.-smoothstep(.02,1.,r))*.26;FragColor=vec4(vCol*a,a);}`;
+function program(v,f){const p=gl.createProgram();for(const [type,src] of [[gl.VERTEX_SHADER,v],[gl.FRAGMENT_SHADER,f]]){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));gl.attachShader(p,s)}gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));return p}
+let P,PB,PT,PD;try{P=program(vs,fs);PB=program(bgvs,bgfs);PT=program(texvs,texfs);PD=program(dotvs,dotfs)}catch(e){console.error(e);$('#error').classList.add('show');$('#loading').classList.add('hide');return}
+const V=()=>({pos:[],nor:[],col:[],glow:[],uv:[],dotPos:[],dotCol:[],dotSize:[]});const rgb=(s)=>{if(Array.isArray(s))return s;let x=parseInt(s.replace('#',''),16);return [(x>>16&255)/255,(x>>8&255)/255,(x&255)/255]};
+const addTri=(g,aa,bb,cc,n,col,em=0)=>{let c=rgb(col);for(let p of [aa,bb,cc]){g.pos.push(...p);g.nor.push(...n);g.col.push(...c);g.glow.push(em)}};
+function quad(g,a,b,c,d,n,col,em=0){addTri(g,a,b,c,n,col,em);addTri(g,a,c,d,n,col,em)}
+function box(g,x,y,z,w,h,d,col,em=0,top=null){let x1=x-w/2,x2=x+w/2,y1=y-h/2,y2=y+h/2,z1=z-d/2,z2=z+d/2;
+quad(g,[x1,y1,z2],[x2,y1,z2],[x2,y2,z2],[x1,y2,z2],[0,0,1],col,em);quad(g,[x2,y1,z1],[x1,y1,z1],[x1,y2,z1],[x2,y2,z1],[0,0,-1],col,em);quad(g,[x1,y1,z1],[x1,y1,z2],[x1,y2,z2],[x1,y2,z1],[-1,0,0],col,em);quad(g,[x2,y1,z2],[x2,y1,z1],[x2,y2,z1],[x2,y2,z2],[1,0,0],col,em);quad(g,[x1,y2,z2],[x2,y2,z2],[x2,y2,z1],[x1,y2,z1],[0,1,0],top||col,em);quad(g,[x1,y1,z1],[x2,y1,z1],[x2,y1,z2],[x1,y1,z2],[0,-1,0],col,em)}
+function polyline(g,p1,p2,r,col,seg=7,em=0){const v=[p2[0]-p1[0],p2[1]-p1[1],p2[2]-p1[2]],len=Math.hypot(...v)||1;let ny=v.map(x=>x/len),e0=Math.abs(ny[1])>.9?[1,0,0]:[0,1,0];const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>{let l=Math.hypot(...a);return a.map(x=>x/l)};let t=norm(cross(ny,e0)),b=cross(ny,t);for(let i=0;i<seg;i++){let a1=i*2*Math.PI/seg,a2=(i+1)*2*Math.PI/seg;let calc=(p,a)=>p.map((x,k)=>x+r*(t[k]*Math.cos(a)+b[k]*Math.sin(a)));let n=norm(t.map((x,k)=>x*Math.cos((a1+a2)/2)+b[k]*Math.sin((a1+a2)/2)));quad(g,calc(p1,a1),calc(p1,a2),calc(p2,a2),calc(p2,a1),n,col,em)}}
+function blob(g,x,y,z,rx,ry,rz,col,seed=0){const lat=5,lon=8;for(let i=0;i<lat;i++)for(let j=0;j<lon;j++){let pt=(u,v)=>{let th=u*Math.PI/lat,ph=v*2*Math.PI/lon;let f=1+.13*Math.sin(seed+u*8+v*5);return [x+Math.sin(th)*Math.cos(ph)*rx*f,y+Math.cos(th)*ry*f,z+Math.sin(th)*Math.sin(ph)*rz*f]};let a=pt(i,j),b=pt(i+1,j),c=pt(i+1,j+1),d=pt(i,j+1);quad(g,a,b,c,d,[0,1,0],col)}}
+function ring(g,x,y,z,r,t,col){const n=18;for(let i=0;i<n;i++){let a=i*2*Math.PI/n,b=(i+1)*2*Math.PI/n;const p=(a,r)=>[x,y+Math.cos(a)*r,z+Math.sin(a)*r];quad(g,p(a,r+t),p(b,r+t),p(b,r-t),p(a,r-t),[1,0,0],col)}}
+function dots(g,pos,col,size=1){g.dotPos.push(...pos);g.dotCol.push(...rgb(col));g.dotSize.push(size)}
+function gpu(g){let vao=gl.createVertexArray();gl.bindVertexArray(vao);for(let [name,data,n] of [['aPos',g.pos,3],['aNorm',g.nor,3],['aCol',g.col,3],['aGlow',g.glow,1]]){let id=gl.getAttribLocation(P,name);if(id<0)continue;let b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);gl.enableVertexAttribArray(id);gl.vertexAttribPointer(id,n,gl.FLOAT,false,0,0)}gl.bindVertexArray(null);return{vao,count:g.pos.length/3}}
+function gpuDynamic(maxVertices){const vao=gl.createVertexArray(),streams={};gl.bindVertexArray(vao);for(const [name,n] of [['aPos',3],['aNorm',3],['aCol',3],['aGlow',1]]){let id=gl.getAttribLocation(P,name);const buffer=gl.createBuffer();streams[name]={buffer,n};gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,maxVertices*n*4,gl.DYNAMIC_DRAW);if(id>=0){gl.enableVertexAttribArray(id);gl.vertexAttribPointer(id,n,gl.FLOAT,false,0,0)}}gl.bindVertexArray(null);return{vao,count:0,streams,maxVertices}}
+function updateDynamic(mesh,g){const list=[['aPos',g.pos],['aNorm',g.nor],['aCol',g.col],['aGlow',g.glow]];mesh.count=Math.min(mesh.maxVertices,g.pos.length/3);for(let [name,arr] of list){gl.bindBuffer(gl.ARRAY_BUFFER,mesh.streams[name].buffer);gl.bufferSubData(gl.ARRAY_BUFFER,0,new Float32Array(arr))}}
+function gpuDots(g){const vao=gl.createVertexArray();gl.bindVertexArray(vao);for(let [name,data,n] of [['aPos',g.dotPos,3],['aCol',g.dotCol,3],['aSize',g.dotSize,1]]){let loc=gl.getAttribLocation(PD,name);let b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,n,gl.FLOAT,false,0,0)}gl.bindVertexArray(null);return{vao,count:g.dotPos.length/3}}
+function quadTex(g,a,b,c,d,u1,v1,u2,v2){let p=[a,b,c,a,c,d],q=[[u1,v2],[u2,v2],[u2,v1],[u1,v2],[u2,v1],[u1,v1]];for(let i=0;i<6;i++){g.pos.push(...p[i]);g.uv.push(...q[i])}}
+function gpuTex(g){const vao=gl.createVertexArray();gl.bindVertexArray(vao);for(const [name,data,n] of [['aPos',g.pos,3],['aUV',g.uv,2]]){let loc=gl.getAttribLocation(PT,name);let b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,n,gl.FLOAT,false,0,0)}gl.bindVertexArray(null);return{vao,count:g.pos.length/3}}
+// billboard signage atlas drawn procedurally: Japanese neighborhood shop signs
+const labels=[['喫茶 こもれび','#174e74','#d8feff'],['ラーメン 月見','#7c271e','#ffe9ac'],['自転車 SHOP','#23507d','#fff4c2'],['青い コンビニ','#0d5e83','#9febff'],['BOOKS & COFFEE','#45355c','#fdf0dc'],['夜の食堂','#724c2e','#fff2be'],['花と音楽','#315646','#f7dcf2'],['T O K Y O','#1e397a','#b0eaff'],['パン屋 はる','#7a4441','#fff4bf'],['居酒屋 ひかり','#795021','#ffecbb'],['SORA MARKET','#193e75','#b5f8ff'],['レコード','#42326b','#e1d2ff']];
+const atlas=document.createElement('canvas');atlas.width=1024;atlas.height=1024;const cctx=atlas.getContext('2d');cctx.fillStyle='#132344';cctx.fillRect(0,0,1024,1024);labels.forEach((l,i)=>{let x=i%3*341,y=Math.floor(i/3)*256;cctx.fillStyle=l[1];cctx.fillRect(x+4,y+4,328,244);cctx.strokeStyle=l[2];cctx.lineWidth=5;cctx.strokeRect(x+11,y+12,314,222);cctx.fillStyle=l[2];cctx.textAlign='center';cctx.shadowBlur=20;cctx.shadowColor=l[2];cctx.font='bold 36px "Arial","Noto Sans CJK JP","Microsoft Yahei",sans-serif';cctx.fillText(l[0],x+167,y+139,292);cctx.font='15px Arial';cctx.fillText('OPEN 24H  ·  東京',x+168,y+185);cctx.shadowBlur=0});const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,atlas);gl.generateMipmap(gl.TEXTURE_2D);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+function sign(g,x,y,z,w,h,id,face='front'){let ix=id%3,iy=Math.floor(id/3),u1=(ix*341+3)/1024,u2=(ix*341+334)/1024,v1=1-(iy*256+244)/1024,v2=1-(iy*256+3)/1024;if(face==='front'){quadTex(g,[x-w/2,y-h/2,z],[x+w/2,y-h/2,z],[x+w/2,y+h/2,z],[x-w/2,y+h/2,z],u1,v1,u2,v2)}else{quadTex(g,[x,y-h/2,z-w/2],[x,y-h/2,z+w/2],[x,y+h/2,z+w/2],[x,y+h/2,z-w/2],u1,v1,u2,v2)}}
+// cycling lane, pavements, city tiles. All geometry is actual 3D triangle meshes.
+const floorG=V();
+box(floorG,0,-.24,-71,12,.45,275,'#222b3c',-.95);
+for(const side of [-1,1]){
+ box(floorG,side*7.1,-.06,-71,2.2,.37,275,'#6d737b');box(floorG,side*5.96,.075,-71,.18,.19,275,'#afafb0');
+ box(floorG,side*8.25,-.02,-71,.13,.13,275,'#283744');
+}
+const floorMesh=gpu(floorG);const laneSegments=[],laneLen=26;
+for(let j=0;j<10;j++){const gg=V(),z0=-j*laneLen;for(let q=0;q<5;q++){let z=z0+13-q*5.25;box(gg,0,.012,z,.115,.018,2.75,'#c2d4db',.29);box(gg,-3.75,.014,z,.095,.018,2.0,'#80c7d5',.21);box(gg,3.75,.014,z,.095,.018,2.0,'#80c7d5',.21);for(let side of [-1,1])box(gg,side*5.7,.01,z,.12,.013,2.7,'#d8d8c4',.19);
+ // Wet glints and reflection strips travel with the street: blue-cyan, amber and coral shop lighting.
+ for(let side of [-1,1]){const seed=j*40+q*7+side, x=side*(1.3+rnd(seed,3)*3.8);box(gg,x,.012,z+rnd(seed,6)*1.1,.07+rnd(seed,7)*.17,.008,1.0+rnd(seed,5)*2.4,seed%3===0?'#926960':seed%2?'#447790':'#887e6f',.13);}
+}laneSegments.push(gpu(gg))}
+const tileLen=26,tileMeshes=[],tileTex=[],tileDots=[];
+const colors=['#384760','#3c3b57','#374c59','#4b3d56','#38445b','#45485e','#3a5063','#384252'];
+for(let t=0;t<9;t++){let g=V(),tt=V(),dg=V();const Z=-t*tileLen;for(let side of [-1,1])for(let j=0;j<4;j++){
+  const k=t*11+j*3+(side+1),px=side*(10.4+(.5-rnd(k,1))*.7),pz=Z+10-j*6.4,ww=3.7+rnd(k,2)*2.7,dep=5.1+rnd(k,3)*1.5,h=7+rnd(k,4)*13,baseCol=colors[Math.floor(rnd(k,5)*colors.length)];
+  box(g,px,h/2-.1,pz,ww,h,dep,baseCol);box(g,px,h+.17,pz,ww+.25,.36,dep+.15,'#27344d');
+  const frontX=px-side*(ww/2+.04);const frontZ=pz+(dep/2+.055);
+  // glass windows and decorative ledges
+  for(let row=1;row<Math.floor(h/2.2);row++)for(let col=0;col<3;col++){const wz=pz-dep*.31+col*(dep*.31),wy=1.7+row*2.05,on=rnd(k*13+row*9+col,6)>.3;box(g,frontX,wy,wz,.08,1.08,1.18,on?'#e8bb7a':'#263957',on?.49:0);box(g,frontX-side*.015,wy+0.64,wz,.13,.12,1.4,'#172741');box(g,frontX,wy-.61,wz,.13,.08,1.39,'#566178')}
+  // front shop windows facing street
+  box(g,frontX,.67,pz,.12,1.2,dep*.7,'#65b4c4',.65);box(g,frontX,.7,pz-dep*.24,.22,1.5,.15,'#17283c');box(g,frontX,.7,pz+dep*.24,.22,1.5,.15,'#17283c');box(g,frontX,1.54,pz,.35,.3,dep*.82,'#29334a');
+  // painted arcade shop awning
+  box(g,frontX-side*.55,2.7,pz,1.25,.14,dep*.89,j%2?'#415fa8':'#b15e5a');for(let v=0;v<5;v++)box(g,frontX-side*1.03,2.55,pz-dep*.39+v*dep*.19,.08,.24,.3,j%2?'#ddd9d3':'#f0c9a8');
+  // sign facing the road: the actual geometry has texture atlas
+  sign(tt,frontX-side*.12,3.4,pz,2.2,1.15,((t*4+j+Math.max(side,0))%12),'side');
+  // shop side window signs visible from camera along z
+  if(j%3===0)sign(tt,px,3.8,frontZ,Math.min(ww*.75,3),1.1,(t+j*2)%12,'front');
+  // V2 storefront: glowing recessed entry, window mullions, shelves, small goods and metallic shutters.
+  box(g,frontX-side*.12,.95,pz,.12,1.6,dep*.53,'#7fb4ad',.46);
+  for(let s=0;s<3;s++)box(g,frontX-side*.24,.44+s*.43,pz,.08,.055,dep*.65,'#c2bcae',.25);
+  box(g,frontX-side*.17,1.14,pz+dep*.18,.12,1.75,.05,'#28465a');
+  box(g,frontX-side*.17,1.14,pz-dep*.18,.12,1.75,.05,'#28465a');
+  box(g,frontX-side*.18,2.05,pz,.12,.08,dep*.83,'#e8ce8c',.27);
+  for(let n=0;n<3;n++)box(g,frontX-side*.31,.42,pz-dep*.19+n*dep*.19,.19,.3,.21,n%2?'#e9c9a3':'#b46d59',.14);
+  // layered facade: window sills, drainpipes, gutters, roof mechanical equipment.
+  box(g,px,h+.39,pz,ww+.44,.18,dep+.29,'#76838d');
+  box(g,px+side*ww*.3,h+.87,pz-.25,ww*.19,.83,dep*.14,'#465b65');
+  for(let p=0;p<2;p++){let zz=pz+(p?1:-1)*dep*.32;polyline(g,[frontX-side*.05,2.65,zz],[frontX-side*.05,h-.48,zz],.036,'#aab5bb',5)}
+  for(let row=1;row<Math.floor(h/2.2);row++)for(let col=0;col<3;col++){
+    const zwin=pz-dep*.31+col*(dep*.31),ywin=1.7+row*2.05;
+    box(g,frontX-side*.087,ywin,zwin,.09,.07,1.06,'#8293a4');
+    box(g,frontX-side*.10,ywin-.51,zwin,.13,.11,1.2,'#b1b5bb');
+  }
+  // rooftop antenna and distant skyline shape.
+  if(k%4===0){polyline(g,[px,h+.2,pz-.3],[px,h+3.1,pz-.3],.038,'#a7b7c6',6);polyline(g,[px-.55,h+2.2,pz-.3],[px+.55,h+2.2,pz-.3],.04,'#a7b7c6',6)}
+  // Paper lanterns and under-awning point light pools.
+  if(k%3===0){for(let n=0;n<3;n++){let zz=pz-dep*.25+n*dep*.24;box(g,frontX-side*.70,2.25,zz,.38,.55,.38,'#f2b384',1.03);box(g,frontX-side*.70,2.60,zz,.14,.13,.14,'#423a47')}}
+  // Pedestrian clutter: bins, delivery crates and parking stanchions.
+  if(j%2===0){box(g,frontX-side*1.27,.44,pz+dep*.29,.55,.87,.48,'#557483');box(g,frontX-side*1.27,.90,pz+dep*.29,.61,.11,.52,'#34485b')}
+  // balconies + pipes
+  if(k%2===0){for(let row=2;row<Math.floor(h/2.9);row++){box(g,frontX-side*.42,1.65+row*2.55,pz,.85,.12,dep*.85,'#657184');for(let col=0;col<4;col++)polyline(g,[frontX-side*.68,1.8+row*2.55,pz-dep*.31+col*dep*.2],[frontX-side*.68,2.48+row*2.55,pz-dep*.31+col*dep*.2],.027,'#b2b6c2',5)}}
+  box(g,px+side*ww*.17,h+.45,pz,ww*.28,.8,dep*.2,'#25364b');
+  // trees at the edge of pavement, intermittently
+  if(j%2===0){let tx=side*6.95,tz=pz-1;polyline(g,[tx,.25,tz],[tx,2.95,tz],.14,'#4b3e42');blob(g,tx,3.9,tz,1.48,1.55,1.55,(k%3)?'#1d514e':'#245f58',k);blob(g,tx-.6,3.2,tz+.55,.9,.95,.8,'#2b6860',k+1)}
+  // evenly placed Japanese style street lamps, glows
+  const lx=side*5.76,lz=pz-1.7;polyline(g,[lx,.15,lz],[lx,5.85,lz],.09,'#667485');polyline(g,[lx,5.8,lz],[lx-side*.95,6.1,lz],.09,'#667485');box(g,lx-side*.93,5.93,lz,.78,.23,.48,'#f9d99a',.75);dots(dg,[lx-side*.93,5.87,lz],'#ffe4a0',2.65);
+  // roadside bollards
+  for(let n=0;n<2;n++){let rz=pz-1+n*3;polyline(g,[side*6.07,.12,rz],[side*6.07,.68,rz],.072,'#8f9bad');box(g,side*6.07,.69,rz,.16,.09,.16,'#f0dba4',.2)}
+  // street advertisements/vending machine
+  if(j===1||j===3){let vx=side*7.1,vz=pz+2.2;box(g,vx,1.04,vz,.85,2.04,1.1,j===1?'#d04965':'#2a73a2');box(g,vx-side*.45,1.35,vz,.04,.85,.7,'#b9eaf5',.8);box(g,vx-side*.46,.54,vz,.05,.19,.65,'#dedeea',.2)}
+}
+// V2: overhead wiring, cross street signs, rooftop signs and railings per reusable city block.
+  for(let n=0;n<2;n++){
+    const zz=Z+5-n*10;
+    for(let sx of [-1,1]){
+      polyline(g,[sx*8.55,.15,zz],[sx*8.55,8.5,zz],.10,'#596b72',7);
+      for(let c=0;c<3;c++)polyline(g,[sx*8.55-.45,7.1+c*.43,zz],[sx*8.55+.45,7.1+c*.43,zz],.035,'#9babb4',5);
+    }
+    for(let p=0;p<8;p++){
+      let a=p/8,b=(p+1)/8;
+      polyline(g,[-8.55+17.1*a,8.6-.76*Math.sin(a*Math.PI),zz],[-8.55+17.1*b,8.6-.76*Math.sin(b*Math.PI),zz],.018,'#263d4d',4);
+      polyline(g,[-8.55+17.1*a,8.2-.52*Math.sin(a*Math.PI),zz+.4],[-8.55+17.1*b,8.2-.52*Math.sin(b*Math.PI),zz+.4],.012,'#344758',4);
+    }
+  }
+  tileMeshes.push(gpu(g));tileTex.push(gpuTex(tt));tileDots.push(gpuDots(dg))}
+// V2 hero model: detailed city bike + rider, isolated limb mesh for dynamic inverse-kinematics pedalling.
+const bikeG=V(),riderG=V(),wheelsG=V();const BX=-1.55,BZ=3.85;const CYAN='#67d7e9';
+const pipe=(g,a,b,r,col,seg=10,em=0)=>polyline(g,[BX+a[0],a[1],BZ+a[2]],[BX+b[0],b[1],BZ+b[2]],r,col,seg,em);
+const cube=(g,x,y,z,w,h,d,c,em=0)=>box(g,BX+x,y,BZ+z,w,h,d,c,em);
+const oval=(g,x,y,z,rx,ry,rz,col,seed=0)=>blob(g,BX+x,y,BZ+z,rx,ry,rz,col,seed);
+const tireRadius=.67;
+const rear=[0,tireRadius,1.22],front=[0,tireRadius,-1.35],crank=[0,1.04,.06],seat=[0,1.74,.49],steer=[0,1.62,-.94];
+for(const [a,b] of [[rear,crank],[crank,front],[rear,seat],[seat,crank],[seat,steer],[steer,front],[steer,crank]])pipe(bikeG,a,b,.07,CYAN,11);
+pipe(bikeG,[0,1.73,.55],[0,1.89,.6],.095,'#33475b');cube(bikeG,0,1.91,.7,.49,.10,.38,'#20313f');
+pipe(bikeG,[0,1.66,-.94],[0,1.90,-1.03],.105,'#778fa2');pipe(bikeG,[-.52,1.92,-1.04],[.52,1.92,-1.04],.055,'#283a46');
+for(let sx of [-1,1]){cube(bikeG,sx*.46,1.92,-1.04,.16,.11,.18,'#1e3545');cube(bikeG,sx*.07,1.08,.07,.12,.14,.36,'#8ca1ac')}
+// mudguards, rack and low-profile basket.
+for(let z of [1.22,-1.35]){
+ for(let a=0;a<14;a++){let theta=Math.PI*.04+a*Math.PI*.87/14,tt=Math.PI*.04+(a+1)*Math.PI*.87/14;
+ pipe(bikeG,[0,tireRadius+Math.cos(theta)*.79,z+Math.sin(theta)*.79],[0,tireRadius+Math.cos(tt)*.79,z+Math.sin(tt)*.79],.048,'#607a88',6)}
+}
+pipe(bikeG,[0,1.54,1.14],[0,1.54,1.87],.045,'#92acb4');cube(bikeG,0,1.55,1.52,.66,.10,.89,'#5a7080');
+cube(bikeG,0,1.18,-1.72,.78,.68,.77,'#455766');cube(bikeG,0,1.46,-1.72,.82,.1,.80,'#263c4d');
+for(let side of [-1,1]){
+ const xx=side*.14;for(let z of [1.22,-1.35]){
+  const center= [BX+xx,tireRadius,BZ+z];ring(wheelsG,...center,tireRadius,.107,'#0e1a26');ring(wheelsG,...center,tireRadius-.105,.029,'#c2d7df');
+  for(let k=0;k<18;k++){let a=k*2*Math.PI/18;polyline(wheelsG,[center[0],center[1],center[2]],[center[0],center[1]+Math.cos(a)*.56,center[2]+Math.sin(a)*.56],.012,'#b7d4e1',4)}
+  ring(bikeG,...center,.135,.042,'#608493');
+ }
+}
+// rider jacket, padded backpack, hood, helmet and face; varied silhouettes and material colours.
+pipe(riderG,[0,1.95,.47],[0,2.54,-.07],.37,'#274c80',12);
+oval(riderG,0,2.48,.0,.40,.44,.35,'#2865a2',3);
+cube(riderG,0,2.29,.12,.60,.66,.52,'#1a477c');cube(riderG,0,2.42,.46,.62,.83,.30,'#b66d4b');
+cube(riderG,0,2.50,.64,.72,.69,.29,'#ae694a');cube(riderG,0,2.61,.79,.28,.23,.12,'#edc085');
+for(let side of [-1,1]){
+ pipe(riderG,[side*.31,2.52,-.22],[side*.39,2.14,-.69],.115,'#284f80');
+ pipe(riderG,[side*.39,2.14,-.69],[side*.45,1.92,-1.02],.105,'#d7ad8a');
+ cube(riderG,side*.45,1.92,-1.03,.18,.12,.18,'#283c4c');
+}
+oval(riderG,0,3.01,-.08,.32,.37,.29,'#e6b69a',5);
+// nose, hair, bike helmet and reflector visor.
+cube(riderG,0,3.34,-.07,.70,.18,.56,'#273f57');oval(riderG,0,3.34,-.05,.34,.16,.34,'#304b5a',7);
+cube(riderG,0,3.40,-.31,.71,.07,.28,'#93bad0');
+for(let side of [-1,1]){cube(riderG,side*.32,2.51,.06,.075,.48,.35,'#6cbed4',.1)}
+// rear taillight, headlight and jacket reflective piping.
+cube(bikeG,0,1.58,1.92,.21,.15,.08,'#f66f68',1.2);cube(bikeG,0,1.57,-1.85,.28,.21,.15,'#d8f3fa',1.5);
+pipe(riderG,[-.23,2.52,.83],[.23,2.52,.83],.033,'#a9dae3',8,.16);
+const riderMesh=gpu(riderG),bikeMesh=gpu(bikeG),wheelMesh=gpu(wheelsG);
+const pedalMesh=gpuDynamic(2100);
+function updatePedals(time){const dyn=V();const phase=time*8.9;for(let side of [-1,1]){
+ const a=phase+(side>0?0:Math.PI),foot=[side*.28,1.04+Math.cos(a)*.34,.06+Math.sin(a)*.35];
+ const hip=[side*.23,1.96,.4],knee=[side*.26,1.52+.10*Math.sin(a),.14+.27*Math.sin(a+1.0)];
+ pipe(dyn,hip,knee,.22,side>0?'#28466c':'#365c83',10);
+ pipe(dyn,knee,foot,.146,'#405169',10);
+ pipe(dyn,foot,[foot[0],foot[1]-.13,foot[2]-.23],.145,'#d6dce2',10);
+ cube(dyn,foot[0],foot[1]-.13,foot[2]-.18,.29,.17,.39,'#e6e4db');
+ pipe(dyn,[0,1.04,.06],[side*.27,1.04+Math.cos(a)*.34,.06+Math.sin(a)*.35],.055,'#9da9b0',8);
+ cube(dyn,side*.34,foot[1]-.09,foot[2],.20,.06,.37,'#253645');
+ }updateDynamic(pedalMesh,dyn)}
+// Background skyline, plus poles and city horizon
+const backG=V();for(let i=0;i<33;i++){let x=(i-16)*4.8,z=-120-rnd(i,8)*28,h=15+rnd(i,4)*32;box(backG,x,h/2-1,z,3+rnd(i,1)*4,h,7,'#293850');for(let yy=4;yy<h-1;yy+=3)for(let xx=-1;xx<2;xx++){let on=rnd(i+xx*39+yy*7,2)>.45;if(on)box(backG,x+xx*.7,yy,z+3.52,.37,.55,.04,'#d9bc93',.27)}}const backMesh=gpu(backG);
+// matrices and camera
+const mat4={persp(fov,aspect,near,far){let f=1/Math.tan(fov/2);return new Float32Array([f/aspect,0,0,0,0,f,0,0,0,0,(far+near)/(near-far),-1,0,0,2*far*near/(near-far),0])},look(eye,center){let z=eye.map((v,i)=>v-center[i]);let l=Math.hypot(...z);z=z.map(v=>v/l);let x=[z[2],0,-z[0]];l=Math.hypot(...x);x=x.map(v=>v/l);let y=[z[1]*x[2]-z[2]*x[1],z[2]*x[0]-z[0]*x[2],z[0]*x[1]-z[1]*x[0]];return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-(x[0]*eye[0]+x[1]*eye[1]+x[2]*eye[2]),-(y[0]*eye[0]+y[1]*eye[1]+y[2]*eye[2]),-(z[0]*eye[0]+z[1]*eye[1]+z[2]*eye[2]),1])}};
+function setCommon(prog,proj,view,off){gl.useProgram(prog);const p=gl.getUniformLocation(prog,'uProj'),v=gl.getUniformLocation(prog,'uView'),o=gl.getUniformLocation(prog,'uOffset');if(p)gl.uniformMatrix4fv(p,false,proj);if(v)gl.uniformMatrix4fv(v,false,view);if(o)gl.uniform3fv(o,off)}
+function draw(mesh,off,role=0,wheel=0){gl.useProgram(P);gl.uniform3fv(gl.getUniformLocation(P,'uOffset'),off);gl.uniform1f(gl.getUniformLocation(P,'uWheel'),wheel);gl.uniform1f(gl.getUniformLocation(P,'uRole'),role);gl.bindVertexArray(mesh.vao);gl.drawArrays(gl.TRIANGLES,0,mesh.count)}
+function drawTex(mesh,off){gl.useProgram(PT);gl.uniform3fv(gl.getUniformLocation(PT,'uOffset'),off);gl.bindVertexArray(mesh.vao);gl.drawArrays(gl.TRIANGLES,0,mesh.count)}
+function drawDots(mesh,off){gl.useProgram(PD);gl.uniform3fv(gl.getUniformLocation(PD,'uOffset'),off);gl.bindVertexArray(mesh.vao);gl.drawArrays(gl.POINTS,0,mesh.count)}
+let w=1,h=1,pr=1,drive=0,anim=0,realSpeed=3.4,camLean=0,camKick=0,wheelAngle=0,pedalPhase=0;
+const rain=$('#rainCanvas'),rctx=rain.getContext('2d');const drops=Array.from({length:135},(_,i)=>({x:rnd(i,12),y:rnd(i,13),l:9+rnd(i,14)*25,s:140+rnd(i,15)*330}));
+function resize(){w=canvas.clientWidth||innerWidth;h=canvas.clientHeight||innerHeight;pr=Math.min(devicePixelRatio||1,innerWidth<720?1.25:1.75);canvas.width=Math.floor(w*pr);canvas.height=Math.floor(h*pr);gl.viewport(0,0,canvas.width,canvas.height);rain.width=Math.floor(w*pr);rain.height=Math.floor(h*pr);rain.style.width=w+'px';rain.style.height=h+'px';rctx.setTransform(pr,0,0,pr,0,0)}window.addEventListener('resize',resize);resize();gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.clearColor(.03,.05,.12,1);
+const blockOffsets=Array.from({length:tileMeshes.length},(_,i)=>[0,0,0]);const roadOffsets=Array.from({length:laneSegments.length},(_,i)=>[0,0,0]);
+let hudClock=0;
+function frame(ms){requestAnimationFrame(frame);let dt=Math.max(0,Math.min((ms-last)/1000,.045));last=ms;tim+=dt;
+ if(!state.paused){anim+=dt;const pace=state.running?state.speed:3.7;realSpeed+=(pace-realSpeed)*(1-Math.exp(-dt*(stumble>0?8:2.1)));drive+=dt*realSpeed*1.55;wheelAngle-=dt*realSpeed*1.55/.67;pedalPhase+=dt*(4.8+realSpeed*.36);if(state.running&&!state.pending)state.distance+=dt*realSpeed*.65;impact=Math.max(0,impact-dt*1.7);stumble=Math.max(0,stumble-dt*2.1);pedalKick=Math.max(0,pedalKick-dt*1.35)}
+ const rapid=Math.max(0,Math.min(1,(realSpeed-5)/15));const portrait=w/h<.85;
+ let sway=(state.running?.10:.035)*Math.sin(anim*1.85);camLean+=(sway-camLean)*Math.min(1,dt*2.8);camKick+=(impact*.38-stumble*.25-camKick)*Math.min(1,dt*5);
+ let sh=rapid*(.035*Math.sin(anim*15)+.028*Math.sin(anim*22));
+ const eye=portrait?[2.8+camLean,7.0+camKick*.27,17.4-rapid*.6]:[8.8+camLean,6.0+camKick*.24+sh,15.9-rapid*.75];
+ const target=portrait?[-2.1,1.55,-5.7]:[-1.05,1.85,-8.5];
+ const view=mat4.look(eye,target),fov=(portrait?64:56)+rapid*6+impact*2;
+ const proj=mat4.persp(fov*Math.PI/180,w/h,.12,320);
+ gl.disable(gl.DEPTH_TEST);gl.useProgram(PB);gl.uniform1f(gl.getUniformLocation(PB,'uTime'),anim);gl.drawArrays(gl.TRIANGLES,0,3);gl.enable(gl.DEPTH_TEST);gl.clear(gl.DEPTH_BUFFER_BIT);
+ setCommon(P,proj,view,[0,0,0]);gl.uniform1f(gl.getUniformLocation(P,'uTime'),anim);gl.uniform1f(gl.getUniformLocation(P,'uRain'),state.rain?1:0);
+ draw(backMesh,[0,0,0]);draw(floorMesh,[0,0,0]);
+ // All street elements and markings share the same movement, restoring parallax.
+ for(let i=0;i<laneSegments.length;i++){const off=roadOffsets[i];off[2]=((drive+i*laneLen+laneLen)%(laneLen*laneSegments.length))-i*laneLen-laneLen;draw(laneSegments[i],off)}
+ for(let i=0;i<tileMeshes.length;i++){const off=blockOffsets[i];off[2]=((drive+i*tileLen+tileLen)%(tileLen*tileMeshes.length))-i*tileLen-tileLen;draw(tileMeshes[i],off)}
+ const bikeBob=Math.sin(anim*16)*(.024+rapid*.016),lean=rapid*.012*Math.sin(anim*6);
+ draw(bikeMesh,[0,bikeBob,0]);draw(riderMesh,[lean,bikeBob+Math.sin(anim*8)*.016,0]);
+ draw(wheelMesh,[0,bikeBob,0],2,wheelAngle);
+ if(!state.paused)updatePedals(pedalPhase/8.9);draw(pedalMesh,[0,bikeBob,0]);
+ gl.useProgram(PT);gl.uniformMatrix4fv(gl.getUniformLocation(PT,'uProj'),false,proj);gl.uniformMatrix4fv(gl.getUniformLocation(PT,'uView'),false,view);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);gl.uniform1i(gl.getUniformLocation(PT,'uTex'),0);
+ for(let i=0;i<tileMeshes.length;i++)drawTex(tileTex[i],blockOffsets[i]);
+ gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.depthMask(false);gl.useProgram(PD);gl.uniformMatrix4fv(gl.getUniformLocation(PD,'uProj'),false,proj);gl.uniformMatrix4fv(gl.getUniformLocation(PD,'uView'),false,view);
+ for(let i=0;i<tileMeshes.length;i++)drawDots(tileDots[i],blockOffsets[i]);gl.depthMask(true);gl.disable(gl.BLEND);
+ rctx.clearRect(0,0,w,h);
+ if(state.rain){rctx.strokeStyle=`rgba(172,219,247,${(.17+rapid*.12).toFixed(3)})`;rctx.lineWidth=.75;rctx.beginPath();let density=portrait?83:125;for(let j=0;j<density;j++){let d=drops[j];let x=(d.x*w-anim*d.s*.15)%w,y=(d.y*h+anim*d.s*(1+rapid))%h;if(x<0)x+=w;rctx.moveTo(x,y);rctx.lineTo(x-(5+rapid*9),y+d.l*(1+rapid*.4))}rctx.stroke()}
+ if(state.running&&rapid>.1) {rctx.strokeStyle=`rgba(161,226,255,${(.035+rapid*.055).toFixed(3)})`;rctx.lineWidth=1;rctx.beginPath();for(let i=0;i<20;i++){let side=i%2?1:-1, xx=side<0?rnd(i,71)*w*.22:w-rnd(i,71)*w*.22;let yy=(rnd(i,72)*h+anim*realSpeed*(52+rnd(i,73)*65))%h;rctx.moveTo(xx,yy);rctx.lineTo(xx+(side*4),yy+36+rapid*53)}rctx.stroke()}
+ $('#speedFx').classList.toggle('active',rapid>.46&&state.running);
+ hudClock+=dt;if(hudClock>.16){hudClock=0;hud();$('#speed').textContent=state.running?Math.round(realSpeed*2.85):Math.round(realSpeed*1.4)}
+}
+updatePedals(0);$('#loading').classList.add('hide');requestAnimationFrame(frame);document.addEventListener('visibilitychange',()=>{last=performance.now()});
+})();
+</script></body></html>
