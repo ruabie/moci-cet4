@@ -36,7 +36,13 @@ test('ride, pause, quality, rain and hint controls respond', async ({ page }, te
   await page.locator('#start').click();
   await expect(page.locator('#startOverlay')).toHaveClass(/hide/);
   await expect(page.locator('#tiles')).not.toBeEmpty();
-  await expect(page.locator('#keyboard .key').first()).toBeVisible();
+  // Wide desktop intentionally hides the touch keyboard; physical keys remain supported.
+  await expect(page.locator('#keyboard .key')).toHaveCount(26);
+  if (testInfo.project.name === 'mobile') {
+    await expect(page.locator('#keyboard .key').first()).toBeVisible();
+  } else {
+    await expect(page.locator('#keyboard .key').first()).toBeHidden();
+  }
 
   await page.locator('#pause').click();
   await expect(page.locator('#pause')).toHaveText('▶');
