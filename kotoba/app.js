@@ -231,7 +231,7 @@
   $('qty').addEventListener('input',()=>{setup.qtyTouched=true;refreshQtyPills();});
   document.querySelectorAll('[data-qty]').forEach(b=>b.onclick=()=>{setup.qtyTouched=true;$('qty').value=Math.min(+b.dataset.qty,setup.pool.length);refreshQtyPills();});
   $('allQty').onclick=()=>{setup.qtyTouched=true;$('qty').value=setup.pool.length;refreshQtyPills();};
-  let session=null, quiz=null, lastWrong=[];
+  let session=null, quiz=null, lastWrong=[], batchQty=10;
   function beginSession(wordJPs,kind='all',lesson=null){
     if(!wordJPs.length){toast('暂无词语');return;}
     session={queue:[...wordJPs],unique:uniq(wordJPs),cursor:0,visited:new Set(),kind,lesson,revealed:false};
@@ -241,6 +241,7 @@
   $('startSession').onclick=()=>{
     const v=Math.floor(Number($('qty').value));
     const qty=Math.min(setup.pool.length,Number.isFinite(v)&&v>0?v:10);
+    batchQty=qty;
     if(setup.qtyTouched)db.settings.qty=qty;
     if(setup.newCycle&&setup.scope)db.coverage[setup.scope]=[];
     save();
@@ -374,6 +375,35 @@
   $('testRemember').onclick=()=>commitMemory(true);
   $('testForgot').onclick=()=>commitMemory(false);
   $('exitTest').onclick=()=>{stopSpeech();view('choose')};
+  function pendingNextBatch(){
+    if(!session||!['lesson','all','extra'].includes(session.kind))return null;
+    const pool=getPool(session.kind,session.lesson);
+    return {remaining:remainingNewWords(pool,coverageScope(session.kind,session.lesson)),kind:session.kind,lesson:session.lesson};
+  }
+  function refreshContinueSession(){
+    const btn=$('continueSession'),status=$('continueStatus'),next=pendingNextBatch();
+    btn.classList.toggle('hidden',!next);
+    status.classList.toggle('hidden',!next);
+    if(!next)return;
+    const label=next.kind==='lesson'?`第 ${next.lesson} 课`:(next.kind==='extra'?'课外词库':'总词汇库');
+    if(!next.remaining.length){
+      btn.disabled=true;
+      btn.textContent='新词已全部学完';
+      status.textContent=`${label}的新词已全部学习过。可以返回词库重新开始，或复习错词。`;
+      return;
+    }
+    const count=Math.min(batchQty,next.remaining.length);
+    btn.disabled=false;
+    btn.innerHTML=`继续学习 ${count} 个新词 <span>→</span>`;
+    status.textContent=`${label} · 还剩 ${next.remaining.length} 个未学词，下一组不会重复已学词。`;
+  }
+  $('continueSession').onclick=()=>{
+    const next=pendingNextBatch();
+    if(!next||!next.remaining.length){toast('当前没有剩余未学词');return;}
+    const count=Math.min(Math.max(1,batchQty),next.remaining.length);
+    const chosen=randomize(next.remaining).slice(0,count);
+    beginSession(chosen.map(w=>w.jp),next.kind,next.lesson);
+  };
   function finishTest(){
     if(!quiz)return;
     const uniqueFirst=new Map();
@@ -386,6 +416,7 @@
     $('score').textContent=`${total?Math.round(100*right/total):0}%`;
     $('scoreDetails').textContent=`原始题 ${total} · 答对 ${right} · 标记不记得 ${quiz.forgotSet.size} · 额外重现 ${Math.max(0,quiz.results.length-total)}`;
     $('doneReview').disabled=!lastWrong.length;
+    refreshContinueSession();
     view('done');
   }
   $('swapMode').onclick=()=>startTest(quiz?.mode==='cn-jp'?'jp-cn':'cn-jp');
