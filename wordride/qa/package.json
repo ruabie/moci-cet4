@@ -1,0 +1,13 @@
+{
+  "name": "wordride-browser-qa",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "test": "playwright test",
+    "test:desktop": "playwright test --project=desktop",
+    "test:mobile": "playwright test --project=mobile"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0"
+  }
+}

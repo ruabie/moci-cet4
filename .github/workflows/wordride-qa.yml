@@ -1,0 +1,55 @@
+name: WordRide browser QA pilot
+
+on:
+  pull_request:
+    paths:
+      - 'wordride/**'
+      - '.github/workflows/wordride-qa.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'wordride/**'
+      - '.github/workflows/wordride-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wordride-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Install QA dependencies
+        working-directory: wordride/qa
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium with OS dependencies
+        working-directory: wordride/qa
+        run: npx playwright install --with-deps chromium
+      - name: Run desktop and mobile smoke tests
+        working-directory: wordride/qa
+        run: npm test
+        env:
+          CI: 'true'
+      - name: Upload screenshots, traces, and metrics
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: wordride-qa-${{ github.run_id }}
+          path: |
+            wordride/qa/playwright-report/
+            wordride/qa/test-results/
+          retention-days: 14
+          if-no-files-found: warn
