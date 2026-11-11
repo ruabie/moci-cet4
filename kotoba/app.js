@@ -16,6 +16,10 @@
   if(thirteen&&SUPPLEMENT_WORDS.some(w=>w.lesson==='13')){thirteen.pages='34–38';thirteen.isPartial=false;}
   BOOK.lessons.sort((a,b)=>Number(a.id)-Number(b.id));
   const BOOK_WORDS=[...BOOK.words,...SUPPLEMENT_WORDS].map(w=>({...w}));
+  // Maintained from this chat: separate source, shared memory progress with the textbook.
+  const CHAT_WORDS=(Array.isArray(window.KOTOBA_EXTRAS)?window.KOTOBA_EXTRAS:[])
+    .filter(w=>w&&w.jp&&w.cn)
+    .map(w=>({...w,lesson:'extra',section:'聊天课外词',source:'chat'}));
   const COURSE=new Map(BOOK.lessons.map(x=>[x.id,x]));
   const STORAGE={get(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}},set(k,x){try{localStorage.setItem(k,JSON.stringify(x));return true}catch{return false}}};
   const clean=s=>String(s??'').trim().slice(0,180);
@@ -25,12 +29,12 @@
   const randomize=a=>{let c=[...a];for(let j=c.length-1;j>0;j--){let k=Math.floor(Math.random()*(j+1));[c[j],c[k]]=[c[k],c[j]];}return c;};
   const dateText=ts=>new Date(ts).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
   // New-word coverage is independent of memory ratings and their spaced-repetition schedule.
-  const coverageScope=(type,lesson)=>type==='lesson'?'lesson:'+lesson:type==='all'?'all':null;
+  const coverageScope=(type,lesson)=>type==='lesson'?'lesson:'+lesson:(type==='all'||type==='extra'?type:null);
   function normalizeCoverage(raw){
     const out={};
     if(!raw||typeof raw!=='object'||Array.isArray(raw))return out;
     for(const [scope,words] of Object.entries(raw)){
-      if(!(/^(all|lesson:[^:]{1,30})$/.test(scope))||!Array.isArray(words))continue;
+      if(!(/^(all|extra|lesson:[^:]{1,30})$/.test(scope))||!Array.isArray(words))continue;
       out[scope]=uniq(words.filter(jp=>typeof jp==='string'&&jp.length<=180)).slice(-5000);
     }
     return out;
@@ -91,7 +95,7 @@
   // Preserve each lesson's printed gloss, including distinct meanings for the same verb.
   const allWords=()=>{
     const map=new Map();
-    for(const source of [...BOOK_WORDS,...db.custom]){
+    for(const source of [...BOOK_WORDS,...CHAT_WORDS,...db.custom]){
       const w={...source},old=map.get(w.jp);
       if(!old){
         map.set(w.jp,{...w,lessons:[w.lesson],lessonVariants:{[w.lesson]:{...w}}});
@@ -179,6 +183,14 @@
   $('openLessons').onclick=()=>view('lessons');
   $('lessonToAll').onclick=()=>openSetup('all');
   $('openAll').onclick=()=>openSetup('all');
+  $('openExtra').onclick=()=>openSetup('extra');
+  $('openRandom').onclick=()=>{
+    const words=randomize(allWords()).slice(0,Math.min(10,allWords().length));
+    if(!words.length){toast('目前没有可抽查的词语');return;}
+    session={queue:words.map(w=>w.jp),unique:words.map(w=>w.jp),cursor:0,visited:new Set(),kind:'random',lesson:null,revealed:false};
+    activeLesson=null;
+    view('choose');
+  };
   $('openReview').onclick=()=>{
     const due=allWords().filter(isDue);
     if(due.length)openSetup('due');
@@ -194,7 +206,7 @@
     $('lessonList').querySelectorAll('[data-lesson]').forEach(btn=>btn.onclick=()=>openSetup('lesson',btn.dataset.lesson));
   }
   let setup={type:'all',lesson:null,pool:[]};
-  function getPool(type,lesson){const words=allWords();if(type==='lesson')return words.filter(w=>w.lessons?.includes(lesson));if(type==='due')return words.filter(isDue).sort((a,b)=>progressFor(a.jp).dueAt-progressFor(b.jp).dueAt);if(type==='weak')return words.filter(isWeak);return words;}
+  function getPool(type,lesson){const words=allWords();if(type==='lesson')return words.filter(w=>w.lessons?.includes(lesson));if(type==='extra')return words.filter(w=>w.lessons?.includes('extra'));if(type==='due')return words.filter(isDue).sort((a,b)=>progressFor(a.jp).dueAt-progressFor(b.jp).dueAt);if(type==='weak')return words.filter(isWeak);return words;}
   function openSetup(type,lesson=null,selected=null){
     const fullPool=selected||getPool(type,lesson);
     if(!fullPool.length){toast('这个分类目前没有可学词语');return;}
@@ -204,8 +216,8 @@
     const newCycle=!!scope&&remaining.length===0;
     const pool=scope?(newCycle?fullPool:remaining):fullPool;
     setup={type,lesson,pool,fullSize:fullPool.length,scope,newCycle,qtyTouched:false};
-    const titles={all:'大词库学习',lesson:COURSE.get(lesson)?.name||'按课学习',due:'到期复习',weak:'薄弱词复习',selected:'继续巩固'};
-    const captions={all:'大词库按未学词轮换；看完整个词库前，不重复上一轮的词。',lesson:`第 ${lesson} 课 · ${COURSE.get(lesson)?.cn||'教材词语'}`,due:'先回忆已经到复习时间的词。',weak:'这些是你过去标记过“不记得了”的词。',selected:'巩固刚才标记为遗忘的词。'};
+    const titles={all:'总词汇库学习',extra:'课外词学习',lesson:COURSE.get(lesson)?.name||'按课学习',due:'到期复习',weak:'薄弱词复习',selected:'继续巩固'};
+    const captions={all:'总词汇库包含课内、课外和自定义词；未学完前各轮不重复。',extra:'只学习课外词；与课内重合的单词只计一个，保留共同记忆进度。',lesson:`第 ${lesson} 课 · ${COURSE.get(lesson)?.cn||'教材词语'}`,due:'先回忆已经到复习时间的词。',weak:'这些是你过去标记过“不记得了”的词。',selected:'巩固刚才标记为遗忘的词。'};
     $('setupKicker').textContent=type==='lesson'?'TEXTBOOK / LESSON '+String(lesson).padStart(2,'0'):'KOTOBA / COLLECTION';
     $('setupTitle').textContent=titles[type]||titles.all;
     const status=scope?(newCycle?` · 全部 ${fullPool.length} 个词已看过；本次开始新一遍。`:` · 尚未学过 ${remaining.length} / ${fullPool.length} 个；本轮不重复旧词。`):'';
@@ -223,7 +235,7 @@
   function beginSession(wordJPs,kind='all',lesson=null){
     if(!wordJPs.length){toast('暂无词语');return;}
     session={queue:[...wordJPs],unique:uniq(wordJPs),cursor:0,visited:new Set(),kind,lesson,revealed:false};
-    activeLesson=kind==='lesson'?lesson:null;
+    activeLesson=kind==='lesson'?lesson:(kind==='extra'?'extra':null);
     view('study');renderStudy();
   }
   $('startSession').onclick=()=>{
@@ -383,10 +395,10 @@
   $('libLesson').onchange=renderLibrary;
   function renderLibrary(){
     const term=norm($('wordSearch').value),lesson=$('libLesson').value;
-    const words=allWords().filter(w=>(lesson==='all'||w.lessons?.includes(lesson))&&(!term||norm(w.jp).includes(term)||norm(w.kana).includes(term)||norm(w.cn).includes(term)||Object.values(w.lessonVariants||{}).some(x=>norm(x.cn).includes(term))));
-    const displayWord=w=>lesson==='all'?w:{...w,...(w.lessonVariants?.[lesson]||{})};
+    const words=allWords().filter(w=>(lesson==='all'||(lesson==='textbook'?w.lessons?.some(l=>l!=='extra'):w.lessons?.includes(lesson)))&&(!term||norm(w.jp).includes(term)||norm(w.kana).includes(term)||norm(w.cn).includes(term)||Object.values(w.lessonVariants||{}).some(x=>norm(x.cn).includes(term))));
+    const displayWord=w=>(lesson==='all'||lesson==='textbook')?w:{...w,...(w.lessonVariants?.[lesson]||{})};
     $('libCount').textContent=`显示 ${words.length} / ${allWords().length} 条`;
-    $('wordList').innerHTML=words.length?words.map(original=>{const w=displayWord(original);return `<div class="word-line"><div class="word-line-main"><strong>${esc(w.jp)}</strong><span class="line-kana">${esc(w.kana)}</span><span class="line-cn">${esc(w.cn)}</span></div>${w.source==='custom'?`<button class="delete-word" data-delete="${encodeURIComponent(w.jp)}">删除</button>`:`<span class="line-source">${lesson==='all'&&original.lessons.length>1?original.lessons.map(l=>l==='extra'?'个人词库':'第'+l+'课').join(' / '):w.lesson==='extra'?'原词库':`第${w.lesson}课 · ${w.page}页`}</span>`}</div>`}).join(''):'<div class="empty-state">没有符合条件的单词。</div>';
+    $('wordList').innerHTML=words.length?words.map(original=>{const w=displayWord(original);return `<div class="word-line"><div class="word-line-main"><strong>${esc(w.jp)}</strong><span class="line-kana">${esc(w.kana)}</span><span class="line-cn">${esc(w.cn)}</span></div>${w.source==='custom'?`<button class="delete-word" data-delete="${encodeURIComponent(w.jp)}">删除</button>`:`<span class="line-source">${lesson==='all'&&original.lessons.length>1?original.lessons.map(l=>l==='extra'?'课外词':'第'+l+'课').join(' / '):w.lesson==='extra'?'课外词':`第${w.lesson}课 · ${w.page}页`}</span>`}</div>`}).join(''):'<div class="empty-state">没有符合条件的单词。</div>';
     $('wordList').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{
       const jp=decodeURIComponent(b.dataset.delete);if(!confirm(`删除自定义单词“${jp}”？`))return;
       db.custom=db.custom.filter(w=>w.jp!==jp);delete db.progress[jp];save();renderLibrary();updateHome();
