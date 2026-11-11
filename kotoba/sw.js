@@ -1,5 +1,5 @@
-const CACHE='kotoba-v6.2-20261111-nextbatch';
-const FILES=['./','./index.html','./styles.css?v=6.2','./book-data.js?v=5.1',
+const CACHE='kotoba-v6.3-20261111-center-pos';
+const FILES=['./','./index.html','./styles.css?v=6.3','./book-data.js?v=5.1',
   './vocab-13.js?v=6.0','./vocab-14.js?v=6.0','./vocab-15.js?v=6.0','./vocab-16.js?v=6.0',
   './extra-words.js?v=6.1','./app.js?v=6.2','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>{
