@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="ことば">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./styles.css?v=6.0">
+<link rel="stylesheet" href="./styles.css?v=6.1">
 <title>ことば · 日语单词手帖</title>
 </head>
 <body>
@@ -26,8 +26,10 @@
   <div class="section-top"><h2>开始学习</h2><span>SELECT A PATH</span></div>
   <div class="entry-list">
     <button class="entry-card" id="openLessons"><span class="entry-mark">01</span><span class="entry-body"><b>按课次学习</b><small>跟随教材，一课一课记住</small></span><span class="entry-arrow">↗</span></button>
-    <button class="entry-card" id="openAll"><span class="entry-mark">02</span><span class="entry-body"><b>大词库学习</b><small>全部词语混合随机练习</small></span><span class="entry-arrow">↗</span></button>
-    <button class="entry-card" id="openReview"><span class="entry-mark">03</span><span class="entry-body"><b>间隔复习</b><small>优先记忆到期与遗忘的词</small></span><span class="entry-arrow">↗</span></button>
+    <button class="entry-card" id="openExtra"><span class="entry-mark">02</span><span class="entry-body"><b>课外词</b><small>聊天中查询的词语，自动归档</small></span><span class="entry-arrow">↗</span></button>
+    <button class="entry-card" id="openAll"><span class="entry-mark">03</span><span class="entry-body"><b>总词汇库</b><small>课内＋课外，一起学习</small></span><span class="entry-arrow">↗</span></button>
+    <button class="entry-card" id="openRandom"><span class="entry-mark">04</span><span class="entry-body"><b>随机抽查</b><small>从总词汇库随机出 10 词，直接默写</small></span><span class="entry-arrow">↗</span></button>
+    <button class="entry-card" id="openReview"><span class="entry-mark">05</span><span class="entry-body"><b>间隔复习</b><small>优先记忆到期与遗忘的词</small></span><span class="entry-arrow">↗</span></button>
   </div>
   <div class="secondary-links"><button data-nav="library">管理词库</button><span class="dot-sep">·</span><button data-nav="stats">学习记录</button><span class="dot-sep">·</span><button id="openGuide">记忆方法</button></div><details class="voice-options"><summary>日语朗读设置</summary><div><label for="voiceSelect">日语发音音色</label><select id="voiceSelect"><option value="">检测日语语音中…</option></select><p id="voiceNotice">朗读使用设备提供的日语系统语音，发音质量因设备与音色而异。</p><button id="testVoice" type="button">试听「こんにちは」 ↗</button></div></details>
 </section>
@@ -55,7 +57,7 @@
 <section id="library" class="view hidden">
   <button class="back" data-nav="home">← 返回首页</button><div class="page-intro"><span class="eyebrow">YOUR COLLECTION</span><h1>我的词库。</h1><p>教材词、旧词库与自定义词都在这里。可以搜索和备份。</p></div>
   <input class="search-field" id="wordSearch" placeholder="查找日语、假名或中文…" autocomplete="off">
-  <div class="library-toolbar"><span id="libCount">—</span><select id="libLesson" aria-label="按课次筛选"><option value="all">全部课次</option><option value="1">第1课</option><option value="2">第2课</option><option value="3">第3课</option><option value="12">第12课</option><option value="13">第13课</option><option value="14">第14课</option><option value="15">第15课</option><option value="16">第16课</option><option value="extra">其他词汇</option></select></div>
+  <div class="library-toolbar"><span id="libCount">—</span><select id="libLesson" aria-label="按课次筛选"><option value="all">总词汇库（全部）</option><option value="textbook">课内词</option><option value="1">第1课</option><option value="2">第2课</option><option value="3">第3课</option><option value="12">第12课</option><option value="13">第13课</option><option value="14">第14课</option><option value="15">第15课</option><option value="16">第16课</option><option value="extra">课外词</option></select></div>
   <div class="word-list" id="wordList"></div>
   <details class="add-panel"><summary>＋ 添加自己的单词</summary><p>每行：日语 | 假名 | 中文释义 | 词性</p><textarea id="importText" rows="4" placeholder="例えば：経験 | けいけん | 经验 | 名词"></textarea><button class="outline-btn" id="importBtn">添加到词库</button><p class="micro" id="importStatus"></p></details>
   <div class="backup-row"><button id="exportBtn">导出学习备份 ↗</button><label class="file-label">导入备份 ↗<input id="restoreFile" type="file" accept=".json,application/json" hidden></label></div><p class="micro">记录保存在当前浏览器。清理网站数据或更换手机可能丢失，请定期导出备份。</p>
@@ -99,5 +101,5 @@
   <div class="test-bottom" id="testCount">01 / 10</div><div id="testModeLabel" class="sr-only">中文 → 日语</div>
 </section>
 <div id="toast" class="toast hidden" role="status"></div>
-<script src="./book-data.js?v=5.1"></script><script src="./vocab-13.js?v=6.0"></script><script src="./vocab-14.js?v=6.0"></script><script src="./vocab-15.js?v=6.0"></script><script src="./vocab-16.js?v=6.0"></script><script src="./app.js?v=6.0"></script>
+<script src="./book-data.js?v=5.1"></script><script src="./vocab-13.js?v=6.0"></script><script src="./vocab-14.js?v=6.0"></script><script src="./vocab-15.js?v=6.0"></script><script src="./vocab-16.js?v=6.0"></script><script src="./extra-words.js?v=6.1"></script><script src="./app.js?v=6.1"></script>
 </body></html>
