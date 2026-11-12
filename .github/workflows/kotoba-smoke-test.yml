@@ -1,5 +1,10 @@
 name: Kotoba published-site check
 on:
+  pull_request:
+    paths:
+      - 'kotoba/**'
+      - '.github/tests/kotoba*'
+      - '.github/workflows/kotoba-smoke-test.yml'
   push:
     branches: [main]
   workflow_run:
@@ -21,5 +26,6 @@ jobs:
           node .github/tests/kotoba-rotation.test.cjs
           node .github/tests/kotoba-catalog-v6.test.cjs
       - name: Verify currently published HTML and its versioned assets
+        if: ${{ github.event_name != 'pull_request' }}
         shell: bash
         run: node .github/tests/kotoba-live-site.test.cjs
