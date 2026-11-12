@@ -83,7 +83,7 @@ test('desktop camera never starts inside the near-right building row', async ({ 
   await page.locator('#start').click();
   const canvas = page.locator('#gl');
   await expect(canvas).toHaveAttribute('data-camera-mode', 'landscape');
-  await expect(canvas).toHaveAttribute('data-camera-x', /-?\\d+\\.\\d+/);
+  await expect(canvas).toHaveAttribute('data-camera-x', /-?\d+\.\d+/);
   const x = Number(await canvas.getAttribute('data-camera-x'));
   expect(Number.isFinite(x)).toBe(true);
   // Street spans |x| < ~5.8; buildings' near faces start beyond |x| ~6.8.
