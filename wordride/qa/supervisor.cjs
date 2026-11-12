@@ -68,11 +68,11 @@ for (const test of tests) {
 }
 const files = inventory(resultsDir);
 const evidence = {
-  desktopPlaying: files.some(f => /playing\\.png$/i.test(f) && f.includes('desktop')),
-  mobilePlaying: files.some(f => /playing\\.png$/i.test(f) && f.includes('mobile')),
-  desktopRoad: files.some(f => /desktop-road-visible\\.png$/i.test(f)),
-  frameMetrics: files.filter(f => /frame-pacing\\.json$/i.test(f)).length,
-  screenshots: files.filter(f => /\\.png$/i.test(f)).length,
+  desktopPlaying: files.some(f => /playing\.png$/i.test(f) && f.includes('desktop')),
+  mobilePlaying: files.some(f => /playing\.png$/i.test(f) && f.includes('mobile')),
+  desktopRoad: files.some(f => /desktop-road-visible\.png$/i.test(f)),
+  frameMetrics: files.filter(f => /frame-pacing\.json$/i.test(f)).length,
+  screenshots: files.filter(f => /\.png$/i.test(f)).length,
 };
 const blockers = [];
 if (counts.failed || counts.other) blockers.push('Failed or indeterminate browser tests');
