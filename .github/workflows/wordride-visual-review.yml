@@ -1,0 +1,146 @@
+name: WordRide independent visual review
+
+# Optional paid image-based review. Enable only after setting the API secret
+# and WORDRIDE_VISUAL_REVIEW_ENABLED=true repository variable.
+on:
+  workflow_run:
+    workflows: ["WordRide browser QA pilot"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wordride-visual-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  review:
+    if: ${{ vars.WORDRIDE_VISUAL_REVIEW_ENABLED == 'true' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && (github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      report_ready: ${{ steps.result.outputs.ready }}
+    steps:
+      - name: Check configured API key
+        id: key-check
+        env:
+          HAS_KEY: ${{ secrets.OPENAI_API_KEY != '' }}
+        run: |
+          if [ "$HAS_KEY" = "true" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Visual review not enabled: set OPENAI_API_KEY in repository Actions secrets." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Checkout trusted supervisor instructions from main
+        if: ${{ steps.key-check.outputs.enabled == 'true' }}
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Download audited CI screenshots (data only)
+        if: ${{ steps.key-check.outputs.enabled == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          mkdir -p .qa-evidence
+          gh run download "$SOURCE_RUN_ID" --name "wordride-qa-$SOURCE_RUN_ID" --dir .qa-evidence
+          desktop="$(find .qa-evidence -type f -name 'playing.png' -path '*desktop*' -print -quit)"
+          mobile="$(find .qa-evidence -type f -name 'playing.png' -path '*mobile*' -print -quit)"
+          test -n "$desktop" && test -n "$mobile"
+          cp "$desktop" .qa-evidence/desktop.png
+          cp "$mobile" .qa-evidence/mobile.png
+          test -s .qa-evidence/desktop.png && test -s .qa-evidence/mobile.png
+          echo "Captured both visual inputs from the actual QA workflow." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run independent read-only image audit
+        if: ${{ steps.key-check.outputs.enabled == 'true' }}
+        id: codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          permission-profile: ":read-only"
+          safety-strategy: drop-sudo
+          allow-bots: true
+          prompt-file: .github/wordride/visual-review-prompt.md
+          output-schema-file: .github/wordride/visual-review-schema.json
+          codex-args: '["--image", ".qa-evidence/desktop.png", "--image", ".qa-evidence/mobile.png"]'
+          output-file: visual-review.json
+
+      - name: Check report exists and summarize
+        if: ${{ steps.key-check.outputs.enabled == 'true' && steps.codex.outcome == 'success' }}
+        id: result
+        run: |
+          set -euo pipefail
+          test -s visual-review.json
+          python3 -m json.tool visual-review.json >/dev/null
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+          python3 - <<'PY'
+          import json, os
+          data = json.load(open('visual-review.json', encoding='utf-8'))
+          lines = [
+              '# WordRide 视觉审核（独立 Agent）',
+              '',
+              '**判定：' + str(data.get('verdict','unknown')) + '**（仅基于桌面与手机各一张截图）',
+              '',
+              str(data.get('summary','')),
+              '',
+              '## 观察'
+          ]
+          for finding in data.get('findings', []):
+              lines.append('- [' + str(finding.get('severity','info')) + '] ' + str(finding.get('platform','both')) + ': ' + str(finding.get('observation','')))
+          lines.extend(['', '不据此宣称已验证动画、帧率、操控手感或用户审美满意度。', ''])
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as f:
+              f.write('\n'.join(lines))
+          PY
+
+      - name: Upload visual review evidence
+        if: ${{ steps.result.outputs.ready == 'true' }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: wordride-visual-${{ github.event.workflow_run.id }}
+          path: visual-review.json
+          retention-days: 14
+
+  comment-pr:
+    needs: review
+    if: ${{ needs.review.outputs.report_ready == 'true' && github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.pull_requests[0].number != null }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Download reviewer JSON (no model secret)
+        uses: actions/download-artifact@v5
+        with:
+          name: wordride-visual-${{ github.event.workflow_run.id }}
+      - name: Post independent visual findings on the PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          data=json.load(open('visual-review.json',encoding='utf-8'))
+          lines=['<!-- wordride-visual-audit -->',
+                 '### WordRide 独立视觉检查',
+                 '**判定：' + str(data.get('verdict','unknown')) + '**（仅基于截图）',
+                 '',
+                 str(data.get('summary','')),
+                 '']
+          for f in data.get('findings',[]):
+              lines.append('- **' + str(f.get('severity','info')) + ' / ' + str(f.get('platform','both')) + '**：' + str(f.get('observation','')) + '；建议：' + str(f.get('suggested_check','')))
+          lines.extend(['','动画、真实设备性能、学习效果与最终美术满意度仍需独立证据。'])
+          open('visual-comment.md','w',encoding='utf-8').write('\n'.join(lines)+'\n')
+          PY
+          gh pr comment "$PR_NUMBER" --body-file visual-comment.md
