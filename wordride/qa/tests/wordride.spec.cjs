@@ -76,6 +76,25 @@ test('ride, pause, quality, rain and hint controls respond', async ({ page }, te
   });
 });
 
+test('desktop camera never starts inside the near-right building row', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Desktop camera regression only');
+  await page.goto(GAME + '?qa=1', { waitUntil: 'load' });
+  await expect(page.locator('#loading')).toHaveClass(/hide/, { timeout: 30_000 });
+  await page.locator('#start').click();
+  const canvas = page.locator('#gl');
+  await expect(canvas).toHaveAttribute('data-camera-mode', 'landscape');
+  await expect(canvas).toHaveAttribute('data-camera-x', /-?\d+\.\d+/);
+  const x = Number(await canvas.getAttribute('data-camera-x'));
+  expect(Number.isFinite(x)).toBe(true);
+  // Street spans |x| < ~5.8; buildings' near faces start beyond |x| ~6.8.
+  expect(x, 'The desktop eye must not be embedded in a building').toBeGreaterThan(-5.5);
+  expect(x, 'The desktop eye must not be embedded in a building').toBeLessThan(5.5);
+  await page.screenshot({ path: testInfo.outputPath('desktop-road-visible.png'), fullPage: true });
+  await testInfo.attach('desktop-road-visible.png', {
+    path: testInfo.outputPath('desktop-road-visible.png'), contentType: 'image/png'
+  });
+});
+
 test('measure animation-frame pacing without claiming GPU-level FPS', async ({ page }, testInfo) => {
   await page.locator('#start').click();
   const metrics = await page.evaluate(() => new Promise((resolve) => {

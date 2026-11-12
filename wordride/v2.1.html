@@ -49,7 +49,7 @@ function pause(){if(!state.running)return;state.paused=!state.paused;$('#pause')
 $$('.mode').forEach(b=>b.addEventListener('click',()=>{$$('.mode').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.mode=b.dataset.mode}));$('#start').onclick=begin;$('#restart').onclick=begin;$('#pause').onclick=pause;$('#speak').onclick=speak;$('#hint').onclick=hint;$('#rainBtn').onclick=()=>{state.rain=!state.rain;$('#rainBtn').textContent=state.rain?'☂ 雨天 / ON':'☀ 晴夜 / OFF'};$('#soundBtn').onclick=()=>{state.sound=!state.sound;$('#soundBtn').textContent=state.sound?'♪ 声音 / ON':'♪ 声音 / OFF'};
 $('#keyboard').innerHTML=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'].map(row=>`<div class="kb-row">${[...row].map(c=>`<button class="key" data-k="${c.toLowerCase()}">${c}</button>`).join('')}</div>`).join('');$$('.key').forEach(b=>b.onclick=()=>key(b.dataset.k));window.addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();pause()}else if(e.key==='Tab'&&state.running){e.preventDefault();speak()}else if(e.key.length===1&&/[a-z]/i.test(e.key)){key(e.key)}});
 // ------------------- self-contained genuine WebGL 3D engine -------------------
-const canvas=$('#gl');let gl;try{gl=canvas.getContext('webgl2',{alpha:false,antialias:innerWidth>720,powerPreference:'high-performance'});if(!gl)throw Error('WebGL2 unsupported')}catch(e){$('#error').classList.add('show');$('#loading').classList.add('hide');return}
+const canvas=$('#gl');const qaEnabled=new URLSearchParams(location.search).get('qa')==='1';let gl;try{gl=canvas.getContext('webgl2',{alpha:false,antialias:innerWidth>720,powerPreference:'high-performance'});if(!gl)throw Error('WebGL2 unsupported')}catch(e){$('#error').classList.add('show');$('#loading').classList.add('hide');return}
 const vs=`#version 300 es
 precision highp float;in vec3 aPos;in vec3 aNorm;in vec3 aCol;in float aGlow;uniform mat4 uProj,uView;uniform vec3 uOffset;uniform float uWheel;uniform float uRole;out vec3 vCol;out float vGlow;out float vDepth;out vec3 vNormal;out vec3 vWorld;
 void main(){vec3 p=aPos;if(uRole>1.5){float a=uWheel;float centerZ=p.z>3.8?5.07:2.50;float yy=p.y-.67,zz=p.z-centerZ;p.y=.67+yy*cos(a)-zz*sin(a);p.z=centerZ+yy*sin(a)+zz*cos(a);}p+=uOffset;vec4 vv=uView*vec4(p,1.0);gl_Position=uProj*vv;vDepth=-vv.z;vCol=aCol;vGlow=aGlow;vNormal=aNorm;vWorld=p;}`;
@@ -267,7 +267,9 @@ function frame(ms){requestAnimationFrame(frame);if(document.hidden){last=ms;retu
  const rapid=Math.max(0,Math.min(1,(realSpeed-5)/15));const portrait=w/h<.85;
  let sway=(state.running?.10:.035)*Math.sin(anim*1.85);camLean+=(sway-camLean)*Math.min(1,dt*2.8);camKick+=(impact*.38-stumble*.25-camKick)*Math.min(1,dt*5);
  let sh=rapid*(.035*Math.sin(anim*15)+.028*Math.sin(anim*22));
- const eye=portrait?[2.8+camLean,7.0+camKick*.27,17.4-rapid*.6]:[8.8+camLean,6.0+camKick*.24+sh,15.9-rapid*.75];
+ // Desktop must remain in the road corridor (the nearest building facades are beyond |x|≈6.8).
+ const eye=portrait?[2.8+camLean,7.0+camKick*.27,17.4-rapid*.6]:[4.15+camLean,6.0+camKick*.24+sh,15.9-rapid*.75];
+ if(qaEnabled){canvas.dataset.cameraX=eye[0].toFixed(3);canvas.dataset.cameraZ=eye[2].toFixed(3);canvas.dataset.cameraMode=portrait?'portrait':'landscape';}
  const target=portrait?[-2.1,1.55,-5.7]:[-1.05,1.85,-8.5];
  const view=mat4.look(eye,target),fov=(portrait?64:56)+rapid*6+impact*2;
  const proj=mat4.persp(fov*Math.PI/180,w/h,.12,320);
