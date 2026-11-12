@@ -2,5 +2,6 @@
 // 格式：{jp,kana,cn,pos,askedOn}；lesson/source 在 app.js 统一补充。
 window.KOTOBA_EXTRAS = [
   {jp:'異なる',kana:'ことなる',cn:'不同；不一样；有差异',pos:'自五',askedOn:'2026-11-11'},
-  {jp:'調査',kana:'ちょうさ',cn:'调查',pos:'名・他サ',askedOn:'2026-11-11'}
+  {jp:'調査',kana:'ちょうさ',cn:'调查',pos:'名・他サ',askedOn:'2026-11-11'},
+  {jp:'パンフレット',kana:'ぱんふれっと',cn:'宣传册；小册子',pos:'名',askedOn:'2026-11-12'}
 ];
