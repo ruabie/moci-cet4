@@ -43,6 +43,10 @@ jobs:
         run: npm test
         env:
           CI: 'true'
+      - name: Generate independent QA evidence summary
+        if: ${{ !cancelled() }}
+        working-directory: wordride/qa
+        run: node supervisor.cjs
       - name: Upload screenshots, traces, and metrics
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v5

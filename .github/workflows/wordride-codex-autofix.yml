@@ -1,0 +1,159 @@
+name: WordRide bounded Codex repair
+
+# Off by default: to enable automatic paid repairs, set repository variable
+# WORDRIDE_AUTOFIX_ENABLED=true and secret OPENAI_API_KEY.
+on:
+  workflow_run:
+    workflows: ["WordRide browser QA pilot"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      objective:
+        description: "限定任务类型；未设置密钥时只生成配置提示"
+        required: true
+        type: choice
+        default: ci-failure
+        options:
+          - ci-failure
+          - camera-guard
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wordride-codex-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  generate-patch:
+    # NEVER run paid repair automatically for PRs or forked sources.
+    if: ${{ github.event_name == 'workflow_dispatch' || (vars.WORDRIDE_AUTOFIX_ENABLED == 'true' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion == 'failure') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      enabled: ${{ steps.key-check.outputs.enabled }}
+      produced: ${{ steps.patch.outputs.produced }}
+    steps:
+      - name: Check optional AI configuration without exposing key
+        id: key-check
+        env:
+          HAS_KEY: ${{ secrets.OPENAI_API_KEY != '' }}
+        run: |
+          if [ "$HAS_KEY" = "true" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Codex repair disabled: set OPENAI_API_KEY in Settings → Secrets and variables → Actions." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Checkout trusted main commit without persisted credentials
+        if: ${{ steps.key-check.outputs.enabled == 'true' }}
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || 'main' }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Fetch only failed CI logs and prepare evidence
+        if: ${{ steps.key-check.outputs.enabled == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FAILED_RUN_ID: ${{ github.event.workflow_run.id || '' }}
+          OBJECTIVE: ${{ inputs.objective || 'ci-failure' }}
+        run: |
+          mkdir -p .supervisor-input
+          printf 'Objective: %s\nSource workflow run: %s\n' "$OBJECTIVE" "$FAILED_RUN_ID" > .supervisor-input/context.md
+          if [ -n "$FAILED_RUN_ID" ]; then
+            (gh run view "$FAILED_RUN_ID" --log-failed 2>/dev/null || true) | head -c 150000 > .supervisor-input/failed-ci.log
+          else
+            printf 'Manual run. No CI failure log was supplied. Do not invent a defect.\n' > .supervisor-input/failed-ci.log
+          fi
+
+      - name: Run one constrained Codex repair attempt
+        if: ${{ steps.key-check.outputs.enabled == 'true' }}
+        id: codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          permission-profile: ":workspace"
+          safety-strategy: drop-sudo
+          prompt-file: .github/wordride/autofix-prompt.md
+          output-file: .supervisor-input/codex-final.txt
+
+      - name: Create limited patch artifact (no repository token)
+        if: ${{ steps.key-check.outputs.enabled == 'true' && steps.codex.outcome == 'success' }}
+        id: patch
+        run: |
+          git diff --binary HEAD -- wordride/v2.1.html > codex.patch
+          if [ -s codex.patch ]; then
+            echo "produced=true" >> "$GITHUB_OUTPUT"
+            echo "Codex proposed one scoped patch; separate publisher will open a PR." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "produced=false" >> "$GITHUB_OUTPUT"
+            echo "No defensible source change proposed. Nothing will be published." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f .supervisor-input/codex-final.txt ]; then
+            cp .supervisor-input/codex-final.txt codex-final.txt
+          fi
+
+      - name: Save agent diagnostics and optional patch
+        if: ${{ steps.key-check.outputs.enabled == 'true' && steps.codex.outcome == 'success' }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: wordride-autofix-${{ github.run_id }}
+          path: |
+            codex.patch
+            codex-final.txt
+          if-no-files-found: warn
+          retention-days: 14
+
+  publish-pr:
+    needs: generate-patch
+    if: ${{ needs.generate-patch.outputs.produced == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Download scoped patch
+        uses: actions/download-artifact@v5
+        with:
+          name: wordride-autofix-${{ github.run_id }}
+      - name: Validate patch only touches the WordRide page
+        run: |
+          set -euo pipefail
+          test -s codex.patch
+          git apply --check --index codex.patch
+          git apply --index codex.patch
+          files="$(git diff --cached --name-only)"
+          test "$files" = "wordride/v2.1.html" || { echo "Out-of-scope change rejected: $files"; exit 1; }
+          git diff --cached --check
+      - name: Commit isolated patch and open draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          branch="bot/wordride-fix-$RUN_ID"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -m "fix(wordride): bounded Codex repair proposal"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" --draft \
+            --title "WordRide Codex candidate fix ($RUN_ID)" \
+            --body "One automatic attempt based on WordRide CI. Requires independent QA and visual review before merge. No auto-release. Generated in run $RUN_ID."
+          # GITHUB_TOKEN PR events do not trigger standard PR workflows; dispatch QA explicitly.
+          gh workflow run wordride-qa.yml --ref "$branch"
+          echo "Draft PR created and WordRide QA dispatched for branch $branch." >> "$GITHUB_STEP_SUMMARY"
