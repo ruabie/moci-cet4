@@ -95,7 +95,7 @@ const report = {
   testResults: tests,
   source: 'Playwright Chromium software renderer'
 };
-const rows = tests.map(t => '| ' + t.project + ' | ' + t.title.replace(/\\|/g, '/') + ' | ' + t.outcome + ' |').join('\n');
+const rows = tests.map(t => '| ' + t.project + ' | ' + t.title.replace(/\|/g, '/') + ' | ' + t.outcome + ' |').join('\n');
 const md = [
   '# WordRide 自动监工验收报告',
   '',
