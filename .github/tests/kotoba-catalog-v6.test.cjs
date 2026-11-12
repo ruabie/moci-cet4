@@ -35,9 +35,13 @@ const testHTML=html.split('<section id="test"')[1];
 assert.ok(studyHTML.includes('class="card-pos" id="cardPos"'),'POS must appear in full-screen study page');
 assert.ok(studyHTML.indexOf('id="cardPos"')>studyHTML.indexOf('id="cardReveal"'),'POS should be shown with the revealed meaning');
 assert.ok(!testHTML.includes('id="cardPos"'),'No POS in assessment page');
-const assetRefs=[...html.matchAll(/(?:src|href)="\\.\\/([^"]+)"/g)].map(m=>m[1]);
+const assetRefs=html.split('"./').slice(1).map(x=>x.split('"')[0]);
+const validVersion=ref=>{
+  const v=ref.split('?v=')[1];
+  return !!v&&v.split('.').every(part=>part.length>0&&[...part].every(ch=>ch>='0'&&ch<='9'));
+};
 for(const file of ['book-data.js','vocab-13.js','vocab-14.js','vocab-15.js','vocab-16.js','extra-words.js','app.js','styles.css']){
-  assert.ok(assetRefs.some(ref=>ref.startsWith(file+'?v=')&&/^\\d+(?:\\.\\d+)*$/.test(ref.slice((file+'?v=').length))),
+  assert.ok(assetRefs.some(ref=>ref.startsWith(file+'?v=')&&validVersion(ref)),
     'Missing versioned script or stylesheet '+file);
 }
 const storage=new Map();
