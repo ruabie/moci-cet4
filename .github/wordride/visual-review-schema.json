@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "block",
+        "unknown"
+      ]
+    },
+    "desktop_road": {
+      "type": "string",
+      "enum": [
+        "clear",
+        "obstructed",
+        "indeterminate"
+      ]
+    },
+    "mobile_road": {
+      "type": "string",
+      "enum": [
+        "clear",
+        "obstructed",
+        "indeterminate"
+      ]
+    },
+    "ui_readability": {
+      "type": "string",
+      "enum": [
+        "good",
+        "bad",
+        "indeterminate"
+      ]
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "block",
+              "warn",
+              "info"
+            ]
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "desktop",
+              "mobile",
+              "both"
+            ]
+          },
+          "observation": {
+            "type": "string"
+          },
+          "suggested_check": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "platform",
+          "observation",
+          "suggested_check"
+        ]
+      }
+    },
+    "evidence_limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "verdict",
+    "desktop_road",
+    "mobile_road",
+    "ui_readability",
+    "findings",
+    "evidence_limitations",
+    "summary"
+  ]
+}
