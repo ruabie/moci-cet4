@@ -35,7 +35,15 @@ const testHTML=html.split('<section id="test"')[1];
 assert.ok(studyHTML.includes('class="card-pos" id="cardPos"'),'POS must appear in full-screen study page');
 assert.ok(studyHTML.indexOf('id="cardPos"')>studyHTML.indexOf('id="cardReveal"'),'POS should be shown with the revealed meaning');
 assert.ok(!testHTML.includes('id="cardPos"'),'No POS in assessment page');
-for(const file of ['book-data.js?v=5.1','vocab-13.js?v=6.0','vocab-14.js?v=6.0','vocab-15.js?v=6.0','vocab-16.js?v=6.0','app.js?v=6.0'])assert.ok(html.includes(file),'Missing included script '+file);
+const assetRefs=html.split('"./').slice(1).map(x=>x.split('"')[0]);
+const validVersion=ref=>{
+  const v=ref.split('?v=')[1];
+  return !!v&&v.split('.').every(part=>part.length>0&&[...part].every(ch=>ch>='0'&&ch<='9'));
+};
+for(const file of ['book-data.js','vocab-13.js','vocab-14.js','vocab-15.js','vocab-16.js','extra-words.js','app.js','styles.css']){
+  assert.ok(assetRefs.some(ref=>ref.startsWith(file+'?v=')&&validVersion(ref)),
+    'Missing versioned script or stylesheet '+file);
+}
 const storage=new Map();
 class MockElement{
   constructor(id=''){
