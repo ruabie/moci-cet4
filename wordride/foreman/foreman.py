@@ -220,8 +220,7 @@ def run_task(task: dict, provider: str, model: str,
         raise ForemanError("Maximum two repair attempts reached")
     path = worktree(task)
     guard_changed_files(path)
-    if git("diff", "--name-only", cwd=path):
-        raise ForemanError("Previous candidate must be committed/reviewed before retry")
+    # A second attempt is permitted against the previous candidate, but only within the allowlist.
     source_path = path / TARGET
     source = source_path.read_text(encoding="utf-8")
     prompt = make_prompt(task, source)
@@ -255,14 +254,51 @@ def run_task(task: dict, provider: str, model: str,
 
 
 def review_task(task: dict, report: Path) -> dict:
-    if task["state"] != "candidate":
+    if task["state"] not in ("candidate", "awaiting_qa"):
         raise ForemanError("No candidate is waiting for a QA report")
     result = json.loads(report.read_text(encoding="utf-8"))
+    branch = result.get("sourceBranch")
+    sha = result.get("sourceHeadSha")
+    expected_sha = git("rev-parse", "HEAD", cwd=worktree(task))
+    if branch != task["branch"] or not sha or sha != expected_sha:
+        raise ForemanError("QA report is not tied to this exact candidate branch/commit")
     if result.get("status") == "technical-pass" and not result.get("blockers"):
         task["state"] = "technical_pass_visual_pending"
     else:
         task["state"] = "needs_repair" if task["attempts"] < MAX_REPAIRS else "blocked"
     task["history"].append({"stage": "qa_reviewed", "result": task["state"]})
+    save(task)
+    return task
+
+
+def submit_task(task: dict) -> dict:
+    if task["state"] != "candidate":
+        raise ForemanError("Only a ready candidate can be submitted for CI")
+    if not shutil.which("gh"):
+        raise ForemanError("GitHub CLI (gh) is required for draft PR creation")
+    path = worktree(task)
+    guard_changed_files(path)
+    check_candidate(path)
+    if git("diff", "--name-only", cwd=path) != TARGET:
+        raise ForemanError("There is no single-target candidate patch")
+    git("add", "--", TARGET, cwd=path)
+    git("commit", "-m", "fix(wordride): Foreman limited candidate", cwd=path)
+    git("push", "-u", "origin", task["branch"], cwd=path, timeout=120)
+    existing = subprocess.run(
+        ["gh", "pr", "view", task["branch"], "--json", "url", "--jq", ".url"],
+        cwd=path, capture_output=True, text=True, timeout=30,
+    )
+    if existing.returncode:
+        p = subprocess.run(
+            ["gh", "pr", "create", "--draft", "--base", "main",
+             "--head", task["branch"], "--title", "WordRide Foreman candidate " + task["id"],
+             "--body", "Bounded local AI proposal; QA and independent visual review required. No auto-merge."],
+            cwd=path, capture_output=True, text=True, timeout=60,
+        )
+        if p.returncode:
+            raise ForemanError("Cannot create draft PR: " + p.stderr[:300])
+    task["state"] = "awaiting_qa"
+    task["history"].append({"stage": "draft_pr_submitted", "head": git("rev-parse", "HEAD", cwd=path)})
     save(task)
     return task
 
@@ -281,6 +317,10 @@ def main(argv=None) -> int:
     run.add_argument("--model", default="qwen3.5:4b")
     run.add_argument("--execute", action="store_true",
                      help="Explicitly permit one model call and a scoped worktree edit")
+    submit = sub.add_parser("submit")
+    submit.add_argument("--id", required=True)
+    submit.add_argument("--execute", action="store_true",
+                        help="Push branch and create a draft PR; never merge")
     review = sub.add_parser("review")
     review.add_argument("--id", required=True)
     review.add_argument("--report", required=True)
@@ -296,6 +336,12 @@ def main(argv=None) -> int:
                 result = run_task(result, args.backend, args.model)
             else:
                 result = dict(result, preview="No model called or files modified. Pass --execute.")
+        elif args.action == "submit":
+            result = load(args.id)
+            if args.execute:
+                result = submit_task(result)
+            else:
+                result = dict(result, preview="Draft PR not created. Pass --execute.")
         elif args.action == "review":
             result = review_task(load(args.id), Path(args.report))
         else:
