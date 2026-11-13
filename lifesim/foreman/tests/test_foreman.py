@@ -38,7 +38,7 @@ class ForemanTests(unittest.TestCase):
         self.root = root
         self.defaults = {key: getattr(F, key) for key in ("ROOT", "STATE", "TASKS", "WORKTREES")}
         F.ROOT = root
-        F.STATE = root / ".foreman-state"
+        F.STATE = root / ".lifesim-foreman-state"
         F.TASKS = F.STATE / "tasks"
         F.WORKTREES = F.STATE / "worktrees"
 
