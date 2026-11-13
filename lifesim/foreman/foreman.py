@@ -287,7 +287,7 @@ def submit_task(task: dict) -> dict:
     if git("diff", "--name-only", cwd=path) != TARGET:
         raise ForemanError("There is no single-target candidate patch")
     git("add", "--", TARGET, cwd=path)
-    git("commit", "-m", "fix(wordride): Foreman limited candidate", cwd=path)
+    git("commit", "-m", "fix(lifesim): Foreman limited candidate", cwd=path)
     git("push", "-u", "origin", task["branch"], cwd=path, timeout=120)
     existing = subprocess.run(
         ["gh", "pr", "view", task["branch"], "--json", "url", "--jq", ".url"],
