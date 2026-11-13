@@ -102,6 +102,17 @@ test('desktop camera never starts inside the near-right building row', async ({ 
   });
 });
 
+test('shopping arcade avoids a full-width beam across the central road', async () => {
+  // Structural guard for Issue #9. The screenshot still requires independent review.
+  const source = fs.readFileSync(require('node:path').join(__dirname, '..', '..', 'index.html'), 'utf8');
+  const start = source.indexOf('if(t===0){ // shopping arcade');
+  const end = source.indexOf('}else if(t===1)', start);
+  expect(start).toBeGreaterThan(0);
+  expect(end).toBeGreaterThan(start);
+  const landmark = source.slice(start, end);
+  expect(landmark).not.toContain('box(g,0,');
+});
+
 test('motion signals advance together when riding, not while paused', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'High-cost WebGL software-render regression runs on desktop');
   await page.goto(GAME + '?qa=1', { waitUntil: 'load' });
