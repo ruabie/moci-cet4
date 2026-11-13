@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }) => {
 
 test('current published entry is the version under test', async ({ page }) => {
   expect(new URL(page.url()).pathname).toBe(GAME);
-  await expect(page).toHaveTitle(/WORDRIDE.*V2\\.2/i);
+  await expect(page).toHaveTitle(/WORDRIDE.*V2\.2/i);
   await expect(page.locator('#start')).toBeVisible();
 });
 
@@ -108,7 +108,7 @@ test('motion signals advance together when riding, not while paused', async ({ p
   await expect(page.locator('#loading')).toHaveClass(/hide/, { timeout: 30_000 });
   await page.locator('#start').click();
   const canvas = page.locator('#gl');
-  await expect(canvas).toHaveAttribute('data-drive', /-?\\d+\\.\\d+/);
+  await expect(canvas).toHaveAttribute('data-drive', /-?\d+\.\d+/);
   const before = await canvas.evaluate(el => ({
     drive: Number(el.dataset.drive),
     wheel: Number(el.dataset.wheelAngle),
