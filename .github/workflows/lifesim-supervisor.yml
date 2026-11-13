@@ -1,0 +1,113 @@
+name: LifeSim game plan supervisor (free)
+
+on:
+  pull_request:
+    paths:
+      - 'lifesim/**'
+      - '.github/workflows/lifesim-supervisor.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'lifesim/**'
+      - '.github/workflows/lifesim-supervisor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lifesim-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      game_ready: ${{ steps.readiness.outputs.ready }}
+      status: ${{ steps.readiness.outputs.status }}
+    steps:
+      - name: Checkout source without persisted credentials
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Node 24 for script checks
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Verify supervisor syntax
+        run: |
+          python -m py_compile lifesim/qa/check_contract.py lifesim/foreman/foreman.py
+          node --check lifesim/qa/score.cjs
+          node --check lifesim/qa/playwright.config.cjs
+          node --check lifesim/qa/tests-browser/lifesim.spec.cjs
+      - name: Report source readiness without pretending to test a missing game
+        run: python lifesim/qa/check_contract.py
+      - name: Run isolated Foreman and contract regression tests
+        run: |
+          python -m unittest discover -s lifesim/qa/tests -v
+          python -m unittest discover -s lifesim/foreman/tests -v
+      - name: Decide whether real game browser QA can start
+        id: readiness
+        shell: bash
+        run: |
+          status="$(python -c "import json; print(json.load(open('lifesim/qa/results/supervisor-report.json'))['status'])")"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          if [ "$status" = "awaiting_browser_qa" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "LifeSim game is NOT approved; current state: $status." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Save readiness report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: lifesim-contract-${{ github.run_id }}
+          path: lifesim/qa/results/
+          if-no-files-found: warn
+          retention-days: 14
+
+  browser-qa:
+    needs: watchdog
+    if: ${{ needs.watchdog.outputs.game_ready == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Node 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Install browser test dependencies
+        working-directory: lifesim/qa
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        working-directory: lifesim/qa
+        run: npx playwright install --with-deps chromium
+      - name: Run real desktop and mobile gameplay checks
+        working-directory: lifesim/qa
+        env:
+          CI: 'true'
+        run: npm test
+      - name: Score actual evidence without automatically approving visuals
+        if: ${{ !cancelled() }}
+        working-directory: lifesim/qa
+        run: node score.cjs
+      - name: Upload browser screenshots and failure evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: lifesim-game-qa-${{ github.run_id }}
+          path: |
+            lifesim/qa/test-results/
+            lifesim/qa/playwright-report/
+          if-no-files-found: warn
+          retention-days: 14

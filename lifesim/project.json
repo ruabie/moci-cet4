@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "id": "lifesim",
+  "title": "游戏计划书｜现实时间人生模拟",
+  "description": "3D browser life simulation with a clock following actual local time, street exploration, apartment, convenience-store work, money, purchases and saves.",
+  "entry": "lifesim/index.html",
+  "stage": "bootstrap",
+  "sourceState": "not_connected",
+  "activeTarget": "lifesim/index.html",
+  "limits": {
+    "maxRepairAttempts": 2,
+    "clockMaxSkewSeconds": 90,
+    "requiresGpuHardwareBenchmark": true,
+    "autoMerge": false,
+    "paidApiEnabled": false
+  },
+  "contract": {
+    "qaTelemetry": "When ?qa=1, expose read-only window.__LIFESIM_QA__.getState(); do not enable money or time cheats in public runtime.",
+    "time": "World wall clock follows device local time on load, focus, and resume; a short game task may be compressed, but never fake the wall clock.",
+    "money": "Each completed job payout is idempotent; purchases never result in negative balances; local save is versioned and reloadable.",
+    "save": "Persistence survives reload; corrupted saves fall back safely and signal the user rather than erase all game data silently.",
+    "standalone": "The first playable prototype must run in a local browser without fetching a remote 3D engine at startup."
+  },
+  "milestones": [
+    {
+      "id": "S0",
+      "title": "源代码接入和可运行首屏",
+      "required": [
+        "真实源码已提交",
+        "WebGL初始化成功",
+        "可本地打开"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "S1",
+      "title": "现实时间与暂停/恢复",
+      "required": [
+        "时钟与本地时钟误差小于等于90秒",
+        "切后台恢复后同步"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "S2",
+      "title": "3D街区与人物操控",
+      "required": [
+        "玩家可实际移动",
+        "碰撞和镜头可用",
+        "桌面与手机有截图证据"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "S3",
+      "title": "公寓与便利店交互",
+      "required": [
+        "进出公寓",
+        "便利店工作活动完成",
+        "收入只结算一次"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "S4",
+      "title": "消费与本地存档",
+      "required": [
+        "消费扣款正确",
+        "余额不会无故为负",
+        "刷新可恢复",
+        "损坏存档安全处理"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "S5",
+      "title": "视觉/性能和试玩交付",
+      "required": [
+        "实际截图人工复核",
+        "目标设备FPS和输入延迟实测",
+        "可下载/可在线玩"
+      ],
+      "status": "pending"
+    }
+  ]
+}
