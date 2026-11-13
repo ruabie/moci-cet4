@@ -228,6 +228,10 @@ def run_task(task: dict, provider: str, model: str,
     try:
         proposal = callback(prompt, model)
         old, new = validate_patch(source, proposal)
+        centre = source.find(task["anchor"])
+        excerpt = source[max(0, centre - 1000):min(len(source), centre + len(task["anchor"]) + 1000)]
+        if old not in excerpt:
+            raise ForemanError("Proposal modifies source outside the approved anchor vicinity")
         # Never write generated content outside the single allowed game entry.
         source_path.write_text(source.replace(old, new, 1), encoding="utf-8")
         guard_changed_files(path)
@@ -254,8 +258,8 @@ def run_task(task: dict, provider: str, model: str,
 
 
 def review_task(task: dict, report: Path) -> dict:
-    if task["state"] not in ("candidate", "awaiting_qa"):
-        raise ForemanError("No candidate is waiting for a QA report")
+    if task["state"] != "awaiting_qa":
+        raise ForemanError("Only a submitted candidate may consume a CI report")
     result = json.loads(report.read_text(encoding="utf-8"))
     branch = result.get("sourceBranch")
     sha = result.get("sourceHeadSha")
