@@ -75,3 +75,13 @@ python -m unittest discover -s wordride/foreman/tests -v
 4. 用至少 10 个真实或模拟可复现缺陷建立成功率、漏检、越权、人工耗时的评测基准。
 
 不安装第三方模型也可以使用现有 GitHub Actions 自动测试；不需要也不应启动仓库中的付费 Codex 工作流。
+
+## 免费本地截图初审（可选）
+
+从 GitHub Actions 的 `wordride-qa-...` artifact 获取当前 V2.2.1 的桌面和手机 `playing.png` 后，可用 Ollama 多模态模型初审（无需付费 API）：
+
+```powershell
+python wordride\foreman\visual_review.py --desktop "桌面截图.png" --mobile "手机截图.png"
+```
+
+结果会写入本地 `.foreman-state/visual-review.json`，只读输出 `visual_precheck_pass / block / unknown`，**绝不自动授权合并或称动画、FPS 已通过**。若模型不支持视觉、内存不足、图片无法读取或返回无效格式，程序会明确失败而不是编造审核意见。先在你的机器上测试运行速度和准确性，再决定是否接入任务协调器。具体 API 遵循 Ollama 本地 `/api/generate`（只向 `127.0.0.1` 发请求）。
