@@ -1,0 +1,7 @@
+# Private, machine-local Foreman task state and git worktrees
+/.foreman-state/
+
+# Browser artifacts from local QA
+/wordride/qa/test-results/
+/wordride/qa/playwright-report/
+/wordride/qa/node_modules/
