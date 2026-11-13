@@ -33,7 +33,8 @@ class ForemanError(Exception):
     pass
 
 
-def git(*args: str, cwd: Path = ROOT, timeout: int = 40) -> str:
+def git(*args: str, cwd: Path | None = None, timeout: int = 40) -> str:
+    cwd = ROOT if cwd is None else cwd
     try:
         p = subprocess.run(
             ["git", "-C", str(cwd), *args],
