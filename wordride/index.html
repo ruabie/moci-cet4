@@ -220,13 +220,17 @@ for(let t=0;t<9;t++){let g=V(),tt=V(),dg=V();const Z=-t*tileLen;for(let side of 
   }
   // Each stretch has one recognizable landmark and spatial rhythm.
   // All fixtures are merged into the existing block mesh; no new draw calls.
-  if(t===0){ // shopping street with layered lantern gateway and neon vending alcove
+  if(t===0){ // shopping arcade with sidewalk entrance markers and neon vending alcove
     const z=Z+4,x=7.5;
     for(let v=0;v<5;v++){const vz=z-v*1.6;box(g,x,.9,vz,.63,1.72,1.05,v%2?'#d45c6b':'#3886b2');box(g,x-.38,1.22,vz,.06,.76,.8,'#f7f1d4',.83);box(g,x-.38,.44,vz,.09,.16,.74,'#a8ccd9');}
-    // Street gateway stays above the rider/camera line of sight instead of
-    // forming a large opaque mid-screen obstruction on desktop and mobile.
-    for(let side of [-1,1]){let bx=side*8.2;polyline(g,[bx,.2,Z-4],[bx,9.1,Z-4],.12,'#946458',7);}
-    box(g,0,9.08,Z-4,16.7,.20,.21,'#9b6351');box(g,0,8.83,Z-4,16.7,.10,.19,'#c49675');
+    // Keep gateway character on the sidewalks: a full-width street crossbar
+    // blocked the riding view at 5 m and cluttered the HUD even when raised.
+    for(let side of [-1,1]){
+      let bx=side*7.95, zGate=Z-4;
+      polyline(g,[bx,.18,zGate],[bx,5.25,zGate],.095,'#946458',7);
+      box(g,bx-side*.65,5.20,zGate,1.4,.20,.22,'#9b6351');
+      box(g,bx-side*.65,4.97,zGate,1.4,.09,.19,'#c49675');
+    }
   }else if(t===1){ // old lane: small shrine torii and stone lanterns
     let x=-8.6,z=Z+5;
     for(let sx of [-1,1]){box(g,x+sx*1.05,1.7,z,.24,3.4,.24,'#a64b43');box(g,x+sx*1.45,.65,z,.35,1.3,.38,'#7a756d')}
