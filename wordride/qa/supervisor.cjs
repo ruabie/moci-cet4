@@ -85,7 +85,7 @@ try {
 const sourceBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || null;
 const blockers = [];
 if (counts.failed || counts.other) blockers.push('Failed or indeterminate browser tests');
-if (counts.passed < 10) blockers.push('Fewer than ten accepted live-entry smoke tests');
+if (counts.passed < 12) blockers.push('Fewer than twelve accepted live-entry smoke tests');
 if (!evidence.desktopPlaying || !evidence.mobilePlaying || !evidence.desktopRoad) {
   blockers.push('Missing desktop/mobile road-scene screenshot evidence');
 }
@@ -93,6 +93,7 @@ if (evidence.frameMetrics < 2) blockers.push('Missing frame pacing samples');
 for (const required of [
   'current published entry is the version under test',
   'desktop camera never starts inside the near-right building row',
+  'shopping arcade avoids a full-width beam across the central road',
   'motion signals advance together when riding, not while paused'
 ]) {
   if (!tests.some(t => t.title === required && t.outcome === 'expected')) {
