@@ -5,3 +5,9 @@
 /wordride/qa/test-results/
 /wordride/qa/playwright-report/
 /wordride/qa/node_modules/
+
+/.lifesim-foreman-state/
+/lifesim/qa/node_modules/
+/lifesim/qa/test-results/
+/lifesim/qa/playwright-report/
+/lifesim/qa/results/
