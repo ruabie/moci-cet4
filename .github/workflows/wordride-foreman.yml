@@ -1,0 +1,38 @@
+name: WordRide free Foreman unit tests
+
+on:
+  pull_request:
+    paths:
+      - 'wordride/foreman/**'
+      - '.github/workflows/wordride-foreman.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'wordride/foreman/**'
+      - '.github/workflows/wordride-foreman.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-foreman:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout trusted source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Install Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Set up Node for parser validation
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Check coordinator Python syntax
+        run: python -m py_compile wordride/foreman/foreman.py
+      - name: Run offline isolated-worktree adversarial tests
+        run: python -m unittest discover -s wordride/foreman/tests -v

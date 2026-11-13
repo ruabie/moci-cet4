@@ -74,20 +74,39 @@ const evidence = {
   frameMetrics: files.filter(f => /frame-pacing\.json$/i.test(f)).length,
   screenshots: files.filter(f => /\.png$/i.test(f)).length,
 };
+// Bind reports to the exact PR head, not just a generic passing CI run.
+let sourceHeadSha = process.env.GITHUB_SHA || null;
+try {
+  const ev = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+  if (ev.pull_request && ev.pull_request.head && ev.pull_request.head.sha) {
+    sourceHeadSha = ev.pull_request.head.sha;
+  }
+} catch (_) { /* Local runs may not have a GitHub event file. */ }
+const sourceBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || null;
 const blockers = [];
 if (counts.failed || counts.other) blockers.push('Failed or indeterminate browser tests');
-if (counts.passed < 7) blockers.push('Fewer than seven accepted smoke tests');
+if (counts.passed < 12) blockers.push('Fewer than twelve accepted live-entry smoke tests');
 if (!evidence.desktopPlaying || !evidence.mobilePlaying || !evidence.desktopRoad) {
   blockers.push('Missing desktop/mobile road-scene screenshot evidence');
 }
 if (evidence.frameMetrics < 2) blockers.push('Missing frame pacing samples');
+for (const required of [
+  'current published entry is the version under test',
+  'desktop camera never starts inside the near-right building row',
+  'shopping arcade avoids a full-width beam across the central road',
+  'motion signals advance together when riding, not while paused'
+]) {
+  if (!tests.some(t => t.title === required && t.outcome === 'expected')) {
+    blockers.push('Required live-entry QA missing or failing: ' + required);
+  }
+}
 const warnings = [];
 if (counts.flaky) warnings.push('Flaky browser cases require investigation');
 warnings.push('Visual aesthetics are NOT automatically approved');
 warnings.push('SwiftShader performance is NOT representative of Windows GPU or iPhone');
 const status = blockers.length ? 'blocked' : 'technical-pass';
 const report = {
-  status,
+  status, sourceBranch, sourceHeadSha, targetPath: 'wordride/index.html',
   counts,
   evidence,
   blockers,

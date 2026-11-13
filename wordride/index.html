@@ -69,7 +69,7 @@ function pause(){if(!state.running)return;state.paused=!state.paused;$('#pause')
 $$('.mode').forEach(b=>b.addEventListener('click',()=>{$$('.mode').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.mode=b.dataset.mode}));$('#start').onclick=begin;$('#restart').onclick=begin;$('#pause').onclick=pause;$('#speak').onclick=speak;$('#hint').onclick=hint;$('#rainBtn').onclick=()=>{state.rain=!state.rain;$('#rainBtn').textContent=state.rain?'☂ 雨天 / ON':'☀ 晴夜 / OFF'};$('#soundBtn').onclick=()=>{state.sound=!state.sound;$('#soundBtn').textContent=state.sound?'♪ 声音 / ON':'♪ 声音 / OFF'};
 $('#keyboard').innerHTML=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'].map(row=>`<div class="kb-row">${[...row].map(c=>`<button class="key" data-k="${c.toLowerCase()}">${c}</button>`).join('')}</div>`).join('');$$('.key').forEach(b=>b.onclick=()=>key(b.dataset.k));window.addEventListener('keydown',e=>{if(e.repeat&&e.key.length===1)return;if(e.key===' '){e.preventDefault();pause()}else if(e.key==='Tab'&&state.running){e.preventDefault();speak()}else if(e.key.length===1&&/[a-z]/i.test(e.key)){key(e.key)}});
 // ------------------- self-contained genuine WebGL 3D engine -------------------
-const canvas=$('#gl');let gl;try{gl=canvas.getContext('webgl2',{alpha:false,antialias:innerWidth>720,powerPreference:'high-performance'});if(!gl)throw Error('WebGL2 unsupported')}catch(e){$('#error').classList.add('show');$('#loading').classList.add('hide');return}
+const canvas=$('#gl');const qaTelemetry=new URLSearchParams(location.search).get('qa')==='1';let gl;try{gl=canvas.getContext('webgl2',{alpha:false,antialias:innerWidth>720,powerPreference:'high-performance'});if(!gl)throw Error('WebGL2 unsupported')}catch(e){$('#error').classList.add('show');$('#loading').classList.add('hide');return}
 const vs=`#version 300 es
 precision highp float;in vec3 aPos;in vec3 aNorm;in vec3 aCol;in float aGlow;uniform mat4 uProj,uView;uniform vec3 uOffset;uniform float uWheel;uniform float uRole;out vec3 vCol;out float vGlow;out float vDepth;out vec3 vNormal;out vec3 vWorld;
 void main(){vec3 p=aPos;if(uRole>1.5){float a=uWheel;float centerZ=p.z>3.8?5.07:2.50;float yy=p.y-.67,zz=p.z-centerZ;p.y=.67+yy*cos(a)-zz*sin(a);p.z=centerZ+yy*sin(a)+zz*cos(a);}p+=uOffset;vec4 vv=uView*vec4(p,1.0);gl_Position=uProj*vv;vDepth=-vv.z;vCol=aCol;vGlow=aGlow;vNormal=aNorm;vWorld=p;}`;
@@ -220,11 +220,17 @@ for(let t=0;t<9;t++){let g=V(),tt=V(),dg=V();const Z=-t*tileLen;for(let side of 
   }
   // Each stretch has one recognizable landmark and spatial rhythm.
   // All fixtures are merged into the existing block mesh; no new draw calls.
-  if(t===0){ // shopping street with layered lantern gateway and neon vending alcove
+  if(t===0){ // shopping arcade with sidewalk entrance markers and neon vending alcove
     const z=Z+4,x=7.5;
     for(let v=0;v<5;v++){const vz=z-v*1.6;box(g,x,.9,vz,.63,1.72,1.05,v%2?'#d45c6b':'#3886b2');box(g,x-.38,1.22,vz,.06,.76,.8,'#f7f1d4',.83);box(g,x-.38,.44,vz,.09,.16,.74,'#a8ccd9');}
-    for(let side of [-1,1]){let bx=side*8.2;polyline(g,[bx,.2,Z-4],[bx,5.3,Z-4],.19,'#ad5c4c',7);}
-    box(g,0,5.27,Z-4,17.0,.39,.40,'#c86a4b');box(g,0,4.85,Z-4,17.6,.14,.48,'#e1a46d');
+    // Keep gateway character on the sidewalks: a full-width street crossbar
+    // blocked the riding view at 5 m and cluttered the HUD even when raised.
+    for(let side of [-1,1]){
+      let bx=side*7.95, zGate=Z-4;
+      polyline(g,[bx,.18,zGate],[bx,5.25,zGate],.095,'#946458',7);
+      box(g,bx-side*.65,5.20,zGate,1.4,.20,.22,'#9b6351');
+      box(g,bx-side*.65,4.97,zGate,1.4,.09,.19,'#c49675');
+    }
   }else if(t===1){ // old lane: small shrine torii and stone lanterns
     let x=-8.6,z=Z+5;
     for(let sx of [-1,1]){box(g,x+sx*1.05,1.7,z,.24,3.4,.24,'#a64b43');box(g,x+sx*1.45,.65,z,.35,1.3,.38,'#7a756d')}
@@ -378,6 +384,14 @@ function frame(ms){requestAnimationFrame(frame);if(document.hidden){last=ms;retu
  // Previous desktop x=8.8 intersected the right-hand storefronts and hid the road.
  // Keep the cyclist in the lower-left third, with a visible forward roadway; retain mobile framing.
  const eye=portrait?[2.8+camLean,7.0+camKick*.27,17.4-rapid*.6]:[3.0+camLean*.55,7.0+camKick*.22+sh,17.5-rapid*.65];
+ if(qaTelemetry){
+  // Read-only test telemetry: never shown in ordinary gameplay; no effect on simulation.
+  canvas.dataset.cameraX=eye[0].toFixed(3);
+  canvas.dataset.cameraMode=portrait?'portrait':'landscape';
+  canvas.dataset.drive=drive.toFixed(3);
+  canvas.dataset.wheelAngle=wheelAngle.toFixed(3);
+  canvas.dataset.pedalPhase=pedalPhase.toFixed(3);
+ }
  const target=portrait?[-2.1,1.55,-5.7]:[-2.0,1.65,-8.0];
  const view=mat4.look(eye,target),fov=(portrait?64:60)+rapid*5+impact*1.5;
  const proj=mat4.persp(fov*Math.PI/180,w/h,.12,320);
