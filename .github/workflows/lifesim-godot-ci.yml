@@ -1,0 +1,38 @@
+name: LifeSim Godot 4.7.2 G0 engine QA
+
+on:
+  pull_request:
+    paths:
+      - 'lifesim/godot/**'
+      - 'lifesim/godot-staging/**'
+      - 'lifesim/godot-migration/**'
+      - '.github/workflows/lifesim-godot-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  godot-g0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Static project checks
+        run: |
+          python lifesim/godot/tests/check_structure.py
+          python lifesim/godot/tests/check_delimiters.py
+      - name: Fetch pinned official Godot 4.7.2 stable
+        shell: bash
+        run: |
+          curl --fail --location --retry 3 --silent --show-error --output godot.zip \
+            'https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip'
+          echo 'cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4  godot.zip' | sha256sum -c -
+          unzip -q godot.zip -d godot-bin
+          chmod +x godot-bin/Godot_v4.7.2-stable_linux.x86_64
+      - name: Import resources and compile Godot scripts
+        run: godot-bin/Godot_v4.7.2-stable_linux.x86_64 --headless --editor --path lifesim/godot --quit
+      - name: Run real engine contract tests
+        run: godot-bin/Godot_v4.7.2-stable_linux.x86_64 --headless --path lifesim/godot --script res://tests/qa_headless.gd
