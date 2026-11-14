@@ -1,4 +1,4 @@
-# 同频之城 / LifeSim — Godot V0.3.1
+# 同频之城 / LifeSim — Godot V0.3.2
 
 > 状态：技术原型，等待真实引擎和视觉验收。
 
@@ -38,3 +38,10 @@ GitHub Actions 工作流在仓库根目录 `.github/workflows/lifesim-godot.yml`
 使用原生简单网格的替身模型，**不满足正式画质门槛**。未实现正式骨骼动画、精细 GLB 建筑、真实 NPC 行为、完整多职业、多人联机。运行于 Windows RTX3060 的帧率仍需真机验证。
 
 详见仓库 Issue #12。
+
+## 本轮引擎及画面证据（2026-11-14）
+
+- GitHub Actions [run 43608521538](https://github.com/ruabie/moci-cet4/actions/runs/43608521538) SUCCESS，Godot 4.7.2 真正导入、执行引擎内 QA 和软件 OpenGL 截图。
+- 首次视觉审查发现中文 HUD 变方框；通过 `SystemFont` 选择系统中文字体，并在 CI 安装中文字体，后续截图汉字已正常显示。
+- **画面审美仍未达标**：当前是程序化简单建筑与方块人体，不应当作 V0.4 最终画质。
+- 1280×720 CI 截图位于该工作流的 artifact 中。CI 的 Mesa 软件渲染不代表用户 Windows RTX 3060 FPS。
