@@ -45,6 +45,7 @@ jobs:
           python3 "$PROJECT_DIR/tests/check_structure.py"
           python3 "$PROJECT_DIR/tests/check_delimiters.py"
           python3 "$PROJECT_DIR/tests/check_regressions.py"
+          python3 "$PROJECT_DIR/tests/check_visual_upgrade.py"
       - name: Godot import and actual GDScript parse
         shell: bash
         run: |
