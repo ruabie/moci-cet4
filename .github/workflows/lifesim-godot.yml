@@ -63,7 +63,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y -qq xvfb xauth libgl1-mesa-dri
+          sudo apt-get install -y -qq xvfb xauth libgl1-mesa-dri fonts-noto-cjk
       - name: Render screenshot through Godot OpenGL
         shell: bash
         env:
