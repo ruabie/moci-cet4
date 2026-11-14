@@ -82,16 +82,19 @@ func _create_world() -> void:
     env.sky = sky
     env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
     env.reflected_light_source = Environment.REFLECTION_SOURCE_BG
-    env.ambient_light_energy = 0.75
+    env.ambient_light_energy = 0.63
+    env.fog_enabled = true
+    env.fog_light_color = Color("#9faeb6")
+    env.fog_density = 0.0055
     env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
     ambient_env.environment = env
     add_child(ambient_env)
     sun = DirectionalLight3D.new()
     sun.name = "SunMoonLighting"
     sun.light_color = Color("#ffe2c2")
-    sun.light_energy = 1.5
+    sun.light_energy = 1.1
     sun.shadow_enabled = true
-    sun.directional_shadow_max_distance = 90.0
+    sun.directional_shadow_max_distance = 70.0
     add_child(sun)
     city = CityBuilder.new()
     city.name = "AokawaDistrict"
@@ -146,7 +149,7 @@ func _create_home() -> void:
 
 func _create_player() -> void:
     player = CityPlayer.new()
-    var p: Array = state.get("position", [0.0, 1.0, 14.0])
+    var p: Array = state.get("position", [-8.1, 0.2, 8.0])
     var saved := Vector3(float(p[0]), float(p[1]), float(p[2]))
     player.position = saved if saved.distance_to(Vector3.ZERO) < 100.0 else Vector3(0, 0.2, 14)
     # User is not allowed to spawn inside the exterior of a building.
@@ -155,6 +158,20 @@ func _create_player() -> void:
     if in_home:
         player.position = Vector3(0, 0.2, 154)
     add_child(player)
+
+func _hud_card(panel: PanelContainer) -> void:
+    var style := StyleBoxFlat.new()
+    style.bg_color = Color(0.07, 0.11, 0.14, 0.78)
+    style.border_color = Color(0.65, 0.74, 0.77, 0.16)
+    style.border_width_left = 1
+    style.border_width_right = 1
+    style.border_width_top = 1
+    style.border_width_bottom = 1
+    style.corner_radius_top_left = 11
+    style.corner_radius_top_right = 11
+    style.corner_radius_bottom_left = 11
+    style.corner_radius_bottom_right = 11
+    panel.add_theme_stylebox_override("panel", style)
 
 func _make_hud_label(parent: Control, content: String, font_size: int, color: Color = FONT_COLOR) -> Label:
     var l := Label.new()
@@ -180,8 +197,9 @@ func _create_ui() -> void:
 
     var header := PanelContainer.new()
     header.position = Vector2(20, 17)
-    header.custom_minimum_size = Vector2(340, 0)
+    header.custom_minimum_size = Vector2(320, 0)
     root.add_child(header)
+    _hud_card(header)
     var top_pad := MarginContainer.new()
     top_pad.add_theme_constant_override("margin_left", 16)
     top_pad.add_theme_constant_override("margin_right", 16)
@@ -199,9 +217,10 @@ func _create_ui() -> void:
     bottom.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
     bottom.offset_left = 20.0
     bottom.offset_right = -20.0
-    bottom.offset_top = -112.0
-    bottom.offset_bottom = -20.0
+    bottom.offset_top = -102.0
+    bottom.offset_bottom = -16.0
     root.add_child(bottom)
+    _hud_card(bottom)
     var margin := MarginContainer.new()
     margin.add_theme_constant_override("margin_left", 18)
     margin.add_theme_constant_override("margin_right", 18)
@@ -221,6 +240,7 @@ func _create_ui() -> void:
     side.offset_top = 20
     side.offset_bottom = 95
     root.add_child(side)
+    _hud_card(side)
     var side_pad := MarginContainer.new()
     side_pad.add_theme_constant_override("margin_left", 13)
     side_pad.add_theme_constant_override("margin_right", 13)
@@ -355,7 +375,7 @@ func _process(delta: float) -> void:
             else:
                 _notify("结算失败或无法保存，未增加余额。", 5.0)
     else:
-        ui_activity.text = "工作 · 购物 · 漫游 · 生活"
+        ui_activity.text = "漫游 · 工作 · 购物 · 生活"
     ui_balance.text = "钱包：%d 城币  ｜  已工作 %d 次" % [state["balance"], state["jobs_completed"]]
     var clock_data := WorldClock.snapshot()
     ui_clock.text = WorldClock.display_text() + ("  夜间" if WorldClock.is_night() else "  白天")
@@ -377,12 +397,12 @@ func _update_sun() -> void:
     var azimuth: float = (hr / 24.0) * TAU
     var elevation: float = maxf(-0.2, sin((hr - 6.0) / 12.0 * PI))
     sun.rotation = Vector3(-0.12 - elevation * 1.25, azimuth, 0.0)
-    sun.light_energy = 0.03 + daylight * 1.25
+    sun.light_energy = 0.03 + daylight * 0.90
     if sky_material != null:
         sky_material.sky_top_color = Color("#0a1624").lerp(Color("#5a83a6"), daylight)
         sky_material.sky_horizon_color = Color("#293c4a").lerp(Color("#d7c7ac"), daylight)
     sun.light_color = Color("#ffd0a3").lerp(Color("#fff2de"), daylight)
-    ambient_env.environment.ambient_light_energy = 0.23 + daylight * 0.68
+    ambient_env.environment.ambient_light_energy = 0.22 + daylight * 0.38
 
 func _commit_state(candidate: Dictionary) -> bool:
     if player != null and not in_home:
