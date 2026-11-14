@@ -5,6 +5,7 @@ class_name CityBuilder
 # V0.3 art is a material-and-lighting blockout, not final rigged/photoreal assets.
 var lamps: Array[OmniLight3D] = []
 var windows: Array[StandardMaterial3D] = []
+var localized_font: Font
 var npc_root: Node3D
 var npc_figures: Array[Node3D] = []
 var all_materials: Dictionary = {}
@@ -58,6 +59,8 @@ func _collision_box(parent: Node3D, center: Vector3, dimensions: Vector3) -> voi
 func _label(parent: Node3D, title: String, pos: Vector3, size: int = 45, color: Color = Color.WHITE) -> void:
     var sign := Label3D.new()
     sign.text = title
+    if localized_font != null:
+        sign.font = localized_font
     sign.font_size = size
     sign.pixel_size = 0.008
     sign.modulate = color
@@ -68,6 +71,9 @@ func _label(parent: Node3D, title: String, pos: Vector3, size: int = 45, color: 
     parent.add_child(sign)
 
 func _ready() -> void:
+    var system_font := SystemFont.new()
+    system_font.font_names = PackedStringArray(["Noto Sans CJK SC", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC"])
+    localized_font = system_font
     create_city()
 
 func create_city() -> void:
