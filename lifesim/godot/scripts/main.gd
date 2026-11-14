@@ -85,7 +85,7 @@ func _create_world() -> void:
     env.ambient_light_energy = 0.63
     env.fog_enabled = true
     env.fog_light_color = Color("#9faeb6")
-    env.fog_density = 0.0024
+    env.fog_density = 0.0055
     env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
     ambient_env.environment = env
     add_child(ambient_env)
@@ -375,7 +375,7 @@ func _process(delta: float) -> void:
             else:
                 _notify("结算失败或无法保存，未增加余额。", 5.0)
     else:
-        ui_activity.text = "漫游 · 工作 · 购物   /   %d FPS" % Engine.get_frames_per_second()
+        ui_activity.text = "漫游 · 工作 · 购物 · 生活"
     ui_balance.text = "钱包：%d 城币  ｜  已工作 %d 次" % [state["balance"], state["jobs_completed"]]
     var clock_data := WorldClock.snapshot()
     ui_clock.text = WorldClock.display_text() + ("  夜间" if WorldClock.is_night() else "  白天")
@@ -397,12 +397,12 @@ func _update_sun() -> void:
     var azimuth: float = (hr / 24.0) * TAU
     var elevation: float = maxf(-0.2, sin((hr - 6.0) / 12.0 * PI))
     sun.rotation = Vector3(-0.12 - elevation * 1.25, azimuth, 0.0)
-    sun.light_energy = 0.03 + daylight * 1.0
+    sun.light_energy = 0.03 + daylight * 0.90
     if sky_material != null:
         sky_material.sky_top_color = Color("#0a1624").lerp(Color("#5a83a6"), daylight)
         sky_material.sky_horizon_color = Color("#293c4a").lerp(Color("#d7c7ac"), daylight)
     sun.light_color = Color("#ffd0a3").lerp(Color("#fff2de"), daylight)
-    ambient_env.environment.ambient_light_energy = 0.22 + daylight * 0.50
+    ambient_env.environment.ambient_light_energy = 0.22 + daylight * 0.38
 
 func _commit_state(candidate: Dictionary) -> bool:
     if player != null and not in_home:

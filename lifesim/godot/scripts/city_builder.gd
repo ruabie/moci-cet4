@@ -21,9 +21,9 @@ func _color(hex: String, roughness: float = 0.80, metal: float = 0.0) -> Standar
     var texture_path := ""
     if hex == "#353c44":
         texture_path = "res://art/textures/asphalt.png"
-    elif hex == "#c2c0b6" or hex == "#9c9991":
+    elif hex in ["#c2c0b6", "#9c9991", "#aaa99f"]:
         texture_path = "res://art/textures/concrete.png"
-    elif hex in ["#b3b7b4", "#c7b99c", "#b6aaa1", "#b2aca2", "#909a9d", "#7b898c", "#9b9a97", "#a09b91"]:
+    elif hex in ["#c9b4a1", "#d1c4b2", "#bbab9a", "#9daea2", "#9aa7a6", "#8ea2a6", "#bca694", "#a5afa2"]:
         texture_path = "res://art/textures/stucco.png"
     if texture_path != "":
         m.albedo_texture = load(texture_path)
@@ -90,14 +90,14 @@ func _ready() -> void:
 func create_city() -> void:
     _ground()
     _roads()
-    _building("APARTMENTS", Vector3(-28, 0, 13), Vector3(21, 18, 18), "#b3b7b4", "#758a83", 4, true)
-    _building("AOI MART", Vector3(-28, 0, -14), Vector3(21, 10, 17), "#c7b99c", "#4c796f", 2, true)
-    _building("KAWA COFFEE", Vector3(28, 0, -14), Vector3(20, 13, 17), "#b6aaa1", "#9c6558", 3, false)
-    _building("SLOW LIVING", Vector3(28, 0, 15), Vector3(20, 12, 19), "#b2aca2", "#7d8c79", 3, false)
-    _building("MIDORI STUDIO", Vector3(-51, 0, -52), Vector3(29, 27, 24), "#909a9d", "#334653", 6, true)
-    _building("KITA OFFICE", Vector3(51, 0, -52), Vector3(27, 29, 24), "#7b898c", "#505e67", 6, false)
-    _building("HIGASHI HOTEL", Vector3(-49, 0, 50), Vector3(27, 32, 24), "#9b9a97", "#786a5a", 7, true)
-    _building("MOMI COURT", Vector3(51, 0, 50), Vector3(29, 22, 25), "#a09b91", "#536f6b", 5, false)
+    _building("APARTMENTS", Vector3(-28, 0, 13), Vector3(21, 18, 18), "#c9b4a1", "#788580", 4, true)
+    _building("AOI MART", Vector3(-28, 0, -14), Vector3(21, 10, 17), "#d1c4b2", "#4c796f", 2, true)
+    _building("KAWA COFFEE", Vector3(28, 0, -14), Vector3(20, 13, 17), "#bbab9a", "#9c6558", 3, false)
+    _building("SLOW LIVING", Vector3(28, 0, 15), Vector3(20, 12, 19), "#9daea2", "#70876f", 3, false)
+    _building("MIDORI STUDIO", Vector3(-51, 0, -52), Vector3(29, 27, 24), "#9aa7a6", "#334653", 6, true)
+    _building("KITA OFFICE", Vector3(51, 0, -52), Vector3(27, 29, 24), "#8ea2a6", "#505e67", 6, false)
+    _building("HIGASHI HOTEL", Vector3(-49, 0, 50), Vector3(27, 32, 24), "#bca694", "#786a5a", 7, true)
+    _building("MOMI COURT", Vector3(51, 0, 50), Vector3(29, 22, 25), "#a5afa2", "#536f6b", 5, false)
     _park_and_props()
     _people()
     _detail_pass()
@@ -108,7 +108,7 @@ func _ground() -> void:
 
 func _roads() -> void:
     var road := _color("#353c44", 0.99)
-    var walk := _color("#c2c0b6", 0.99)
+    var walk := _color("#aaa99f", 0.99)
     var curb := _color("#8e9994", 0.99)
     var stripe := _color("#deddd5", 0.95)
     _box(self, Vector3(0, 0.005, 0), Vector3(13, 0.04, 177), road, false)
@@ -193,6 +193,7 @@ func _tree(where: Vector3, big: bool = false) -> void:
     _sphere(root, Vector3(0, height, 0), Vector3(2.2, 2.3, 2.0) if big else Vector3(1.75, 1.9, 1.65), leaf_a)
     _sphere(root, Vector3(-0.8, height + 0.45, -0.3), Vector3(1.22, 1.25, 1.12), leaf_b)
     _sphere(root, Vector3(0.6, height + 0.28, 0.5), Vector3(1.17, 1.24, 1.16), leaf_a)
+    _sphere(root, Vector3(0.24, height + 1.13, -0.50), Vector3(0.78, 0.61, 0.81), leaf_b)
 
 func _street_lamp(where: Vector3) -> void:
     var n := Node3D.new()
@@ -345,6 +346,16 @@ func _planter(where: Vector3, lush: bool = false) -> void:
         var angle := float(i) * 2.38
         _sphere(root, Vector3(cos(angle) * 0.24, 0.88 + float(i % 3) * 0.16, sin(angle) * 0.22), Vector3(0.32, 0.56, 0.30), leaves)
 
+func _bike_rod(root: Node3D, a: Vector3, b: Vector3, material: Material) -> void:
+    var bar := MeshInstance3D.new()
+    var mesh := BoxMesh.new()
+    mesh.size = Vector3(a.distance_to(b), 0.055, 0.055)
+    bar.mesh = mesh
+    bar.position = (a + b) * 0.5
+    bar.rotation.z = atan2(b.y - a.y, b.x - a.x)
+    bar.material_override = material
+    root.add_child(bar)
+
 func _parked_bicycle(where: Vector3) -> void:
     var root := Node3D.new()
     root.position = where
@@ -361,7 +372,12 @@ func _parked_bicycle(where: Vector3) -> void:
         tire.position = Vector3(x, 0.47, 0)
         tire.rotation.x = PI * 0.5
         root.add_child(tire)
-    _box(root, Vector3(0, 0.82, 0), Vector3(1.18, 0.065, 0.06), metal)
+    _bike_rod(root, Vector3(-0.67, 0.47, 0), Vector3(-0.21, 0.96, 0), metal)
+    _bike_rod(root, Vector3(-0.21, 0.96, 0), Vector3(0.32, 0.92, 0), metal)
+    _bike_rod(root, Vector3(0.32, 0.92, 0), Vector3(-0.08, 0.49, 0), metal)
+    _bike_rod(root, Vector3(-0.08, 0.49, 0), Vector3(-0.67, 0.47, 0), metal)
+    _bike_rod(root, Vector3(0.32, 0.92, 0), Vector3(0.67, 0.47, 0), metal)
+    _bike_rod(root, Vector3(-0.21, 0.96, 0), Vector3(-0.08, 0.49, 0), metal)
     _box(root, Vector3(0, 0.56, 0), Vector3(0.06, 0.59, 0.06), metal)
     _box(root, Vector3(-0.27, 1.10, 0), Vector3(0.44, 0.07, 0.22), _color("#4e4743"))
     _box(root, Vector3(0.64, 1.19, 0), Vector3(0.65, 0.065, 0.08), metal)
@@ -436,7 +452,7 @@ func _detail_pass() -> void:
         for x in [-32.5, -28.0, -23.5, -19.0]:
             _round_post(self, Vector3(x, 0.12, z), 0.78, 0.055, "#727d77")
     # Distant skyline silhouettes prevent the street from ending in an empty horizon.
-    var skyline := _color("#8b9795", 0.94)
+    var skyline := _color("#758688", 0.94)
     for idx in range(18):
         var x := -90.0 + float(idx) * 11.0
         var height := 12.0 + float((idx * 7) % 6) * 5.0
