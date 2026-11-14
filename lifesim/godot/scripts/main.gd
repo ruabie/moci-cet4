@@ -12,6 +12,7 @@ var state: Dictionary = {}
 var sun: DirectionalLight3D
 var ambient_env: WorldEnvironment
 var sky_material: ProceduralSkyMaterial
+var localized_font: Font
 var ui_clock: Label
 var ui_balance: Label
 var ui_hint: Label
@@ -158,12 +159,17 @@ func _create_player() -> void:
 func _make_hud_label(parent: Control, content: String, font_size: int, color: Color = FONT_COLOR) -> Label:
     var l := Label.new()
     l.text = content
+    if localized_font != null:
+        l.add_theme_font_override("font", localized_font)
     l.add_theme_font_size_override("font_size", font_size)
     l.add_theme_color_override("font_color", color)
     parent.add_child(l)
     return l
 
 func _create_ui() -> void:
+    var system_font := SystemFont.new()
+    system_font.font_names = PackedStringArray(["Noto Sans CJK SC", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC"])
+    localized_font = system_font
     var layer := CanvasLayer.new()
     layer.name = "HUD"
     add_child(layer)
