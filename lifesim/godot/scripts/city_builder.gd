@@ -426,7 +426,7 @@ func _detail_pass() -> void:
             if level % 2 == 0 and h > 14.0:
                 var y := float(level) * 3.3
                 for q in [-0.27, 0.25]:
-                    var z := origin.z + q * d
+                    var z: float = origin.z + float(q) * d
                     _box(self, Vector3(facade_x + s * 0.58, y - 0.88, z), Vector3(1.12, 0.14, d * 0.24), _color("#a4a8a0"))
                     _box(self, Vector3(facade_x + s * 1.07, y - 0.44, z), Vector3(0.09, 0.78, d * 0.24), _color("#657371", 0.38, 0.4))
                     _box(self, Vector3(facade_x + s * 0.58, y - 0.44, z - d * 0.115), Vector3(1.05, 0.08, 0.10), edge_color)
