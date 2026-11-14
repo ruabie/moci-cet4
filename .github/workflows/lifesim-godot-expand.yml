@@ -1,0 +1,37 @@
+name: LifeSim Godot original source recovery
+
+on:
+  push:
+    branches: [feat/lifesim-godot-g0-recovery]
+    paths:
+      - 'lifesim/godot-staging/**'
+      - 'lifesim/godot-migration/unpack.py'
+      - '.github/workflows/lifesim-godot-expand.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  expand-pinned-source:
+    if: github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/feat/lifesim-godot-g0-recovery'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout isolated feature branch
+        uses: actions/checkout@v6
+        with:
+          ref: feat/lifesim-godot-g0-recovery
+      - name: Decode original source with strict SHA-256 and path checks
+        run: python lifesim/godot-migration/unpack.py
+      - name: Run structural checks on restored project
+        run: |
+          python lifesim/godot/tests/check_structure.py
+          python lifesim/godot/tests/check_delimiters.py
+      - name: Commit restored original files to feature branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- lifesim/godot
+          git diff --cached --quiet && exit 0
+          git commit -m 'chore(lifesim): restore original Godot V0.3 source'
+          git push origin HEAD:refs/heads/feat/lifesim-godot-g0-recovery
