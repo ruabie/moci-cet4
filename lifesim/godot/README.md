@@ -1,47 +1,36 @@
-# 同频之城 / LifeSim — Godot V0.3.2
+# 同频之城 / 青川町 V0.4 视觉升级 Alpha
 
-> 状态：技术原型，等待真实引擎和视觉验收。
+本工程基于 V0.3.2 Godot 4.7.2 可运行版本，属于**美术迭代候选**，不是成品城市或精致开放世界。
 
-独立于原来的 HTML V0.2 版本。此目录承载真正的 Godot 4.7.2 项目，不依赖在线 CDN 3D 引擎。
+## 当前目标与取舍
 
-## 打开方式
+- 保持真实设备时间的日期与昼夜同步；不改变收益结算和备份存档协议。
+- 采用原创程序化贴图（`art/textures/`）和手工细化的商店、阳台、街具、远景构件；不使用外链 CDNs。
+- 玩家从方块改为可动的关节式风格化人物（非骨骼蒙皮 GLB）；手臂与腿具有独立关节，镜头具有物理遮挡检测。
+- 街景增加商店雨棚、阳台、花箱、自行车、铺装和远景。此阶段仍未制作完整室内场景和多职业体系。
 
-下载 [Godot 4.7.2 Standard](https://godotengine.org/download/)；在 Godot 项目管理器中选择「导入」，选中本目录的 `project.godot`，再按 `F5` 运行。
+## 开始运行
 
-操作：`WASD` 行走、`Shift` 跑步、鼠标转镜头、滚轮缩放、`Esc` 释放鼠标；靠近地点按 `E`，便利店按 `J` 打工，商店按 `B` 购买，公寓内按 `Q/E` 返回。
+下载 Godot **4.7.2-stable**（当前项目固定稳定版本），在 Godot 项目管理器选择包含 `project.godot` 的文件夹，按 F5 运行。Windows 操作：WASD 移动，鼠标旋转，Shift 跑步，E 交互，J 便利店兼职，B 购买，Q 从公寓返回；Esc 释放鼠标。可在离线状态使用，不消耗付费模型 API。
 
-## 功能模块
+## 质量验证
 
-- `scripts/world_clock.gd`：真实设备时间与昼夜计算
-- `scripts/city_builder.gd`：程序化街区、建筑、道路、基础 NPC
-- `scripts/player.gd`：第三人称角色、相机避障
-- `scripts/game_state.gd`：版本化存档、备份、消费、幂等工资
-- `scripts/main.gd`：场景组装、交互、兼职、商店、公寓、HUD
+```
+python tests/check_structure.py
+python tests/check_delimiters.py
+python tests/check_regressions.py
+python tests/check_visual_upgrade.py
+# 下列两步需要 Godot 4.7.2 引擎
+Godot_v4.7.2-stable_linux.x86_64 --headless --editor --path . --import --quit
+Godot_v4.7.2-stable_linux.x86_64 --headless --path . --script res://tests/qa_headless.gd
+```
 
-## V0.3.1 修复
+GitHub Actions 会执行 GDScript 导入和实际渲染截图，并保留构建日志；**CI 通过不等于画面审美通过，更不代表 RTX 3060 真机 60 FPS 已验证**。若 GH CI 尚未执行，状态保持待引擎验证。
 
-1. 消耗品支出与家具清单分离，防止咖啡无限积累到永久物品。
-2. 工作与购物改为候选状态提交，存档失败不先确认收益。
-3. 存储 `at_home` 状态，回到游戏时可以正确恢复公寓。
-4. QA 使用隔离的临时文件和 `qa_mode`，避免覆盖玩家真实存档。
+## 素材归属和限制
 
-## 自动化验证
+纹理为本项目脚本算法生成的原创灰度图片，程序几何体和人物造型为本项目代码生成，不引用外部受限模型或影视角色。不存在正式 PBR 扫描建模、骨骼动画文件或高精度城市资产。V0.4 后续必须补真实尺度 GLB 素材与角色绑定，并且逐一检查来源许可、真机性能、脚滑问题。
 
-GitHub Actions 工作流在仓库根目录 `.github/workflows/lifesim-godot.yml`。
+## 无破坏性存档变更
 
-它应执行 Godot 4.7.2 引擎导入、GDScript 解析、场景创建及经济/存档契约测试，并保留日志。注意：静态 Python 测试通过并不能证明 Godot 工程能运行。
-
-本目录由独立的 `lifesim/godot/` 验收，不更改旧版 `lifesim/project.json` 的 S0–S5 浏览器验收状态。
-
-## 当前限制
-
-使用原生简单网格的替身模型，**不满足正式画质门槛**。未实现正式骨骼动画、精细 GLB 建筑、真实 NPC 行为、完整多职业、多人联机。运行于 Windows RTX3060 的帧率仍需真机验证。
-
-详见仓库 Issue #12。
-
-## 本轮引擎及画面证据（2026-11-14）
-
-- GitHub Actions [run 43608521538](https://github.com/ruabie/moci-cet4/actions/runs/43608521538) SUCCESS，Godot 4.7.2 真正导入、执行引擎内 QA 和软件 OpenGL 截图。
-- 首次视觉审查发现中文 HUD 变方框；通过 `SystemFont` 选择系统中文字体，并在 CI 安装中文字体，后续截图汉字已正常显示。
-- **画面审美仍未达标**：当前是程序化简单建筑与方块人体，不应当作 V0.4 最终画质。
-- 1280×720 CI 截图位于该工作流的 artifact 中。CI 的 Mesa 软件渲染不代表用户 Windows RTX 3060 FPS。
+延续 `SAVE_VERSION=1` 和 `user://same_time_city_v03.json`，已存在的 V0.3 玩家存档自动使用同一版本读取；首次游玩默认出生点位于便利店附近的人行道。测试使用临时路径，不修改真实玩家存档。

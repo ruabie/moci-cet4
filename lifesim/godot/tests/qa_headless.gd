@@ -105,7 +105,15 @@ func run_contracts() -> void:
     if instance.get_node_or_null("AokawaDistrict") == null:
         fail("3D district missing")
         return
-    print("QA PASS: clock, spend, purchase, idempotent jobs, save, corrupt fallback, scene startup")
+    var visual: Node = avatar.get_node_or_null("AvatarVisual")
+    if visual == null or visual.get_node_or_null("LeftHip/LeftKnee") == null or visual.get_node_or_null("RightHip/RightKnee") == null:
+        fail("V0.4 articulated character nodes missing")
+        return
+    var district: Node = instance.get_node_or_null("AokawaDistrict")
+    if district.get_node_or_null("AmbientResidents") == null:
+        fail("V0.4 residents missing")
+        return
+    print("QA PASS: clock, spend, purchase, idempotent jobs, save, corrupt fallback, scene startup, articulated model and residents")
     instance.queue_free()
     ProjectSettings.set_setting("application/config/qa_mode", false)
     quit(0)
