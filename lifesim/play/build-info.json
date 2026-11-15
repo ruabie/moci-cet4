@@ -1,6 +1,6 @@
 {
   "version": "0.5.1",
   "source_branch": "lifesim-v051-web",
-  "commit": "d0ba624a7d43f07ef7d174b4740a8059bf9dd0d3",
+  "commit": "a524cdf9fc3b9712a967b8f2b45e7fffd6688dfe",
   "build_system": "Godot 4.7.2 Web single thread"
 }
