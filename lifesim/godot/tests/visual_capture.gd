@@ -28,6 +28,22 @@ func capture() -> void:
         printerr("CAPTURE FAIL: cannot write PNG, error ", err)
         quit(1)
         return
-    print("CAPTURE PASS: %dx%d PNG" % [image.get_width(), image.get_height()])
+    var player: CityPlayer = instance.get_node_or_null("Player") as CityPlayer
+    var before: Vector3 = player.global_position
+    Input.action_press("move_forward")
+    for step in range(18):
+        await process_frame
+    Input.action_release("move_forward")
+    await RenderingServer.frame_post_draw
+    if player.global_position.distance_to(before) < 0.08:
+        printerr("CAPTURE FAIL: no movement during visual capture")
+        quit(1)
+        return
+    var walking_image: Image = root.get_texture().get_image()
+    if walking_image.save_png("res://tests/visual_walk_evidence.png") != OK:
+        printerr("CAPTURE FAIL: cannot save walking evidence")
+        quit(1)
+        return
+    print("CAPTURE PASS: %dx%d PNG plus walking evidence" % [image.get_width(), image.get_height()])
     instance.queue_free()
     quit(0)
