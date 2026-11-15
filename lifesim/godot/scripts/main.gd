@@ -181,93 +181,19 @@ func _simple_box(parent: Node3D, pos: Vector3, size: Vector3, color: Color, coll
         parent.add_child(b)
 
 func _create_home() -> void:
-    # Separate spatial interior ensures no black-screen scene swaps or data loss.
-    var room := Node3D.new()
+    var room := CuratedInteriorsV11.new()
     room.name = "ApartmentInterior"
     room.position = Vector3(0, 0, 150)
     add_child(room)
-    _simple_box(room, Vector3(0, -0.14, 0), Vector3(16, 0.26, 15), Color("#b6a997"), true)
-    _simple_box(room, Vector3(-8.1, 3.1, 0), Vector3(0.2, 6.2, 15), Color("#f2ece2"), true)
-    _simple_box(room, Vector3(8.1, 3.1, 0), Vector3(0.2, 6.2, 15), Color("#eee5da"), true)
-    _simple_box(room, Vector3(0, 3.1, -7.6), Vector3(16, 6.2, 0.2), Color("#e5d9cb"), true)
-    _simple_box(room, Vector3(0, 3.1, 7.6), Vector3(16, 6.2, 0.2), Color("#f0e8db"), true)
-    _simple_box(room, Vector3(-3.0, 0.55, -3.4), Vector3(4.0, 1.1, 2.7), Color("#c7b8aa"))
-    _simple_box(room, Vector3(-3.0, 1.13, -3.6), Vector3(4.0, 0.19, 2.6), Color("#f2eee9"))
-    _simple_box(room, Vector3(2.5, 0.84, -3.6), Vector3(2.4, 0.12, 1.3), Color("#8c705a"))
-    _simple_box(room, Vector3(2.5, 0.43, -3.6), Vector3(2.2, 0.75, 0.10), Color("#6a564c"))
-    _simple_box(room, Vector3(4.2, 1.2, -7.45), Vector3(3.8, 2.2, 0.1), Color("#69899a"))
-    for item_id in state.get("owned_items", []):
-        _home_item(room, str(item_id))
-    var light := OmniLight3D.new()
-    light.position = Vector3(0, 4.7, 0)
-    light.light_color = Color("#ffe8c2")
-    light.light_energy = 1.9
-    light.omni_range = 17
-    room.add_child(light)
-
-func _home_item(room: Node3D, item_id: String) -> void:
-    match item_id:
-        "desk_lamp":
-            _simple_box(room, Vector3(2.5, 1.45, -3.6), Vector3(0.15, 0.68, 0.15), Color("#5e665e"))
-            _simple_box(room, Vector3(2.5, 1.82, -3.6), Vector3(0.72, 0.28, 0.72), Color("#eacb94"))
-        "soft_rug":
-            _simple_box(room, Vector3(-2.0, 0.025, 1.3), Vector3(4.3, 0.04, 2.6), Color("#c5b6aa"))
-            for x in [-3.6, -2.6, -1.6, -0.6]:
-                _simple_box(room, Vector3(x, 0.056, 1.3), Vector3(0.04, 0.007, 2.3), Color("#a69d93"))
-        "green_plant":
-            _simple_box(room, Vector3(5.5, 0.37, 3.6), Vector3(0.85, 0.75, 0.85), Color("#c5ad8f"))
-            var foliage := MeshInstance3D.new()
-            var sphere := SphereMesh.new()
-            sphere.radius = 0.85
-            foliage.mesh = sphere
-            foliage.position = Vector3(5.5, 1.35, 3.6)
-            var mat := StandardMaterial3D.new()
-            mat.albedo_color = Color("#608363")
-            foliage.material_override = mat
-            room.add_child(foliage)
-        "bookshelf":
-            _simple_box(room, Vector3(-6.2, 1.47, 2.5), Vector3(1.45, 2.9, 0.56), Color("#896e57"))
-            for shelf_y in [0.54, 1.22, 1.91, 2.63]:
-                _simple_box(room, Vector3(-6.2, shelf_y, 2.1), Vector3(1.28, 0.10, 0.18), Color("#d5baa0"))
-                for b in range(4):
-                    _simple_box(room, Vector3(-6.65 + b * 0.28, shelf_y + 0.27, 2.35), Vector3(0.18, 0.43, 0.23), Color("#607b7b" if b % 2 == 0 else "#b48378"))
-        "computer":
-            _simple_box(room, Vector3(2.5, 1.25, -3.6), Vector3(1.5, 0.9, 0.12), Color("#303b40"))
-            _simple_box(room, Vector3(2.5, 1.26, -3.52), Vector3(1.31, 0.70, 0.035), Color("#6b8c99"))
-            _simple_box(room, Vector3(2.5, 0.96, -2.96), Vector3(0.95, 0.06, 0.26), Color("#bdbcb4"))
+    room.build_home(state.get("owned_items", []))
 
 func _create_business_interiors() -> void:
-    # Visit actual enclosed rooms rather than menu-only store interactions.
     for place in ["便利店", "咖啡馆"]:
-        var zbase: float = 190.0 if place == "便利店" else 222.0
-        var room := Node3D.new()
+        var room := CuratedInteriorsV11.new()
         room.name = "MartInterior" if place == "便利店" else "CafeInterior"
-        room.position = Vector3(0, 0, zbase)
+        room.position = Vector3(0, 0, 190 if place == "便利店" else 222)
         add_child(room)
-        var wall: Color = Color("#e7e6de") if place == "便利店" else Color("#d6bb9f")
-        _simple_box(room, Vector3(0, -0.14, 0), Vector3(14, 0.25, 14), Color("#9d9a8c"), true)
-        _simple_box(room, Vector3(-7.1, 2.5, 0), Vector3(0.2, 5, 14), wall, true)
-        _simple_box(room, Vector3(7.1, 2.5, 0), Vector3(0.2, 5, 14), wall, true)
-        _simple_box(room, Vector3(0, 2.5, -7.1), Vector3(14, 5, 0.2), wall, true)
-        _simple_box(room, Vector3(0, 2.5, 7.1), Vector3(14, 5, 0.2), wall, true)
-        var wood: Color = Color("#80614d") if place == "咖啡馆" else Color("#718b8b")
-        _simple_box(room, Vector3(-3.4, 0.72, -3.0), Vector3(5.2, 1.44, 1.15), wood, true)
-        if place == "便利店":
-            for x in [1.3, 4.2]:
-                for y in [0.7, 1.35, 2.0]:
-                    _simple_box(room, Vector3(x, y, -2.0), Vector3(1.7, 0.12, 2.8), Color("#9faca6"))
-                    for z in [-2.7, -1.65]:
-                        _simple_box(room, Vector3(x, y + 0.22, z), Vector3(0.34, 0.34, 0.3), Color("#e6a88e"))
-        else:
-            for x in [1.6, 4.5]:
-                _simple_box(room, Vector3(x, 0.62, 1.8), Vector3(1.55, 0.13, 1.55), Color("#a17a58"), true)
-                _simple_box(room, Vector3(x, 0.30, 1.8), Vector3(0.20, 0.6, 0.20), Color("#5a514a"))
-        var light := OmniLight3D.new()
-        light.position = Vector3(0, 4.3, 0)
-        light.light_energy = 2.3
-        light.omni_range = 17.0
-        light.light_color = Color("#fff0d8")
-        room.add_child(light)
+        room.build_shop(place)
 
 func _create_player() -> void:
     player = CityPlayer.new()
@@ -624,9 +550,9 @@ func _purchase_furniture(index: int) -> void:
     if not _commit_state(candidate):
         _notify("保存失败，本次购买没有生效。", 5.0)
         return
-    var room := get_node_or_null("ApartmentInterior") as Node3D
+    var room := get_node_or_null("ApartmentInterior") as CuratedInteriorsV11
     if room != null:
-        _home_item(room, str(product[0]))
+        room.add_purchased_item(str(product[0]))
     shop_open = false
     _notify("购买了%s，支付 %d 城币。回家看看新布置！" % [product[1], product[2]], 6.0)
 
