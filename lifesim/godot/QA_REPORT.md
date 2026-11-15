@@ -1,14 +1,7 @@
-# 《同频之城》V0.4 视觉升级 Alpha / 验收状态
+# V0.5 QA 状态（候选包）
 
-本报告随源码更新，不能以源码数量替代引擎运行或审美质量。
+静态检查：本地 `python3 tests/check_regressions.py`、`check_delimiters.py`、`check_authored_assets.py`；游戏引擎侧 `tests/qa_headless.gd` 新增 rig 验证。
 
-- [x] 独立素材：生成三张本地纹理，未引入授权不明的商业模型。
-- [x] 新角色：圆润身体与可旋转的肩、肘、髋、膝（属于关节式程序动画，非蒙皮骨骼动画）。
-- [x] 街景：增加商店雨棚、阳台、花箱、自行车、路桩、贴图和远景体块。
-- [x] 离线静态回归：`check_structure.py`、`check_delimiters.py`、`check_regressions.py`、`check_visual_upgrade.py`。
-- [ ] Godot 4.7.2 实际导入、headless QA、截图：以 GitHub CI 为准，尚未在本地运行验证。
-- [ ] 实际游玩检查：人物脚滑、角色方向、商店互动入口、严重穿模。
-- [ ] 用户设备：RTX 3060 6GB / 16GB 1080p 帧率及镜头延迟测试。
-- [ ] 美术满意度：当前为升级中版本，不能宣称高精度街景或成品。
+**不宣称通过 Godot 引擎测试**：当前容器中没有 Godot 可执行文件；必须通过 CI 真实导入和实例化 GLB，截图人工评估后才能升级验收状态。
 
-回归要求：时间不加速，工资不重复结算，余额不透支，消耗品不进入永久家具，存档损坏安全恢复。GitHub PR 暂不自动合并。
+重点阻断：如果 Skeleton3D 缺少命名骨骼，或街道没有显示新模型，停止交付；如 Godot 导入警告，修复而不是关闭检查。
