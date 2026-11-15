@@ -184,6 +184,7 @@ func _create_home() -> void:
     var room := CuratedInteriorsV11.new()
     room.name = "ApartmentInterior"
     room.position = Vector3(0, 0, 150)
+    room.scale = Vector3(0.78, 1.0, 0.78)
     add_child(room)
     room.build_home(state.get("owned_items", []))
 
@@ -192,6 +193,7 @@ func _create_business_interiors() -> void:
         var room := CuratedInteriorsV11.new()
         room.name = "MartInterior" if place == "便利店" else "CafeInterior"
         room.position = Vector3(0, 0, 190 if place == "便利店" else 222)
+        room.scale = Vector3(0.78, 1.0, 0.78)
         add_child(room)
         room.build_shop(place)
 
