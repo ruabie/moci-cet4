@@ -253,6 +253,18 @@ func run_contracts() -> void:
     if v12_cafe.room_dimensions.x > 12 or v12_home.room_dimensions.x > 9.5:
         fail("V0.12 interior footprint still too cavernous")
         return
+    # Verify unobstructed doorway-to-center aisle against real physics bodies.
+    for candidate in [v12_cafe, v12_mart, v12_home]:
+        var room: CuratedInteriorsV12 = candidate as CuratedInteriorsV12
+        var front_offset: float = room.room_dimensions.y*.5-.65
+        var a: Vector3 = room.global_position + Vector3(0, 1.08, front_offset)
+        var b: Vector3 = room.global_position + Vector3(0, 1.08, 1.1)
+        var ray := PhysicsRayQueryParameters3D.create(a, b)
+        ray.collision_mask = 1
+        var hit: Dictionary = room.get_world_3d().direct_space_state.intersect_ray(ray)
+        if not hit.is_empty():
+            fail("V0.12 entrance path blocked in "+room.name+" by "+str(hit.get("collider")))
+            return
     var block: LicensedBlockV11 = district.get_node_or_null("V11LicensedNeighborhood") as LicensedBlockV11
     if block == null or block.building_count < 6 or block.model_count < 12:
         fail("V0.11 licensed district GLBs not loaded")
