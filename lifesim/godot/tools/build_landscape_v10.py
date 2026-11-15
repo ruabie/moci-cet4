@@ -43,12 +43,12 @@ def leaf(g, material, p, width, length, yaw, pitch, faces):
 def tree(seed, name, height, spread, autumn=False):
     rng=random.Random(seed)
     g=Gltf()
-    bark=g.material('aged_bark',(.26,.235,.195),rough=.99)
-    bark_light=g.material('sunlit_bark',(.32,.30,.24),rough=.99)
-    twig=g.material('fine_twigs',(.29,.275,.22),rough=.98)
-    palette=([(0.24,.34,.20),(.36,.44,.22),(.27,.39,.23),(.42,.47,.25),(.19,.31,.18),(.40,.36,.21)]
+    bark=g.material('aged_bark',(.16,.13,.115),rough=.99)
+    bark_light=g.material('sunlit_bark',(.20,.16,.13),rough=.99)
+    twig=g.material('fine_twigs',(.15,.14,.115),rough=.98)
+    palette=([(.075,.165,.075),(.11,.20,.082),(.085,.175,.089),(.15,.215,.09),(.070,.14,.072),(.12,.17,.066)]
         if not autumn else
-        [(.44,.37,.15),(.59,.43,.16),(.31,.37,.19),(.64,.51,.21),(.34,.31,.15),(.53,.39,.19)])
+        [(.17,.145,.055),(.23,.170,.064),(.115,.165,.074),(.25,.19,.082),(.13,.14,.052),(.20,.16,.066)])
     leaf_mat=[g.material('canopy_leaf_%02d'%i,c,rough=.92) for i,c in enumerate(palette)]
     faces=[{'vertices':[],'triangles':[]} for _ in palette]
     base=(0,0,0)
@@ -90,7 +90,7 @@ def tree(seed, name, height, spread, autumn=False):
             p=(tip[0]+rng.gauss(0,.27),tip[1]+rng.gauss(0,.31),tip[2]+rng.gauss(0,.27))
             if .8 < p[1] < height*1.10:
                 clusters.append(p)
-    for _ in range(470):
+    for _ in range(660):
         a=rng.uniform(0,math.tau)
         radial=math.sqrt(rng.random())
         x=math.cos(a)*spread*radial
@@ -99,8 +99,8 @@ def tree(seed, name, height, spread, autumn=False):
         clusters.append((x+rng.gauss(0,.11),y,z+rng.gauss(0,.11)))
     for p in clusters:
         pick=rng.randrange(len(palette))
-        width=.13+rng.random()*.12
-        length=.19+rng.random()*.20
+        width=.095+rng.random()*.075
+        length=.145+rng.random()*.155
         # Tilt leaves in multiple directions for silhouette depth at street level.
         leaf(g,leaf_mat[pick],p,width,length,rng.random()*math.tau,rng.uniform(.23,2.5),faces[pick])
     for j,f in enumerate(faces):
@@ -114,8 +114,8 @@ def tree(seed, name, height, spread, autumn=False):
 def shrub():
     rng=random.Random(129071)
     g=Gltf()
-    brown=g.material('thin_woody_stems',(.27,.31,.22),rough=.97)
-    palette=[(.19,.35,.23),(.26,.43,.26),(.38,.50,.31),(.22,.39,.24)]
+    brown=g.material('thin_woody_stems',(.16,.17,.11),rough=.97)
+    palette=[(.085,.18,.095),(.11,.21,.12),(.15,.23,.13),(.10,.19,.10)]
     leaf_mats=[g.material('small_shrub_leaves_%d'%i,c,rough=.92) for i,c in enumerate(palette)]
     faces=[{'vertices':[],'triangles':[]} for _ in palette]
     for k in range(44):
@@ -127,7 +127,7 @@ def shrub():
         for j in range(8):
             p=(tip[0]+rng.gauss(0,.17),tip[1]+rng.gauss(0,.14),tip[2]+rng.gauss(0,.17))
             choice=rng.randrange(len(palette))
-            leaf(g,leaf_mats[choice],p,.10+rng.random()*.09,.16+rng.random()*.13,
+            leaf(g,leaf_mats[choice],p,.08+rng.random()*.055,.12+rng.random()*.095,
                  rng.random()*math.tau,rng.uniform(.28,2.3),faces[choice])
     for j, f in enumerate(faces):
         g.add_mesh(leaf_mats[j],f['vertices'],f['triangles'])
