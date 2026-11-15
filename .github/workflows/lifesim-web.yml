@@ -1,9 +1,9 @@
-name: LifeSim V0.7 integrated street preview build
+name: LifeSim V0.8 integrated street preview build
 
 on:
   push:
     branches:
-      - lifesim-v07-integrated-street
+      - lifesim-v08-pbr-interior
     paths:
       - '.github/workflows/lifesim-web.yml'
       - 'lifesim/godot/**'
@@ -70,8 +70,10 @@ jobs:
           set -euo pipefail
           python3 "$PROJECT/tools/build_assets.py"
           python3 "$PROJECT/tools/build_street_v07.py"
+          python3 "$PROJECT/tools/build_street_v08.py"
           python3 "$PROJECT/tests/check_authored_assets.py"
           python3 "$PROJECT/tests/check_integrated_street.py"
+          python3 "$PROJECT/tests/check_pbr_street.py"
           python3 "$PROJECT/tests/check_structure.py"
           python3 "$PROJECT/tests/check_delimiters.py"
           python3 "$PROJECT/tests/check_regressions.py"
@@ -116,7 +118,7 @@ jobs:
       - name: Upload web build for review; not automatically published
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v07-integrated-street-build
+          name: lifesim-v08-pbr-interior-build
           path: lifesim-web-build/
           if-no-files-found: error
           retention-days: 14
@@ -124,7 +126,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v07-integrated-street-logs
+          name: lifesim-v08-pbr-interior-logs
           path: |
             godot-web-import.log
             godot-web-export.log
@@ -133,17 +135,17 @@ jobs:
 
 
   publish-isolated-path:
-    name: Publish only lifesim/play-v07 to main without merging game source
+    name: Publish only lifesim/play-v08 to main without merging game source
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v07-integrated-street' }}
+    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v08-pbr-interior' }}
     permissions:
       contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: lifesim-v07-integrated-street-build
+          name: lifesim-v08-pbr-interior-build
           path: site-build
       - uses: actions/checkout@v4
         with:
@@ -160,31 +162,31 @@ jobs:
           compgen -G "site-build/*.wasm" >/dev/null
           compgen -G "site-build/*.pck" >/dev/null
           compgen -G "site-build/*.js" >/dev/null
-          test ! -e published-main/lifesim/play-v07/index.html || grep -q 'Godot' published-main/lifesim/play-v07/index.html
+          test ! -e published-main/lifesim/play-v08/index.html || grep -q 'Godot' published-main/lifesim/play-v08/index.html
       - name: Copy only the new Web export to its isolated URL path
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p published-main/lifesim/play-v07
-          find published-main/lifesim/play-v07 -maxdepth 1 -type f -delete
-          cp -a site-build/. published-main/lifesim/play-v07/
+          mkdir -p published-main/lifesim/play-v08
+          find published-main/lifesim/play-v08 -maxdepth 1 -type f -delete
+          cp -a site-build/. published-main/lifesim/play-v08/
           python3 - <<'PY'
           import json, os
           from pathlib import Path
-          (Path('published-main')/'lifesim'/'play-v07'/'build-info.json').write_text(
-              json.dumps({'version':'0.7','source_branch':'lifesim-v07-integrated-street',
+          (Path('published-main')/'lifesim'/'play-v08'/'build-info.json').write_text(
+              json.dumps({'version':'0.8','source_branch':'lifesim-v08-pbr-interior',
                           'commit':os.environ['GITHUB_SHA'],
                           'build_system':'Godot 4.7.2 Web single thread'},indent=2)+'\n')
           PY
           cd published-main
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lifesim/play-v07
-          test -z "$(git diff --name-only -- . ':!lifesim/play-v07')" || { echo 'Unexpected modifications outside lifesim/play-v07'; exit 1; }
+          git add lifesim/play-v08
+          test -z "$(git diff --name-only -- . ':!lifesim/play-v08')" || { echo 'Unexpected modifications outside lifesim/play-v08'; exit 1; }
           if git diff --cached --quiet; then
             echo "Unchanged web files: no update needed"
           else
-            git commit -m "deploy(lifesim): publish isolated V0.7 integrated street Web build"
+            git commit -m "deploy(lifesim): publish isolated V0.8 integrated street Web build"
             git push origin HEAD:main
           fi
       - name: Read GitHub Pages site status without altering it

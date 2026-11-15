@@ -521,13 +521,13 @@ func _integrated_building(title: String, variant: String, origin: Vector3, size:
     root.position = Vector3(origin.x + side * size.x * 0.5, 0.0, origin.z)
     root.rotation.y = 0.0 if front_right else PI
     add_child(root)
-    var path: String = "res://art/architecture/v07_%s_integrated.glb" % variant
+    var path: String = "res://art/architecture/v08_%s_integrated.glb" % variant
     var packed: PackedScene = load(path) as PackedScene
     if packed == null:
         push_error("V0.7 envelope missing: " + path)
         return
     var model: Node3D = packed.instantiate() as Node3D
-    model.name = "V07ContinuousEnvelope"
+    model.name = "V08TexturedEnvelopeAndInterior"
     root.add_child(model)
     # Collision behind the front reveals; front face itself is not a full opaque slab.
     _collision_box(root, Vector3(-size.x * .5 - .60, size.y * .5, 0),

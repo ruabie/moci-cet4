@@ -22,5 +22,5 @@ code=(p/"scripts"/"city_builder.gd").read_text(encoding="utf8")
 assert "_integrated_building(" in code and "_integrated_forecourts()" in code
 assert "    _authored_facades()" not in code
 assert "    _awning(-17.52" not in code
-assert "res://art/architecture/v07_%s_integrated.glb" in code
-print("V0.7 PASS: distinct GLB envelopes, no duplicate front modules, no overflow")
+assert "res://art/architecture/v08_%s_integrated.glb" in code
+print("V0.7 baseline GLBs validated; current V0.8 street path confirmed")
