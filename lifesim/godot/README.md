@@ -1,36 +1,35 @@
-# 同频之城 / 青川町 V0.4 视觉升级 Alpha
+# 同频之城 · V0.5.1 角色骨骼、行人和原创建筑资产候选版
 
-本工程基于 V0.3.2 Godot 4.7.2 可运行版本，属于**美术迭代候选**，不是成品城市或精致开放世界。
+此包是 V0.4 Alpha 的工程升级版本，**已在 Godot 4.7.2 CI 完成首次导入与静态画面截图，但人物动作、Windows 帧率和视觉质量尚未通过最终验收**。不是正式游戏，也没有可证明的 Windows 60 FPS 数据。
 
-## 当前目标与取舍
+## 启动
 
-- 保持真实设备时间的日期与昼夜同步；不改变收益结算和备份存档协议。
-- 采用原创程序化贴图（`art/textures/`）和手工细化的商店、阳台、街具、远景构件；不使用外链 CDNs。
-- 玩家从方块改为可动的关节式风格化人物（非骨骼蒙皮 GLB）；手臂与腿具有独立关节，镜头具有物理遮挡检测。
-- 街景增加商店雨棚、阳台、花箱、自行车、铺装和远景。此阶段仍未制作完整室内场景和多职业体系。
+1. 使用 Godot 4.7.2 稳定版（GL Compatibility）导入 `project.godot`。
+2. 聊天下载包已包含预生成 `.glb`，不需联网或 Python；GitHub 源码克隆后先在工程目录执行 `python3 tools/build_assets.py` 生成模型再导入 Godot。
+3. 按 F5 运行；WASD 移动、鼠标控制视角、Shift 跑步、E 互动、J 打工、B 购买、Q 离开公寓。
 
-## 开始运行
+## 本轮真正修改了什么
 
-下载 Godot **4.7.2-stable**（当前项目固定稳定版本），在 Godot 项目管理器选择包含 `project.godot` 的文件夹，按 F5 运行。Windows 操作：WASD 移动，鼠标旋转，Shift 跑步，E 交互，J 便利店兼职，B 购买，Q 从公寓返回；Esc 释放鼠标。可在离线状态使用，不消耗付费模型 API。
+- `art/characters/commuter_rig.glb`：原创、可商用的 glTF 2.0 `skin` 资产，17 个命名关节，包含躯干、服装、面部、鞋子、背包等网格。`scripts/player.gd` 在 `Skeleton3D` 上按实际水平速度更新走跑/转向动画。
+- `art/architecture/storefront.glb`：有门、橱窗、室内陈列、灯箱、棚架的可复用店面模型。
+- `art/architecture/apartment_lobby.glb`：公寓入口、门、玻璃、信箱与花盆。暂不属于可进入真实大楼室内。
+- `tools/build_assets.py`：纯 Python 标准库，能离线重建所有五个 GLB；资源均为原创，不依赖外部 API 或许可不明素材。
+- `tests/check_authored_assets.py`：验证 glTF 结构、材质、命名骨骼和皮肤权重的静态检查；`tests/qa_headless.gd` 增加真正的 Skeleton3D 与建筑实例验收。
 
-## 质量验证
+## 审核状态
 
-```
-python tests/check_structure.py
-python tests/check_delimiters.py
-python tests/check_regressions.py
-python tests/check_visual_upgrade.py
-# 下列两步需要 Godot 4.7.2 引擎
-Godot_v4.7.2-stable_linux.x86_64 --headless --editor --path . --import --quit
-Godot_v4.7.2-stable_linux.x86_64 --headless --path . --script res://tests/qa_headless.gd
-```
+| 项目 | 状态 |
+|---|---|
+| 独立 GLB 文件可生成并由第三方 glTF 解析器打开 | 已验证（本地） |
+| 真实 glTF 皮肤权重和命名骨骼 | 已验证结构 |
+| 游戏经济、存档静态回归 | 已通过 |
+| Godot 4.7.2 骨骼导入/动画解析 | **CI 导入与场景测试已通过，Windows 实机待测** |
+| Godot 实际视觉截图和性能 | **待验证** |
+| 真人/高品质动画完整度 | **未达到** |
 
-GitHub Actions 会执行 GDScript 导入和实际渲染截图，并保留构建日志；**CI 通过不等于画面审美通过，更不代表 RTX 3060 真机 60 FPS 已验证**。若 GH CI 尚未执行，状态保持待引擎验证。
+## 已知限制
 
-## 素材归属和限制
-
-纹理为本项目脚本算法生成的原创灰度图片，程序几何体和人物造型为本项目代码生成，不引用外部受限模型或影视角色。不存在正式 PBR 扫描建模、骨骼动画文件或高精度城市资产。V0.4 后续必须补真实尺度 GLB 素材与角色绑定，并且逐一检查来源许可、真机性能、脚滑问题。
-
-## 无破坏性存档变更
-
-延续 `SAVE_VERSION=1` 和 `user://same_time_city_v03.json`，已存在的 V0.3 玩家存档自动使用同一版本读取；首次游玩默认出生点位于便利店附近的人行道。测试使用临时路径，不修改真实玩家存档。
+- 人物是完整骨骼皮肤模型，但由原创程序化几何生成，离电影级角色建模还有显著差距。
+- 玩家尚不能真正走入 AOI MART 店面，也尚无完整店内收银交互；沿用之前的兼职逻辑。
+- 6 名 NPC 改用三套骨骼角色外观；仍采用简单日程与局部往返路线，而非完整社会模拟。
+- V0.5 不会自动合并到主分支，验收缺口必须保留。

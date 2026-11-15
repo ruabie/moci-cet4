@@ -38,6 +38,12 @@ jobs:
           mkdir -p /tmp/godot
           unzip -q /tmp/godot.zip -d /tmp/godot
           chmod +x "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+      - name: Build reproducible original GLB assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/build_assets.py"
+          python3 "$PROJECT_DIR/tests/check_authored_assets.py"
       - name: Static checks
         shell: bash
         run: |
@@ -74,6 +80,7 @@ jobs:
           xvfb-run -a -s "-screen 0 1280x720x24"             "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"             --rendering-driver opengl3 --path "$PROJECT_DIR"             --script res://tests/visual_capture.gd 2>&1 | tee godot-visual.log
           grep -F 'CAPTURE PASS:' godot-visual.log
           test -s "$PROJECT_DIR/tests/visual_evidence.png"
+          test -s "$PROJECT_DIR/tests/visual_walk_evidence.png"
       - name: Save logs even when tests fail
         if: always()
         uses: actions/upload-artifact@v4
@@ -84,5 +91,8 @@ jobs:
             godot-qa.log
             godot-visual.log
             lifesim/godot/tests/visual_evidence.png
+            lifesim/godot/tests/visual_walk_evidence.png
+            lifesim/godot/art/characters/*.glb
+            lifesim/godot/art/architecture/*.glb
           if-no-files-found: warn
           retention-days: 14

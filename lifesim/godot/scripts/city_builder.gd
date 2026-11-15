@@ -8,6 +8,7 @@ var windows: Array[StandardMaterial3D] = []
 var localized_font: Font
 var npc_root: Node3D
 var npc_figures: Array[Node3D] = []
+var npc_rigs: Array[Skeleton3D] = []
 var all_materials: Dictionary = {}
 
 func _color(hex: String, roughness: float = 0.80, metal: float = 0.0) -> StandardMaterial3D:
@@ -101,6 +102,7 @@ func create_city() -> void:
     _park_and_props()
     _people()
     _detail_pass()
+    _authored_facades()
 
 func _ground() -> void:
     _box(self, Vector3(0, -0.36, 0), Vector3(180, 0.6, 180), _color("#8a9180"))
@@ -108,8 +110,8 @@ func _ground() -> void:
 
 func _roads() -> void:
     var road := _color("#353c44", 0.99)
-    var walk := _color("#aaa99f", 0.99)
-    var curb := _color("#8e9994", 0.99)
+    var walk := _color("#82857f", 0.99)
+    var curb := _color("#696d6b", 0.99)
     var stripe := _color("#deddd5", 0.95)
     _box(self, Vector3(0, 0.005, 0), Vector3(13, 0.04, 177), road, false)
     _box(self, Vector3(0, 0.014, -32), Vector3(177, 0.04, 13), road, false)
@@ -266,11 +268,24 @@ func _citizen_ellipsoid(parent: Node3D, pos: Vector3, dimensions: Vector3, mat: 
     inst.material_override = mat
     parent.add_child(inst)
 
+func _find_resident_skeleton(node: Node) -> Skeleton3D:
+    if node is Skeleton3D:
+        return node as Skeleton3D
+    for child in node.get_children():
+        var nested: Skeleton3D = _find_resident_skeleton(child)
+        if nested != null:
+            return nested
+    return null
+
 func _people() -> void:
     npc_root = Node3D.new()
     npc_root.name = "AmbientResidents"
     add_child(npc_root)
-    var shirts: Array[String] = ["#ae8471", "#738c99", "#a39689", "#718a7b", "#827a92", "#b18c79"]
+    var residents: Array[PackedScene] = [
+        load("res://art/characters/resident_olive.glb"),
+        load("res://art/characters/resident_sand.glb"),
+        load("res://art/characters/commuter_rig.glb")
+    ]
     var spots: Array[Vector3] = [Vector3(-10, 0, -15), Vector3(-9, 0, 16), Vector3(10, 0, -10), Vector3(8, 0, 24), Vector3(-11, 0, -55), Vector3(11, 0, 55)]
     for i in range(spots.size()):
         var npc := Node3D.new()
@@ -278,36 +293,31 @@ func _people() -> void:
         npc.position = spots[i]
         npc.set_meta("base", spots[i])
         npc.set_meta("offset", float(i) * 1.71)
-        npc.set_meta("stride", 0.0)
         npc_root.add_child(npc)
-        var torso := Node3D.new()
-        torso.name = "Body"
-        npc.add_child(torso)
-        _citizen_ellipsoid(torso, Vector3(0, 1.23, 0), Vector3(0.68, 0.72, 0.38), _color(shirts[i]))
-        _citizen_ellipsoid(torso, Vector3(0, 1.75, 0), Vector3(0.40, 0.45, 0.40), _color("#d2ab8c"))
-        _citizen_ellipsoid(torso, Vector3(0, 1.95, 0.02), Vector3(0.43, 0.17, 0.42), _color("#3d3937"))
-        for s in [-1.0, 1.0]:
-            var arm := Node3D.new()
-            arm.name = "ArmL" if s < 0 else "ArmR"
-            arm.position = Vector3(s * 0.39, 1.45, 0)
-            npc.add_child(arm)
-            _citizen_ellipsoid(arm, Vector3(0, -0.27, 0), Vector3(0.22, 0.53, 0.23), _color(shirts[i]))
-            _citizen_ellipsoid(arm, Vector3(0, -0.56, 0), Vector3(0.15, 0.13, 0.16), _color("#d2ab8c"))
-            var leg := Node3D.new()
-            leg.name = "LegL" if s < 0 else "LegR"
-            leg.position = Vector3(s * 0.17, 0.91, 0)
-            npc.add_child(leg)
-            _citizen_ellipsoid(leg, Vector3(0, -0.34, 0), Vector3(0.23, 0.68, 0.25), _color("#434f56"))
-            _citizen_ellipsoid(leg, Vector3(0, -0.76, -0.08), Vector3(0.24, 0.17, 0.40), _color("#dedad1"))
+        var figure: Node3D = residents[i % residents.size()].instantiate() as Node3D
+        figure.name = "ResidentRigModel"
+        figure.scale = Vector3.ONE * (0.77 + float(i % 3) * 0.025)
+        npc.add_child(figure)
+        var skeleton: Skeleton3D = _find_resident_skeleton(figure)
+        if skeleton == null or skeleton.find_bone("LeftThigh") < 0:
+            push_error("Missing resident Skeleton3D for " + npc.name)
+        npc_rigs.append(skeleton)
         npc_figures.append(npc)
+
+func _resident_pose(rig: Skeleton3D, name: String, rotation: float) -> void:
+    if rig == null:
+        return
+    var idx: int = rig.find_bone(name)
+    if idx >= 0:
+        rig.set_bone_pose_rotation(idx, Quaternion(Vector3.RIGHT, rotation))
 
 func update_ambience(daylight: float, elapsed: float) -> void:
     for light in lamps:
         light.visible = daylight < 0.48
-        light.light_energy = lerpf(2.3, 0.0, daylight)
+        light.light_energy = lerpf(1.65, 0.0, daylight)
     var hour: int = int(WorldClock.snapshot()["hour"])
     for idx in range(npc_figures.size()):
-        var npc := npc_figures[idx]
+        var npc: Node3D = npc_figures[idx]
         npc.visible = (hour >= 6 and hour <= 23) or idx == 0
         var base: Vector3 = npc.get_meta("base")
         var phase: float = float(npc.get_meta("offset"))
@@ -315,13 +325,14 @@ func update_ambience(daylight: float, elapsed: float) -> void:
         var movement := Vector3(cos(t) * 0.48, 0, -sin(t) * 1.45)
         npc.position = base + Vector3(sin(t) * 2.0, 0, cos(t) * 1.45)
         npc.rotation.y = atan2(-movement.x, -movement.z)
-        var stride := sin(elapsed * 4.0 + phase) * 0.33
-        var left: Node3D = npc.get_node("LegL")
-        var right: Node3D = npc.get_node("LegR")
-        left.rotation.x = stride
-        right.rotation.x = -stride
-        npc.get_node("ArmL").rotation.x = -stride * 0.65
-        npc.get_node("ArmR").rotation.x = stride * 0.65
+        var stride: float = sin(elapsed * 4.0 + phase) * 0.36
+        var rig: Skeleton3D = npc_rigs[idx]
+        _resident_pose(rig, "LeftThigh", stride)
+        _resident_pose(rig, "RightThigh", -stride)
+        _resident_pose(rig, "LeftShin", maxf(0.0, -stride) * .7)
+        _resident_pose(rig, "RightShin", maxf(0.0, stride) * .7)
+        _resident_pose(rig, "LeftUpperArm", -stride * .68)
+        _resident_pose(rig, "RightUpperArm", stride * .68)
 
 func _round_post(parent: Node3D, where: Vector3, height: float, radius: float, color: String) -> void:
     var mesh := CylinderMesh.new()
@@ -395,8 +406,8 @@ func _awning(front: float, z0: float, y: float, width: float, base: String) -> v
 
 func _detail_pass() -> void:
     # Forecourts and shopfronts establish a walkable rather than empty street edge.
-    var tile := _color("#aaa69c", 0.99)
-    var tile_light := _color("#c7c3b6", 0.99)
+    var tile := _color("#878c86", 0.99)
+    var tile_light := _color("#959891", 0.99)
     for side in [-1.0, 1.0]:
         for z in range(-76, 79, 3):
             if z > -41 and z < -23:
@@ -458,3 +469,26 @@ func _detail_pass() -> void:
         var height := 12.0 + float((idx * 7) % 6) * 5.0
         _box(self, Vector3(x, height * 0.5, -115.0), Vector3(7.5, height, 11.0), skyline, false)
         _box(self, Vector3(x, height * 0.5, 111.0), Vector3(8.4, height, 12.0), skyline, false)
+
+func _authored_facades() -> void:
+    # Reusable authored glTF architecture, generated by tools/build_assets.py.
+    # Art lives in GLB meshes; Godot owns collisions, player interaction and signage.
+    var mart_scene: PackedScene = load("res://art/architecture/storefront.glb")
+    var lobby_scene: PackedScene = load("res://art/architecture/apartment_lobby.glb")
+    if mart_scene == null or lobby_scene == null:
+        push_error("Authored GLB facades are missing; run python3 tools/build_assets.py")
+        return
+    for item in [
+        [mart_scene, Vector3(-17.46, 0, -14), 0.0, "AOI MART  ·  24H"],
+        [mart_scene, Vector3(18.03, 0, -14), PI, "KAWA COFFEE"],
+        [mart_scene, Vector3(18.03, 0, 15), PI, "SLOW LIVING"],
+        [lobby_scene, Vector3(-17.46, 0, 13), 0.0, "青川公寓"]
+    ]:
+        var instance: Node3D = item[0].instantiate() as Node3D
+        instance.name = "Authored_%s" % str(item[3]).replace(" ", "_")
+        instance.position = item[1]
+        instance.rotation.y = item[2]
+        add_child(instance)
+        var direction: float = -1.0 if is_equal_approx(float(item[2]), PI) else 1.0
+        var sign_pos: Vector3 = item[1] + Vector3(direction * 1.15, 5.18, 0)
+        _label(self, str(item[3]), sign_pos, 43, Color("#213c3a"))
