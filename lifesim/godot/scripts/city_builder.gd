@@ -201,7 +201,7 @@ func _tree(where: Vector3, big: bool = false) -> void:
         push_error("V0.10 vegetation asset not imported: " + path)
         return
     var root := Node3D.new()
-    root.name = "V10StreetscapeTree_%s" % species
+    root.name = "V10StreetscapeTree_%s_%d_%d" % [species, roundi(where.x * 10.0), roundi(where.z * 10.0)]
     root.position = where
     root.rotation.y = float(hash_value % 13) * 0.31
     var random_scale: float = 1.02 + float(hash_value % 5) * 0.035
