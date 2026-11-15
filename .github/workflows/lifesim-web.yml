@@ -50,6 +50,20 @@ jobs:
             test -s "$DEST/$template"
             unzip -tq "$DEST/$template" >/dev/null
           done
+      - name: Bundle OFL-licensed Simplified Chinese font for Web UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$PROJECT/art/fonts"
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf" \
+            -o "$PROJECT/art/fonts/NotoSansCJKsc-Regular.otf"
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/LICENSE" \
+            -o "$PROJECT/art/fonts/OFL-LICENSE.txt"
+          test "$(stat -c%s "$PROJECT/art/fonts/NotoSansCJKsc-Regular.otf")" -gt 1000000
+          grep -q "SIL OPEN FONT LICENSE" "$PROJECT/art/fonts/OFL-LICENSE.txt"
+          sha256sum "$PROJECT/art/fonts/NotoSansCJKsc-Regular.otf"
       - name: Regenerate original glTF models and run static checks
         shell: bash
         run: |
