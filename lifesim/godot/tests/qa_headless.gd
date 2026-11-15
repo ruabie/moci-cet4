@@ -134,6 +134,21 @@ func run_contracts() -> void:
     if not LifeContent.prepare_day(life, "2026-11-16") or LifeContent.completed(life, "delivery") or not LifeContent.begin_delivery(life, "2026-11-16"):
         fail("daily reset regression")
         return
+    if LifeContent.prepare_day(life, "2026-11-14"):
+        fail("backdated device clock triggered repeated daily rewards")
+        return
+    var home: Dictionary = CitySave.initial()
+    if not CitySave.purchase(home, "soft_rug", 180) or not CitySave.purchase(home, "green_plant", 240):
+        fail("furniture purchase failed")
+        return
+    if CitySave.purchase(home, "soft_rug", 180) or int(home["balance"]) != 380:
+        fail("furniture repeat purchase / balance regression")
+        return
+    home["mood"] = 30
+    LifeContent.rest(home, true)
+    if int(home["mood"]) != 44:
+        fail("furniture comfort had no effect on apartment rest")
+        return
     ProjectSettings.set_setting("application/config/qa_mode", true)
     var scene: PackedScene = load("res://scenes/main.tscn")
     if scene == null:
@@ -197,7 +212,7 @@ func run_contracts() -> void:
         if npc_rig == null or npc_rig.get_bone_count() < 15:
             fail("V0.5.1 unrigged resident")
             return
-    print("QA PASS: clock, spend, purchase, idempotent jobs, save, corrupt fallback, scene startup, skinned GLB avatar, authored storefront and skinned residents")
+    print("QA PASS: clock, old-save migration, daily quest idempotence, real-work payout, delivery, residents, photography, interiors, rigged characters, save and scene")
     instance.queue_free()
     ProjectSettings.set_setting("application/config/qa_mode", false)
     quit(0)
