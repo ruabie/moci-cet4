@@ -106,14 +106,24 @@ func run_contracts() -> void:
         fail("3D district missing")
         return
     var visual: Node = avatar.get_node_or_null("AvatarVisual")
-    if visual == null or visual.get_node_or_null("LeftHip/LeftKnee") == null or visual.get_node_or_null("RightHip/RightKnee") == null:
-        fail("V0.4 articulated character nodes missing")
+    if visual == null or not avatar.animation_verified:
+        fail("V0.5 authored skinned avatar not initialized")
+        return
+    if avatar.rig == null or avatar.rig.get_bone_count() < 15:
+        fail("V0.5 Skeleton3D missing or unrigged")
+        return
+    for required_name in ["LeftThigh", "RightThigh", "LeftShin", "RightShin"]:
+        if avatar.rig.find_bone(required_name) < 0:
+            fail("V0.5 missing locomotion bone: " + required_name)
+            return
+    if instance.get_node_or_null("AokawaDistrict/Authored_AOI_MART__·__24H") == null:
+        fail("Authored GLB storefront was not instantiated")
         return
     var district: Node = instance.get_node_or_null("AokawaDistrict")
     if district.get_node_or_null("AmbientResidents") == null:
         fail("V0.4 residents missing")
         return
-    print("QA PASS: clock, spend, purchase, idempotent jobs, save, corrupt fallback, scene startup, articulated model and residents")
+    print("QA PASS: clock, spend, purchase, idempotent jobs, save, corrupt fallback, scene startup, skinned glTF skeleton, authored storefront and residents")
     instance.queue_free()
     ProjectSettings.set_setting("application/config/qa_mode", false)
     quit(0)
