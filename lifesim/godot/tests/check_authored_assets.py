@@ -4,7 +4,7 @@ This is not a Godot importer or GPU FPS test.
 import json, struct, hashlib
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-paths=[ROOT/'art/characters/commuter_rig.glb',ROOT/'art/architecture/storefront.glb',ROOT/'art/architecture/apartment_lobby.glb']
+paths=[ROOT/'art/characters/commuter_rig.glb',ROOT/'art/characters/resident_olive.glb',ROOT/'art/characters/resident_sand.glb',ROOT/'art/architecture/storefront.glb',ROOT/'art/architecture/apartment_lobby.glb']
 for path in paths:
  data=path.read_bytes()
  assert len(data)>=32 and data[:4]==b'glTF',path
