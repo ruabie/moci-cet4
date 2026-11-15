@@ -116,6 +116,21 @@ func run_contracts() -> void:
         if avatar.rig.find_bone(required_name) < 0:
             fail("V0.5 missing locomotion bone: " + required_name)
             return
+    # Verify keyboard movement changes position and updates the skinned skeleton.
+    var initial_pos: Vector3 = avatar.global_position
+    Input.action_press("move_forward")
+    for step in range(12):
+        await physics_frame
+    Input.action_release("move_forward")
+    var travelled: float = avatar.global_position.distance_to(initial_pos)
+    if travelled < 0.10:
+        fail("V0.5.1 input did not move player, displacement: %f" % travelled)
+        return
+    var thigh_idx: int = avatar.rig.find_bone("LeftThigh")
+    var pose: Quaternion = avatar.rig.get_bone_pose_rotation(thigh_idx)
+    if absf(pose.get_angle()) < 0.01:
+        fail("V0.5.1 locomotion didn't update skinned left thigh")
+        return
     if instance.get_node_or_null("AokawaDistrict/Authored_AOI_MART__·__24H") == null:
         fail("Authored GLB storefront was not instantiated")
         return
