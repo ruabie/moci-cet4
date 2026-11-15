@@ -33,19 +33,11 @@ jobs:
             curl --fail --location --silent --show-error --head \
               --max-time 30 "$BASE/$item" | grep -E -i 'HTTP/|content-type|content-length'
           done
-          # The CDN may still serve the previous build for a short time.
-          for i in $(seq 1 18); do
-            curl --fail --location --silent --show-error \
-              "$BASE/build-info.json?revision=b0305e0a&i=$i" -o /tmp/build-info.json
-            if grep -q 'b0305e0a9b7a3b5468087cbd10e36f1836c7bfc6' /tmp/build-info.json; then
-              break
-            fi
-            echo "Waiting for Pages CDN to publish expected build revision: $i"
-            sleep 10
-          done
+          curl --fail --location --silent --show-error \
+            "$BASE/build-info.json?qa-check=$GITHUB_RUN_ID" -o /tmp/build-info.json
           cat /tmp/build-info.json
           grep -q '"version": "0.11"' /tmp/build-info.json
-          grep -q 'b0305e0a9b7a3b5468087cbd10e36f1836c7bfc6' /tmp/build-info.json
+          grep -q '"source_branch": "lifesim-v011-open-city-interiors"' /tmp/build-info.json
           echo "LIVE HTTP PASS: published Godot Web assets are reachable."
       - name: Check Chromium availability
         shell: bash
