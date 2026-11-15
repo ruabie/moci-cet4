@@ -184,9 +184,15 @@ func _make_hud_label(parent: Control, content: String, font_size: int, color: Co
     return l
 
 func _create_ui() -> void:
-    var system_font := SystemFont.new()
-    system_font.font_names = PackedStringArray(["Noto Sans CJK SC", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC"])
-    localized_font = system_font
+    # WebAssembly cannot reliably access OS CJK fallback fonts.
+    # An OFL-licensed Noto Sans CJK SC font is included at Web export time.
+    var bundled_path := "res://art/fonts/NotoSansCJKsc-Regular.otf"
+    if ResourceLoader.exists(bundled_path):
+        localized_font = load(bundled_path) as Font
+    else:
+        var system_font := SystemFont.new()
+        system_font.font_names = PackedStringArray(["Noto Sans CJK SC", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC"])
+        localized_font = system_font
     var layer := CanvasLayer.new()
     layer.name = "HUD"
     add_child(layer)
