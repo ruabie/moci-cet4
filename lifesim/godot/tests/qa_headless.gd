@@ -222,6 +222,22 @@ func run_contracts() -> void:
     if instance.get_node_or_null("MartInterior") == null or instance.get_node_or_null("CafeInterior") == null:
         fail("V0.6 store interiors missing")
         return
+    var cafe_v11: CuratedInteriorsV11 = instance.get_node_or_null("CafeInterior") as CuratedInteriorsV11
+    var mart_v11: CuratedInteriorsV11 = instance.get_node_or_null("MartInterior") as CuratedInteriorsV11
+    var home_v11: CuratedInteriorsV11 = instance.get_node_or_null("ApartmentInterior") as CuratedInteriorsV11
+    if cafe_v11 == null or mart_v11 == null or home_v11 == null:
+        fail("V0.11 furnished interiors not instantiated")
+        return
+    if cafe_v11.placed_assets < 20 or mart_v11.placed_assets < 20 or home_v11.placed_assets < 10:
+        fail("V0.11 imported furniture missing")
+        return
+    if cafe_v11.collidable_assets < 5 or mart_v11.collidable_assets < 5:
+        fail("V0.11 furniture collision missing")
+        return
+    var block: LicensedBlockV11 = district.get_node_or_null("V11LicensedNeighborhood") as LicensedBlockV11
+    if block == null or block.building_count < 6 or block.model_count < 12:
+        fail("V0.11 licensed district GLBs not loaded")
+        return
     if district.npc_rigs.size() != district.npc_figures.size():
         fail("V0.5.1 NPC bone rigs do not match resident count")
         return
