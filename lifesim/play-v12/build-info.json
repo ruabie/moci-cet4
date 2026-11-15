@@ -1,0 +1,6 @@
+{
+  "version": "0.12",
+  "source_branch": "lifesim-v012-lived-in-district",
+  "commit": "7a3772e6942909abe855186e91ae6f4fb4edef20",
+  "build_system": "Godot 4.7.2 Web single thread"
+}
