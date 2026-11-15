@@ -1,6 +1,6 @@
 {
   "version": "0.11",
   "source_branch": "lifesim-v011-open-city-interiors",
-  "commit": "b0305e0a9b7a3b5468087cbd10e36f1836c7bfc6",
+  "commit": "7417870b2d97d39d00b4c248bf084fcf15df2c2a",
   "build_system": "Godot 4.7.2 Web single thread"
 }
