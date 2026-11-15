@@ -1,0 +1,146 @@
+name: LifeSim V0.12 public browser interior and movement acceptance
+
+on:
+  push:
+    branches: [lifesim-v012-lived-in-district]
+    paths:
+      - '.github/workflows/lifesim-v012-live-verify.yml'
+      - 'lifesim/godot/scripts/main.gd'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-site:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Probe published HTML, WASM, JS, PCK, version metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://ruabie.github.io/moci-cet4/lifesim/play-v12"
+          for i in $(seq 1 12); do
+            if curl --fail --location --silent --show-error --connect-timeout 10 \
+                 --max-time 40 --output /tmp/site.html "$BASE/index.html" \
+                 && grep -q '同频之城' /tmp/site.html; then break; fi
+            echo "Pages not ready, retry $i"
+            sleep 10
+          done
+          test -s /tmp/site.html
+          grep -q 'Godot' /tmp/site.html || grep -q 'index.wasm' /tmp/site.html
+          for item in index.js index.wasm index.pck build-info.json; do
+            echo "--- $item ---"
+            curl --fail --location --silent --show-error --head \
+              --max-time 30 "$BASE/$item" | grep -E -i 'HTTP/|content-type|content-length'
+          done
+          curl --fail --location --silent --show-error \
+            "$BASE/build-info.json?qa-check=$GITHUB_RUN_ID" -o /tmp/build-info.json
+          cat /tmp/build-info.json
+          grep -q '"version": "0.12"' /tmp/build-info.json
+          grep -q '"source_branch": "lifesim-v012-lived-in-district"' /tmp/build-info.json
+          echo "LIVE HTTP PASS: published Godot Web assets are reachable."
+      - name: Check Chromium availability
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v google-chrome || command -v chromium || command -v chromium-browser
+          node --version
+      - name: Install browser smoke harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Attempt Chromium WebGL2 and game-start test
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/lifesim-browser-smoke.cjs <<'JS'
+          const { chromium } = require(process.cwd() + '/node_modules/playwright');
+          (async () => {
+            const binary = process.env.CHROME_BIN || '/usr/bin/google-chrome';
+            const browser = await chromium.launch({
+              executablePath: binary, headless: true,
+              args: ['--no-sandbox','--disable-dev-shm-usage',
+                     '--enable-unsafe-swiftshader','--use-angle=swiftshader',
+                     '--use-gl=angle','--enable-webgl']
+            });
+            const page = await browser.newPage({viewport:{width:1280,height:720}});
+            const messages=[];
+            page.on('console', msg => {if(msg.type()==='error')messages.push(msg.text())});
+            page.on('pageerror', e => messages.push(String(e)));
+            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v12/?qa=1', {waitUntil:'domcontentloaded', timeout:60000});
+            const gl2=await page.evaluate(()=> Boolean(document.createElement('canvas').getContext('webgl2')));
+            await page.waitForTimeout(15000);
+            await page.waitForFunction(() => typeof window.__LIFESIM_QA__?.getState === 'function',{timeout:20000});
+            await page.keyboard.press('t');
+            await page.waitForTimeout(350);
+            const info=await page.evaluate(()=> ({
+              title: document.title, canvas: !!document.querySelector('canvas'),
+              status: document.getElementById('status')?.getAttribute('style'),
+              errorText: document.getElementById('status-notice')?.textContent?.slice(0,300)
+            }));
+            await page.screenshot({path:'lifesim-public-browser.png',fullPage:true});
+            // User-driven game input, read-only telemetry; no QA cheat.
+            const beforeState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            await page.locator('canvas').click({position:{x:640,y:410},force:true});
+            await page.waitForTimeout(350);
+            // First test entry into the previously empty cafe interior.
+            if (beforeState.interaction !== '咖啡馆') throw new Error('expected cafe at the default spawn');
+            await page.evaluate(() => {
+              window.__LIFESIM_KEY_DIAG = [];
+              document.addEventListener('keydown', e => window.__LIFESIM_KEY_DIAG.push({
+                key: e.key, code: e.code, keyCode: e.keyCode,
+                focused: document.activeElement?.tagName,
+                target: e.target?.tagName
+              }), true);
+            });
+            // SwiftShader 3D can run at low FPS; hold key across several frames.
+            await page.keyboard.down('e');
+            await page.waitForTimeout(2700);
+            await page.keyboard.up('e');
+            await page.waitForTimeout(1500);
+            console.log('V12_DOM_KEYS',JSON.stringify(await page.evaluate(()=>window.__LIFESIM_KEY_DIAG)));
+            const enteredState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            console.log('V12_ENTRY',JSON.stringify({beforeState,enteredState}));
+            await page.screenshot({path:'lifesim-v12-cafe-indoors.png',fullPage:true});
+            if (enteredState.indoor !== '咖啡馆') throw new Error('E key did not enter the cafe');
+            await page.keyboard.down('w');
+            await page.waitForTimeout(1700);
+            await page.keyboard.up('w');
+            await page.waitForTimeout(450);
+            const movedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            console.log('V12_MOVE',JSON.stringify({beforeState,movedState}));
+            if (Math.hypot(movedState.x-enteredState.x,movedState.z-enteredState.z)<0.6)
+              throw new Error('V12 indoor WASD movement blocked or below 0.6m');
+            // Headless SwiftShader can deliver fewer frames than keystroke duration;
+            // keep the release action active across several rendered frames.
+            await page.keyboard.down('q');
+            await page.waitForTimeout(2500);
+            await page.keyboard.up('q');
+            await page.waitForTimeout(1300);
+            const exitedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            if (exitedState.indoor !== '') throw new Error('Q failed to leave cafe');
+            await page.screenshot({path:'lifesim-v12-movement.png',fullPage:true});
+            console.log('BROWSER_CHECK',JSON.stringify({gl2,info,messages:messages.slice(-10)}));
+            await browser.close();
+            if(!gl2||!info.canvas||messages.some(x=>/Failed to load|WebGL|error loading|Unable to initialize/i.test(x)))
+              process.exit(1);
+            console.log('BROWSER WEBGL2 SMOKE PASS (not a gameplay-quality guarantee)');
+          })().catch(err=>{console.error(err);process.exit(1)});
+          JS
+          node /tmp/lifesim-browser-smoke.cjs
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+      - name: Upload browser evidence if available
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-public-browser-check
+          path: |
+            lifesim-public-browser.png
+            lifesim-v12-movement.png
+            lifesim-v12-cafe-indoors.png
+          if-no-files-found: ignore
+          retention-days: 14
