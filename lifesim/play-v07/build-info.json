@@ -1,0 +1,6 @@
+{
+  "version": "0.7",
+  "source_branch": "lifesim-v07-integrated-street",
+  "commit": "de44caa13b480c023ba3fe2b8f49d3671abbed21",
+  "build_system": "Godot 4.7.2 Web single thread"
+}
