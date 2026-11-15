@@ -193,12 +193,12 @@ func run_contracts() -> void:
         fail("V0.5.1 locomotion didn't update skinned left thigh")
         return
     var district: Node = instance.get_node_or_null("AokawaDistrict")
-    if district.get_node_or_null("Authored_AOI_MART__·__24H/V07ContinuousEnvelope") == null:
-        fail("V0.7 integrated mart model missing")
+    if district.get_node_or_null("Authored_AOI_MART__·__24H/V08TexturedEnvelopeAndInterior") == null:
+        fail("V0.8 integrated mart model missing")
         return
     for address in ["Authored_KAWA_COFFEE", "Authored_SLOW_LIVING", "Authored_青川公寓"]:
-        if district.get_node_or_null(address + "/V07ContinuousEnvelope") == null:
-            fail("V0.7 integrated facade missing: " + address)
+        if district.get_node_or_null(address + "/V08TexturedEnvelopeAndInterior") == null:
+            fail("V0.8 integrated facade missing: " + address)
             return
     if district.get_node_or_null("AmbientResidents") == null:
         fail("V0.4 residents missing")
@@ -216,7 +216,7 @@ func run_contracts() -> void:
         if npc_rig == null or npc_rig.get_bone_count() < 15:
             fail("V0.5.1 unrigged resident")
             return
-    print("QA PASS: V0.7 integrated facade and clock, old-save migration, daily quest idempotence, real-work payout, delivery, residents, photography, interiors, rigged characters, save and scene")
+    print("QA PASS: V0.8 integrated facade and clock, old-save migration, daily quest idempotence, real-work payout, delivery, residents, photography, interiors, rigged characters, save and scene")
     instance.queue_free()
     ProjectSettings.set_setting("application/config/qa_mode", false)
     quit(0)
