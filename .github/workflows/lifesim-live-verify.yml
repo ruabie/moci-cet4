@@ -33,10 +33,19 @@ jobs:
             curl --fail --location --silent --show-error --head \
               --max-time 30 "$BASE/$item" | grep -E -i 'HTTP/|content-type|content-length'
           done
-          curl --fail --location --silent --show-error \
-            "$BASE/build-info.json" | tee /tmp/build-info.json
+          # The CDN may still serve the previous build for a short time.
+          for i in $(seq 1 18); do
+            curl --fail --location --silent --show-error \
+              "$BASE/build-info.json?revision=04c0a93f&i=$i" -o /tmp/build-info.json
+            if grep -q '04c0a93f9f0cfe5f68cc740e3ff1bdc78ed86c4a' /tmp/build-info.json; then
+              break
+            fi
+            echo "Waiting for Pages CDN to publish expected build revision: $i"
+            sleep 10
+          done
+          cat /tmp/build-info.json
           grep -q '"version": "0.6"' /tmp/build-info.json
-          grep -q '62da5f01f503c344e0e09cc12abc0aad9d4d99b7' /tmp/build-info.json
+          grep -q '04c0a93f9f0cfe5f68cc740e3ff1bdc78ed86c4a' /tmp/build-info.json
           echo "LIVE HTTP PASS: published Godot Web assets are reachable."
       - name: Check Chromium availability
         shell: bash
@@ -50,7 +59,6 @@ jobs:
           set -euo pipefail
           npm install --no-save --no-package-lock playwright@1.56.1
       - name: Attempt Chromium WebGL2 and game-start test
-        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
