@@ -123,7 +123,14 @@ func run_contracts() -> void:
     if district.get_node_or_null("AmbientResidents") == null:
         fail("V0.4 residents missing")
         return
-    print("QA PASS: clock, spend, purchase, idempotent jobs, save, corrupt fallback, scene startup, skinned glTF skeleton, authored storefront and residents")
+    if district.npc_rigs.size() != district.npc_figures.size():
+        fail("V0.5.1 NPC bone rigs do not match resident count")
+        return
+    for npc_rig in district.npc_rigs:
+        if npc_rig == null or npc_rig.get_bone_count() < 15:
+            fail("V0.5.1 unrigged resident")
+            return
+    print("QA PASS: clock, spend, purchase, idempotent jobs, save, corrupt fallback, scene startup, skinned GLB avatar, authored storefront and skinned residents")
     instance.queue_free()
     ProjectSettings.set_setting("application/config/qa_mode", false)
     quit(0)
