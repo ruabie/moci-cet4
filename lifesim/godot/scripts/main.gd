@@ -34,6 +34,8 @@ var job_correct: int = 0
 var job_seconds: float = -1.0
 var dialogue_npc: int = -1
 var shop_open: bool = false
+var web_qa_mode: bool = false
+var web_qa_tick: float = 0.0
 var near_npc: int = -1
 var journal_open: bool = false
 var indoor_place: String = ""
@@ -71,6 +73,7 @@ func _ready() -> void:
     _create_business_interiors()
     _create_player()
     _create_ui()
+    _initialize_web_qa()
     _update_sun()
     if not qa_mode:
         _save_progress()
@@ -78,6 +81,34 @@ func _ready() -> void:
         _notify(CitySave.last_load_warning, 12.0)
     else:
         _notify("欢迎来到青川町。世界时间与你的设备同步。", 6.0)
+
+func _initialize_web_qa() -> void:
+    # Read-only diagnostics in ?qa=1 only: never expose mutating game actions.
+    if not OS.has_feature("web"):
+        return
+    var query: String = str(JavaScriptBridge.eval("window.location.search", true))
+    web_qa_mode = query.contains("qa=1")
+    if web_qa_mode:
+        _emit_web_qa()
+
+func _emit_web_qa() -> void:
+    if not web_qa_mode or player == null:
+        return
+    var snapshot: Dictionary = {
+        "x": player.global_position.x,
+        "y": player.global_position.y,
+        "z": player.global_position.z,
+        "balance": int(state.get("balance", 0)),
+        "jobs_completed": int(state.get("jobs_completed", 0)),
+        "interaction": current_interaction,
+        "job_mode": job_mode,
+        "job_step": job_step,
+        "indoor": indoor_place,
+        "at_home": in_home
+    }
+    # Only serialized numbers and strings are passed to the browser.
+    var value: String = JSON.stringify(snapshot)
+    JavaScriptBridge.eval("window.__LIFESIM_QA__ = Object.freeze({getState:function(){return Object.freeze(" + value + ");}});", true)
 
 func _configure_input() -> void:
     var keys := {
@@ -650,6 +681,7 @@ func _notify(message: String, seconds: float = 4.0) -> void:
 func _process(delta: float) -> void:
     gameplay_time += delta
     autosave_time += delta
+    web_qa_tick += delta
     notice_time -= delta
     photo_preview_time -= delta
     if photo_preview != null and photo_preview_time <= 0.0:
@@ -718,6 +750,9 @@ func _process(delta: float) -> void:
     if autosave_time >= AUTOSAVE_SECONDS:
         autosave_time = 0.0
         _save_progress()
+    if web_qa_mode and web_qa_tick >= 0.25:
+        web_qa_tick = 0.0
+        _emit_web_qa()
 
 func _update_sun() -> void:
     if sun == null or ambient_env == null:
