@@ -1,8 +1,8 @@
-name: LifeSim public web availability and browser smoke
+name: LifeSim V0.6 public preview browser smoke
 
 on:
   push:
-    branches: [lifesim-v051-web]
+    branches: [lifesim-v06-life-loop]
     paths: ['.github/workflows/lifesim-live-verify.yml']
   workflow_dispatch:
 
@@ -18,7 +18,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BASE="https://ruabie.github.io/moci-cet4/lifesim/play"
+          BASE="https://ruabie.github.io/moci-cet4/lifesim/play-v06"
           for i in $(seq 1 12); do
             if curl --fail --location --silent --show-error --connect-timeout 10 \
                  --max-time 40 --output /tmp/site.html "$BASE/index.html" \
@@ -35,8 +35,8 @@ jobs:
           done
           curl --fail --location --silent --show-error \
             "$BASE/build-info.json" | tee /tmp/build-info.json
-          grep -q '"version": "0.5.1"' /tmp/build-info.json
-          grep -q 'a524cdf9fc3b9712a967b8f2b45e7fffd6688dfe' /tmp/build-info.json
+          grep -q '"version": "0.6"' /tmp/build-info.json
+          grep -q '62da5f01f503c344e0e09cc12abc0aad9d4d99b7' /tmp/build-info.json
           echo "LIVE HTTP PASS: published Godot Web assets are reachable."
       - name: Check Chromium availability
         shell: bash
@@ -68,9 +68,11 @@ jobs:
             const messages=[];
             page.on('console', msg => {if(msg.type()==='error')messages.push(msg.text())});
             page.on('pageerror', e => messages.push(String(e)));
-            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play/', {waitUntil:'domcontentloaded', timeout:60000});
+            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v06/', {waitUntil:'domcontentloaded', timeout:60000});
             const gl2=await page.evaluate(()=> Boolean(document.createElement('canvas').getContext('webgl2')));
             await page.waitForTimeout(15000);
+            await page.keyboard.press('t');
+            await page.waitForTimeout(350);
             const info=await page.evaluate(()=> ({
               title: document.title, canvas: !!document.querySelector('canvas'),
               status: document.getElementById('status')?.getAttribute('style'),
