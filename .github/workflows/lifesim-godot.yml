@@ -83,6 +83,7 @@ jobs:
           grep -F 'CAPTURE PASS:' godot-visual.log
           test -s "$PROJECT_DIR/tests/visual_evidence.png"
           test -s "$PROJECT_DIR/tests/visual_walk_evidence.png"
+          test -s "$PROJECT_DIR/tests/v07_facade_inspection.png"
       - name: Save logs even when tests fail
         if: always()
         uses: actions/upload-artifact@v4
@@ -94,6 +95,7 @@ jobs:
             godot-visual.log
             lifesim/godot/tests/visual_evidence.png
             lifesim/godot/tests/visual_walk_evidence.png
+            lifesim/godot/tests/v07_facade_inspection.png
             lifesim/godot/art/characters/*.glb
             lifesim/godot/art/architecture/*.glb
           if-no-files-found: warn
