@@ -36,6 +36,7 @@ var dialogue_npc: int = -1
 var shop_open: bool = false
 var web_qa_mode: bool = false
 var web_qa_tick: float = 0.0
+var input_interact_attempts: int = 0
 var near_npc: int = -1
 var journal_open: bool = false
 var indoor_place: String = ""
@@ -104,7 +105,9 @@ func _emit_web_qa() -> void:
         "job_mode": job_mode,
         "job_step": job_step,
         "indoor": indoor_place,
-        "at_home": in_home
+        "at_home": in_home,
+        "input_interact_attempts": input_interact_attempts,
+        "notice": (ui_notice.text if ui_notice != null else "")
     }
     # Only serialized numbers and strings are passed to the browser.
     var value: String = JSON.stringify(snapshot)
@@ -316,7 +319,7 @@ func _create_ui() -> void:
     # UI does not take focus away from keyboard/mouse controls.
     root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
         if shop_open and event.physical_keycode >= KEY_1 and event.physical_keycode <= KEY_5:
             _purchase_furniture(int(event.physical_keycode) - int(KEY_1))
@@ -337,6 +340,7 @@ func _unhandled_input(event: InputEvent) -> void:
     if job_mode != "" or dialogue_npc >= 0:
         return
     if event.is_action_pressed("interact"):
+        input_interact_attempts += 1
         _interact()
     elif event.is_action_pressed("job"):
         _begin_job()
