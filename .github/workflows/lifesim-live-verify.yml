@@ -97,8 +97,9 @@ jobs:
             await page.keyboard.press('e');
             await page.waitForTimeout(650);
             const enteredState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
-            if (enteredState.indoor !== '咖啡馆') throw new Error('E key did not enter the cafe');
+            console.log('V11_ENTRY',JSON.stringify({beforeState,enteredState}));
             await page.screenshot({path:'lifesim-v11-cafe-indoors.png',fullPage:true});
+            if (enteredState.indoor !== '咖啡馆') throw new Error('E key did not enter the cafe');
             await page.keyboard.down('w');
             await page.waitForTimeout(1700);
             await page.keyboard.up('w');
