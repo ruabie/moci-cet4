@@ -45,7 +45,7 @@ jobs:
             -o /tmp/export_templates.tpz
           DEST="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
           mkdir -p "$DEST"
-          for template in web_release.zip web_debug.zip; do
+          for template in web_nothreads_release.zip web_nothreads_debug.zip; do
             unzip -p /tmp/export_templates.tpz "templates/$template" > "$DEST/$template"
             test -s "$DEST/$template"
             unzip -tq "$DEST/$template" >/dev/null
