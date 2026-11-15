@@ -8,10 +8,10 @@ sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent))
 from build_assets import Gltf
 
 SPECS={
- "mart":(21.,10.,17.,(.75,.74,.67),(.24,.36,.33)),
- "coffee":(20.,13.,17.,(.60,.55,.49),(.48,.32,.27)),
- "apartment":(21.,18.,18.,(.74,.68,.60),(.51,.59,.54)),
- "living":(20.,12.,19.,(.66,.70,.65),(.48,.53,.42)),
+ "mart":(21.,10.,17.,(.46,.44,.38),(.15,.23,.21)),
+ "coffee":(20.,13.,17.,(.39,.32,.27),(.29,.19,.15)),
+ "apartment":(21.,18.,18.,(.47,.40,.34),(.32,.35,.31)),
+ "living":(20.,12.,19.,(.40,.45,.40),(.30,.34,.26)),
 }
 def quad(g,mat,p):
  g.add_mesh(mat,p,[(0,1,2),(0,2,3)])
@@ -39,12 +39,14 @@ def one(kind,spec):
  depth,h,d,wall_rgb,trim_rgb=spec
  g=Gltf()
  wall=g.material("continuous_masonry",wall_rgb,rough=.93)
- stone=g.material("stone_reveal",(.62,.61,.56),rough=.89)
+ stone=g.material("stone_reveal",(.37,.36,.33),rough=.89)
  trim=g.material("integrated_fascia",trim_rgb,metal=.28,rough=.55)
- frame=g.material("window_joinery",(.22,.27,.27),metal=.5,rough=.47)
- roof=g.material("zinc_roof",(.34,.37,.36),metal=.34,rough=.68)
+ frame=g.material("window_joinery",(.13,.17,.17),metal=.5,rough=.47)
+ roof=g.material("zinc_roof",(.22,.24,.24),metal=.34,rough=.68)
  timber=g.material("interior_oak",(.43,.33,.25),rough=.77)
- glazing=g.material("recessed_glazing",(.33,.46,.49),metal=.15,rough=.27)
+ glazing=g.material("recessed_glazing",(.20,.31,.35),metal=.12,rough=.25)
+ g.materials[glazing]["alphaMode"]="BLEND"
+ g.materials[glazing]["pbrMetallicRoughness"]["baseColorFactor"][3]=.77
  warm=g.material("light_diffuser",(.93,.78,.58),emissive=(.18,.12,.07))
  paper=g.material("display_cards",(.89,.84,.75),rough=.94)
  green=g.material("planter_green",(.23,.34,.27),rough=.88)
