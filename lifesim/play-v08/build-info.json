@@ -1,0 +1,6 @@
+{
+  "version": "0.8",
+  "source_branch": "lifesim-v08-pbr-interior",
+  "commit": "4b47b43711546032c5b5e9ea9dc238c0e283168b",
+  "build_system": "Godot 4.7.2 Web single thread"
+}
