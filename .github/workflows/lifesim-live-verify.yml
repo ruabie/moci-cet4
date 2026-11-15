@@ -92,14 +92,25 @@ jobs:
             const beforeState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
             await page.locator('canvas').click({position:{x:640,y:410},force:true});
             await page.waitForTimeout(350);
+            // First test entry into the previously empty cafe interior.
+            if (beforeState.interaction !== '咖啡馆') throw new Error('expected cafe at the default spawn');
+            await page.keyboard.press('e');
+            await page.waitForTimeout(650);
+            const enteredState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            if (enteredState.indoor !== '咖啡馆') throw new Error('E key did not enter the cafe');
+            await page.screenshot({path:'lifesim-v11-cafe-indoors.png',fullPage:true});
             await page.keyboard.down('w');
             await page.waitForTimeout(1700);
             await page.keyboard.up('w');
             await page.waitForTimeout(450);
             const movedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
             console.log('V11_MOVE',JSON.stringify({beforeState,movedState}));
-            if (Math.hypot(movedState.x-beforeState.x,movedState.z-beforeState.z)<0.6)
-              throw new Error('V11 public browser WASD movement did not change position');
+            if (Math.hypot(movedState.x-enteredState.x,movedState.z-enteredState.z)<0.6)
+              throw new Error('V11 indoor WASD movement blocked or below 0.6m');
+            await page.keyboard.press('q');
+            await page.waitForTimeout(400);
+            const exitedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            if (exitedState.indoor !== '') throw new Error('Q failed to leave cafe');
             await page.screenshot({path:'lifesim-v11-movement.png',fullPage:true});
             console.log('BROWSER_CHECK',JSON.stringify({gl2,info,messages:messages.slice(-10)}));
             await browser.close();
@@ -119,5 +130,6 @@ jobs:
           path: |
             lifesim-public-browser.png
             lifesim-v11-movement.png
+            lifesim-v11-cafe-indoors.png
           if-no-files-found: ignore
           retention-days: 14
