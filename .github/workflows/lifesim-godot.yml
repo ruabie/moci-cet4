@@ -99,6 +99,17 @@ jobs:
           grep -F 'V08 CAPTURE PASS:' godot-v08-visual.log
           test -s "$PROJECT_DIR/tests/v08_hero_cafe.png"
           test -s "$PROJECT_DIR/tests/v08_hero_mart.png"
+      - name: Archive this exact verified Godot project
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v08-godot-source-verified
+          path: |
+            lifesim/godot/
+            !lifesim/godot/.godot/**
+            !lifesim/godot/tests/*.png
+          if-no-files-found: error
+          retention-days: 14
       - name: Save logs even when tests fail
         if: always()
         uses: actions/upload-artifact@v4
