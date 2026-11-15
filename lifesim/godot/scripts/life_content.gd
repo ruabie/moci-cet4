@@ -123,7 +123,8 @@ static func job_finish(s: Dictionary, job_id: String, place: String, correct: in
 
 static func rest(s: Dictionary, at_home: bool) -> void:
     s["energy"] = mini(100, int(s.get("energy", 50)) + (40 if at_home else 15))
-    s["mood"] = mini(100, int(s.get("mood", 50)) + (8 if at_home else 10))
+    var comfort_bonus: int = mini(12, s.get("owned_items", []).size() * 3) if at_home else 0
+    s["mood"] = mini(100, int(s.get("mood", 50)) + (8 if at_home else 10) + comfort_bonus)
     note(s, "在%s休息了一会。" % ("家里" if at_home else "公园"))
 
 static func task_line(s: Dictionary) -> String:
