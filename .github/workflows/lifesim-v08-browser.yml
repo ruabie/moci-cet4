@@ -1,0 +1,81 @@
+name: LifeSim V0.8 public browser and movement smoke
+
+on:
+  push:
+    branches: [lifesim-v08-pbr-interior]
+    paths:
+      - '.github/workflows/lifesim-v08-browser.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Confirm public export and content types
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://ruabie.github.io/moci-cet4/lifesim/play-v08"
+          for i in $(seq 1 12); do
+            if curl -fLsS --max-time 35 "$BASE/build-info.json" -o /tmp/v08-build.json &&
+               grep -q '"version": "0.8"' /tmp/v08-build.json; then break; fi
+            sleep 8
+          done
+          grep -q '"version": "0.8"' /tmp/v08-build.json
+          for asset in index.html index.js index.wasm index.pck; do
+            curl -fLsSI --max-time 35 "$BASE/$asset" >/dev/null
+          done
+          echo "PUBLIC HTTP V08 PASS"
+      - name: Install Playwright driver
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Chromium WebGL and genuine player movement
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/check.cjs <<'JS'
+          const {chromium} = require(process.cwd()+'/node_modules/playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,executablePath:'/usr/bin/google-chrome',
+              args:['--no-sandbox','--disable-dev-shm-usage',
+                    '--enable-unsafe-swiftshader','--use-angle=swiftshader',
+                    '--use-gl=angle','--enable-webgl']});
+            const page=await browser.newPage({viewport:{width:1280,height:720}});
+            const errors=[];
+            page.on('pageerror',e=>errors.push(String(e)));
+            page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v08/?qa=1',
+                            {waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForFunction(()=>!!window.__LIFESIM_QA__?.getState,{timeout:65000});
+            const gl2=await page.evaluate(()=>!!document.createElement('canvas').getContext('webgl2'));
+            if(!gl2) throw Error('WEBGL2 UNAVAILABLE');
+            const before=await page.evaluate(()=>window.__LIFESIM_QA__.getState());
+            await page.screenshot({path:'lifesim-v08-public-before.png'});
+            await page.locator('canvas').click({position:{x:500,y:340}});
+            await page.keyboard.down('w');
+            await page.waitForTimeout(1200);
+            await page.keyboard.up('w');
+            await page.waitForTimeout(450);
+            const after=await page.evaluate(()=>window.__LIFESIM_QA__.getState());
+            await page.screenshot({path:'lifesim-v08-public-after.png'});
+            const distance=Math.hypot((after.x-before.x),(after.z-before.z));
+            console.log('V08 LIVE',JSON.stringify({title:await page.title(),gl2,before,after,distance,errors:errors.slice(-8)}));
+            await browser.close();
+            if(distance<.15)throw Error('PLAYER_MOVEMENT_NOT_OBSERVED');
+            if(errors.some(x=>/Failed to load|WebGL|Unable to initialize|Parse Error/i.test(x)))
+              throw Error('RENDER_JS_ERRORS');
+            console.log('V08 PUBLIC BROWSER PASS: real WebGL2, live world, observable player movement');
+          })().catch(err=>{console.error(err);process.exit(1)});
+          JS
+          node /tmp/check.cjs
+      - name: Preserve browser images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v08-public-smoke-evidence
+          path: lifesim-v08-public-*.png
+          if-no-files-found: warn
+          retention-days: 14
