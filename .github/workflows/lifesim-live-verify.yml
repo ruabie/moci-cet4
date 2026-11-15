@@ -68,9 +68,10 @@ jobs:
             const messages=[];
             page.on('console', msg => {if(msg.type()==='error')messages.push(msg.text())});
             page.on('pageerror', e => messages.push(String(e)));
-            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v06/', {waitUntil:'domcontentloaded', timeout:60000});
+            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v06/?qa=1', {waitUntil:'domcontentloaded', timeout:60000});
             const gl2=await page.evaluate(()=> Boolean(document.createElement('canvas').getContext('webgl2')));
             await page.waitForTimeout(15000);
+            await page.waitForFunction(() => typeof window.__LIFESIM_QA__?.getState === 'function',{timeout:20000});
             await page.keyboard.press('t');
             await page.waitForTimeout(350);
             const info=await page.evaluate(()=> ({
@@ -81,12 +82,17 @@ jobs:
             await page.screenshot({path:'lifesim-public-browser.png',fullPage:true});
             // Real input smoke: exit journal, approach the convenience store, complete 3 orders.
             await page.keyboard.press('t');
+            const beforeState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
             // First user gesture: Godot Web requires focus/pointer lock to receive movement.
             await page.locator('canvas').click({position:{x:640,y:410},force:true});
             await page.waitForTimeout(300);
             await page.keyboard.down('w');
             await page.waitForTimeout(2400);
             await page.keyboard.up('w');
+            await page.waitForTimeout(500);
+            const movedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            console.log('LIFE_MOVE',JSON.stringify({beforeState,movedState}));
+            if(Math.hypot(movedState.x-beforeState.x,movedState.z-beforeState.z)<1.0) throw new Error('PLAYER DID NOT MOVE VIA BROWSER KEYBOARD');
             await page.keyboard.press('j');
             await page.waitForTimeout(450);
             await page.screenshot({path:'lifesim-job-start.png',fullPage:true});
@@ -95,6 +101,9 @@ jobs:
             await page.keyboard.press('3');
             await page.waitForTimeout(650);
             await page.screenshot({path:'lifesim-job-result.png',fullPage:true});
+            const completedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            console.log('LIFE_JOB_RESULT',JSON.stringify(completedState));
+            if(completedState.balance<=beforeState.balance) throw new Error('BROWSER JOB DID NOT PAY OUT');
             console.log('BROWSER_CHECK',JSON.stringify({gl2,info,messages:messages.slice(-10)}));
             await browser.close();
             if(!gl2||!info.canvas||messages.some(x=>/Failed to load|WebGL|error loading|Unable to initialize/i.test(x)))
