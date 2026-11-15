@@ -98,7 +98,7 @@ func run_contracts() -> void:
     root.add_child(instance)
     await process_frame
     await physics_frame
-    var avatar: Node = instance.get_node_or_null("Player")
+    var avatar: CityPlayer = instance.get_node_or_null("Player") as CityPlayer
     if avatar == null:
         fail("player not created")
         return
