@@ -81,8 +81,11 @@ jobs:
             await page.screenshot({path:'lifesim-public-browser.png',fullPage:true});
             // Real input smoke: exit journal, approach the convenience store, complete 3 orders.
             await page.keyboard.press('t');
+            // First user gesture: Godot Web requires focus/pointer lock to receive movement.
+            await page.locator('canvas').click({position:{x:640,y:410},force:true});
+            await page.waitForTimeout(300);
             await page.keyboard.down('w');
-            await page.waitForTimeout(1500);
+            await page.waitForTimeout(2400);
             await page.keyboard.up('w');
             await page.keyboard.press('j');
             await page.waitForTimeout(450);
