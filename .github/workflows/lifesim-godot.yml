@@ -43,7 +43,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 "$PROJECT_DIR/tools/build_assets.py"
+          python3 "$PROJECT_DIR/tools/build_street_v07.py"
           python3 "$PROJECT_DIR/tests/check_authored_assets.py"
+          python3 "$PROJECT_DIR/tests/check_integrated_street.py"
       - name: Static checks
         shell: bash
         run: |
