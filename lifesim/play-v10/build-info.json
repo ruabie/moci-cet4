@@ -1,6 +1,6 @@
 {
   "version": "0.10",
   "source_branch": "lifesim-v010-landscape-depth",
-  "commit": "9a46d2f995445cd05b6f655c298916bc1443ac15",
+  "commit": "cad5ceb75cff357191260f43b589ed6d4ef7f9a7",
   "build_system": "Godot 4.7.2 Web single thread"
 }
