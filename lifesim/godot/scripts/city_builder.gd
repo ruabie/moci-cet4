@@ -2,7 +2,7 @@ extends Node3D
 class_name CityBuilder
 
 # All geometry is local to the Godot project (no runtime CDN).
-# V0.3 art is a material-and-lighting blockout, not final rigged/photoreal assets.
+# V0.5.1 authored GLBs are a stylized art milestone, not photoreal-quality validation.
 var lamps: Array[OmniLight3D] = []
 var windows: Array[StandardMaterial3D] = []
 var localized_font: Font
@@ -83,9 +83,13 @@ func _label(parent: Node3D, title: String, pos: Vector3, size: int = 45, color: 
     parent.add_child(sign)
 
 func _ready() -> void:
-    var system_font := SystemFont.new()
-    system_font.font_names = PackedStringArray(["Noto Sans CJK SC", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC"])
-    localized_font = system_font
+    var font_path := "res://art/fonts/NotoSansCJKsc-Regular.otf"
+    if ResourceLoader.exists(font_path):
+        localized_font = load(font_path) as Font
+    else:
+        var system_font := SystemFont.new()
+        system_font.font_names = PackedStringArray(["Noto Sans CJK SC", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC"])
+        localized_font = system_font
     create_city()
 
 func create_city() -> void:
@@ -100,6 +104,7 @@ func create_city() -> void:
     _building("HIGASHI HOTEL", Vector3(-49, 0, 50), Vector3(27, 32, 24), "#bca694", "#786a5a", 7, true)
     _building("MOMI COURT", Vector3(51, 0, 50), Vector3(29, 22, 25), "#a5afa2", "#536f6b", 5, false)
     _park_and_props()
+    _life_props()
     _people()
     _detail_pass()
     _authored_facades()
@@ -257,6 +262,48 @@ func _park_and_props() -> void:
         _box(self, Vector3(-13.2, 0.42, z), Vector3(1.25, 0.86, 0.8), _color("#727d75"))
         _sphere(self, Vector3(-13.2, 0.88, z), Vector3(0.72, 0.64, 0.6), _color("#658265"))
 
+func _life_props() -> void:
+    # Visible affordances make errands legible without requiring a minimap.
+    var timber := _color("#82644b")
+    var ink := _color("#314f48")
+    var poster := _color("#f3e0b7")
+    # Park bulletin board: the town's daily objectives live here.
+    var board := Node3D.new()
+    board.name = "LifeQuestBoard"
+    board.position = Vector3(-18, 0.13, 55)
+    add_child(board)
+    _box(board, Vector3(-1.1, 1.05, 0), Vector3(0.13, 2.1, 0.13), timber)
+    _box(board, Vector3(1.1, 1.05, 0), Vector3(0.13, 2.1, 0.13), timber)
+    _box(board, Vector3(0, 2.03, 0), Vector3(3.1, 1.75, 0.18), ink)
+    _box(board, Vector3(0, 2.04, -0.12), Vector3(2.82, 1.47, 0.04), poster, false)
+    _label(board, "TODAY  /  今日委托", Vector3(0, 2.32, -0.27), 30, Color("#29463c"))
+    _label(board, "E 查看目标", Vector3(0, 1.81, -0.27), 24, Color("#486b57"))
+    # Parcel locker opposite the park — delivery requires actually walking here.
+    var parcel := Node3D.new()
+    parcel.name = "RiversideParcelLocker"
+    parcel.position = Vector3(12, 0.12, 47)
+    add_child(parcel)
+    _box(parcel, Vector3(0, 1.15, 0), Vector3(2.2, 2.3, 1.0), _color("#718c8e"))
+    for x in [-0.58, 0.58]:
+        for y in [0.66, 1.26, 1.86]:
+            _box(parcel, Vector3(x, y, -0.54), Vector3(0.98, 0.51, 0.04), _color("#d3d7cb"), false)
+    _label(parcel, "PARCEL  /  河畔取件", Vector3(0, 2.65, -0.6), 22, Color("#e9e5d2"))
+    # Three camera-friendly, distinct spots across the walkable district.
+    var signs: Array = [
+        ["RIVER / P 摄影", Vector3(-18, 0.13, 47)],
+        ["CROSSING / P 摄影", Vector3(0, 0.13, -23)],
+        ["SHOP WINDOW / P 摄影", Vector3(13, 0.13, 16)]
+    ]
+    for idx in range(signs.size()):
+        var item: Array = signs[idx]
+        var post := Node3D.new()
+        post.name = "PhotoMarker_%d" % idx
+        post.position = item[1]
+        add_child(post)
+        _box(post, Vector3(0, 0.95, 0), Vector3(0.10, 1.9, 0.10), _color("#565b58"))
+        _box(post, Vector3(0, 1.93, 0), Vector3(1.05, 0.48, 0.17), _color("#66817b"))
+        _label(post, str(item[0]), Vector3(0, 2.37, 0), 21, Color("#f4e5cc"))
+
 func _citizen_ellipsoid(parent: Node3D, pos: Vector3, dimensions: Vector3, mat: Material) -> void:
     var mesh := SphereMesh.new()
     mesh.radial_segments = 12
@@ -291,6 +338,7 @@ func _people() -> void:
         var npc := Node3D.new()
         npc.name = "Citizen_%02d" % i
         npc.position = spots[i]
+        npc.set_meta("resident_name", ["小遥", "拓海", "晴子", "阿诚", "美咲", "木村"][i])
         npc.set_meta("base", spots[i])
         npc.set_meta("offset", float(i) * 1.71)
         npc_root.add_child(npc)
@@ -303,6 +351,7 @@ func _people() -> void:
             push_error("Missing resident Skeleton3D for " + npc.name)
         npc_rigs.append(skeleton)
         npc_figures.append(npc)
+        _label(npc, str(npc.get_meta("resident_name")), Vector3(0, 2.6, 0), 28, Color("#e6d4b2"))
 
 func _resident_pose(rig: Skeleton3D, name: String, rotation: float) -> void:
     if rig == null:
@@ -318,7 +367,14 @@ func update_ambience(daylight: float, elapsed: float) -> void:
     var hour: int = int(WorldClock.snapshot()["hour"])
     for idx in range(npc_figures.size()):
         var npc: Node3D = npc_figures[idx]
-        npc.visible = (hour >= 6 and hour <= 23) or idx == 0
+        if hour < 6:
+            npc.visible = idx in [0, 3]
+        elif hour < 10:
+            npc.visible = idx in [0, 1, 3, 5]
+        elif hour < 18:
+            npc.visible = idx in [0, 1, 2, 3, 4]
+        else:
+            npc.visible = idx in [0, 1, 2, 4, 5]
         var base: Vector3 = npc.get_meta("base")
         var phase: float = float(npc.get_meta("offset"))
         var t: float = elapsed * 0.24 + phase

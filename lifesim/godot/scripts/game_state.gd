@@ -16,7 +16,19 @@ static func initial() -> Dictionary:
         "position": [-11.0, 0.2, -5.0],
         "at_home": false,
         "last_seen_utc": int(Time.get_unix_time_from_system()),
-        "completed_job_ids": []
+        "completed_job_ids": [],
+        "day_key": "",
+        "daily_done": [],
+        "npc_talked_today": [],
+        "photo_spots": [],
+        "friends": {},
+        "journal": [],
+        "skills": {"service": 0, "barista": 0},
+        "energy": 78,
+        "mood": 68,
+        "jobs_today": 0,
+        "deliveries": 0,
+        "delivery_active": false
     }
 
 static func sanitize(raw: Variant) -> Dictionary:
@@ -55,6 +67,42 @@ static func sanitize(raw: Variant) -> Dictionary:
     if raw["owned_items"].size() > 2000 or raw["completed_job_ids"].size() > 50000:
         return {}
     result["completed_job_ids"] = raw["completed_job_ids"].duplicate()
+    # Optional fields remain backward-compatible with V0.5.1 saves.
+    for field in ["daily_done", "npc_talked_today", "photo_spots", "journal"]:
+        var values: Variant = raw.get(field, [])
+        if typeof(values) != TYPE_ARRAY or values.size() > 48:
+            return {}
+        for item in values:
+            if typeof(item) != TYPE_STRING or item.length() > 120:
+                return {}
+        result[field] = values.duplicate()
+    var date_text: Variant = raw.get("day_key", "")
+    if typeof(date_text) != TYPE_STRING or date_text.length() > 16:
+        return {}
+    result["day_key"] = date_text
+    for field in ["friends", "skills"]:
+        var values: Variant = raw.get(field, result[field])
+        if typeof(values) != TYPE_DICTIONARY or values.size() > 40:
+            return {}
+        for key in values.keys():
+            if typeof(key) != TYPE_STRING or key.length() > 80:
+                return {}
+            if typeof(values[key]) not in [TYPE_INT, TYPE_FLOAT]:
+                return {}
+            if int(values[key]) < 0 or int(values[key]) > 999:
+                return {}
+        result[field] = values.duplicate()
+    for field in ["energy", "mood"]:
+        var val: Variant = raw.get(field, result[field])
+        if typeof(val) not in [TYPE_INT, TYPE_FLOAT] or float(val) < 0.0 or float(val) > 100.0:
+            return {}
+        result[field] = int(val)
+    for field in ["jobs_today", "deliveries"]:
+        var val: Variant = raw.get(field, 0)
+        if typeof(val) not in [TYPE_INT, TYPE_FLOAT] or int(val) < 0 or int(val) > 1000000:
+            return {}
+        result[field] = int(val)
+    result["delivery_active"] = bool(raw.get("delivery_active", false))
     result["last_seen_utc"] = int(raw.get("last_seen_utc", 0))
     return result
 

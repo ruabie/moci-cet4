@@ -1,9 +1,9 @@
-name: LifeSim Web build and compatibility gate
+name: LifeSim V0.6 Web preview build
 
 on:
   push:
     branches:
-      - lifesim-v051-web
+      - lifesim-v06-life-loop
     paths:
       - '.github/workflows/lifesim-web.yml'
       - 'lifesim/godot/**'
@@ -114,7 +114,7 @@ jobs:
       - name: Upload web build for review; not automatically published
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v051-web-build
+          name: lifesim-v06-life-loop-build
           path: lifesim-web-build/
           if-no-files-found: error
           retention-days: 14
@@ -122,7 +122,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v051-web-logs
+          name: lifesim-v06-life-loop-logs
           path: |
             godot-web-import.log
             godot-web-export.log
@@ -131,17 +131,17 @@ jobs:
 
 
   publish-isolated-path:
-    name: Publish only lifesim/play to main without merging game source
+    name: Publish only lifesim/play-v06 to main without merging game source
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v051-web' }}
+    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v06-life-loop' }}
     permissions:
       contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: lifesim-v051-web-build
+          name: lifesim-v06-life-loop-build
           path: site-build
       - uses: actions/checkout@v4
         with:
@@ -158,31 +158,31 @@ jobs:
           compgen -G "site-build/*.wasm" >/dev/null
           compgen -G "site-build/*.pck" >/dev/null
           compgen -G "site-build/*.js" >/dev/null
-          test ! -e published-main/lifesim/play/index.html || grep -q 'Godot' published-main/lifesim/play/index.html
+          test ! -e published-main/lifesim/play-v06/index.html || grep -q 'Godot' published-main/lifesim/play-v06/index.html
       - name: Copy only the new Web export to its isolated URL path
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p published-main/lifesim/play
-          find published-main/lifesim/play -maxdepth 1 -type f -delete
-          cp -a site-build/. published-main/lifesim/play/
+          mkdir -p published-main/lifesim/play-v06
+          find published-main/lifesim/play-v06 -maxdepth 1 -type f -delete
+          cp -a site-build/. published-main/lifesim/play-v06/
           python3 - <<'PY'
           import json, os
           from pathlib import Path
-          (Path('published-main')/'lifesim'/'play'/'build-info.json').write_text(
-              json.dumps({'version':'0.5.1','source_branch':'lifesim-v051-web',
+          (Path('published-main')/'lifesim'/'play-v06'/'build-info.json').write_text(
+              json.dumps({'version':'0.6','source_branch':'lifesim-v06-life-loop',
                           'commit':os.environ['GITHUB_SHA'],
                           'build_system':'Godot 4.7.2 Web single thread'},indent=2)+'\n')
           PY
           cd published-main
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lifesim/play
-          test -z "$(git diff --name-only -- . ':!lifesim/play')" || { echo 'Unexpected modifications outside lifesim/play'; exit 1; }
+          git add lifesim/play-v06
+          test -z "$(git diff --name-only -- . ':!lifesim/play-v06')" || { echo 'Unexpected modifications outside lifesim/play-v06'; exit 1; }
           if git diff --cached --quiet; then
             echo "Unchanged web files: no update needed"
           else
-            git commit -m "deploy(lifesim): publish isolated V0.5.1 Godot Web build"
+            git commit -m "deploy(lifesim): publish isolated V0.6 Godot Web build"
             git push origin HEAD:main
           fi
       - name: Read GitHub Pages site status without altering it
