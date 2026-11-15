@@ -38,6 +38,12 @@ jobs:
           mkdir -p /tmp/godot
           unzip -q /tmp/godot.zip -d /tmp/godot
           chmod +x "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+      - name: Build reproducible original GLB assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/build_assets.py"
+          python3 "$PROJECT_DIR/tests/check_authored_assets.py"
       - name: Static checks
         shell: bash
         run: |
@@ -84,5 +90,7 @@ jobs:
             godot-qa.log
             godot-visual.log
             lifesim/godot/tests/visual_evidence.png
+            lifesim/godot/art/characters/*.glb
+            lifesim/godot/art/architecture/*.glb
           if-no-files-found: warn
           retention-days: 14
