@@ -19,12 +19,12 @@ jobs:
           for i in $(seq 1 20); do
             curl --fail --location --silent --show-error --max-time 30 \
               "$BASE/build-info.json?check=$i" -o /tmp/info.json || true
-            if grep -q "9a46d2f995445cd05b6f655c298916bc1443ac15" /tmp/info.json 2>/dev/null; then break; fi
+            if grep -q "cad5ceb75cff357191260f43b589ed6d4ef7f9a7" /tmp/info.json 2>/dev/null; then break; fi
             echo "Pages V0.10 revision not yet live: retry $i"
             sleep 10
           done
           grep -q '"version": "0.10"' /tmp/info.json
-          grep -q '9a46d2f995445cd05b6f655c298916bc1443ac15' /tmp/info.json
+          grep -q 'cad5ceb75cff357191260f43b589ed6d4ef7f9a7' /tmp/info.json
           for f in index.html index.js index.wasm index.pck; do
             curl --fail --location --silent --show-error --head "$BASE/$f" | grep -E -i 'HTTP/|content-type|content-length'
           done
