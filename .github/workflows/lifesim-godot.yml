@@ -52,6 +52,7 @@ jobs:
           python3 "$PROJECT_DIR/tests/check_v09_hero.py"
           python3 "$PROJECT_DIR/tools/build_landscape_v10.py"
           python3 "$PROJECT_DIR/tests/check_landscape_v10.py"
+          python3 "$PROJECT_DIR/tests/check_open_city_v11.py"
       - name: Static checks
         shell: bash
         run: |
@@ -130,11 +131,26 @@ jobs:
           test -s "$PROJECT_DIR/tests/v10_cafe_same_camera.png"
           test -s "$PROJECT_DIR/tests/v10_street_landscape.png"
           test -s "$PROJECT_DIR/tests/v10_park_trees.png"
+      - name: Capture V0.11 actual furnished spaces and licensed neighborhood
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v11.gd 2>&1 | tee godot-v11-visual.log
+          grep -F 'V11 CAPTURE PASS:' godot-v11-visual.log
+          test -s "$PROJECT_DIR/tests/v11_cafe.png"
+          test -s "$PROJECT_DIR/tests/v11_mart.png"
+          test -s "$PROJECT_DIR/tests/v11_home.png"
+          test -s "$PROJECT_DIR/tests/v11_licensed_block.png"
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v010-godot-source-verified
+          name: lifesim-v011-godot-source-verified
           path: |
             lifesim/godot/
             !lifesim/godot/.godot/**
@@ -153,6 +169,8 @@ jobs:
             godot-v08-visual.log
             godot-v09-visual.log
             godot-v10-visual.log
+            godot-v11-visual.log
+            lifesim/godot/tests/v11_*.png
             lifesim/godot/tests/v08_hero_*.png
             lifesim/godot/tests/v09_cafe_*.png
             lifesim/godot/tests/v10_*.png
