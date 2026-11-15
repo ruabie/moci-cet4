@@ -79,6 +79,19 @@ jobs:
               errorText: document.getElementById('status-notice')?.textContent?.slice(0,300)
             }));
             await page.screenshot({path:'lifesim-public-browser.png',fullPage:true});
+            // Real input smoke: exit journal, approach the convenience store, complete 3 orders.
+            await page.keyboard.press('t');
+            await page.keyboard.down('w');
+            await page.waitForTimeout(1500);
+            await page.keyboard.up('w');
+            await page.keyboard.press('j');
+            await page.waitForTimeout(450);
+            await page.screenshot({path:'lifesim-job-start.png',fullPage:true});
+            await page.keyboard.press('2');
+            await page.keyboard.press('1');
+            await page.keyboard.press('3');
+            await page.waitForTimeout(650);
+            await page.screenshot({path:'lifesim-job-result.png',fullPage:true});
             console.log('BROWSER_CHECK',JSON.stringify({gl2,info,messages:messages.slice(-10)}));
             await browser.close();
             if(!gl2||!info.canvas||messages.some(x=>/Failed to load|WebGL|error loading|Unable to initialize/i.test(x)))
@@ -94,6 +107,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lifesim-public-browser-check
-          path: lifesim-public-browser.png
+          path: |
+            lifesim-public-browser.png
+            lifesim-job-start.png
+            lifesim-job-result.png
           if-no-files-found: ignore
           retention-days: 14
