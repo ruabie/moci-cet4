@@ -1,0 +1,6 @@
+{
+  "version": "0.9",
+  "source_branch": "lifesim-v09-curated-cafe",
+  "commit": "dfe7e44e1b0c8832f447c79580c787521aa0951e",
+  "build_system": "Godot 4.7.2 Web single thread"
+}
