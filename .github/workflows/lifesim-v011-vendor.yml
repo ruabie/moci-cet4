@@ -1,0 +1,45 @@
+name: LifeSim V0.11 import licensed city and interior assets
+
+on:
+  push:
+    branches: [lifesim-v011-open-city-interiors]
+    paths: ['.github/workflows/lifesim-v011-vendor.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vendor:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Fetch pinned Kenney CC0 GLBs, validate and generate ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 lifesim/godot/tools/vendor_kenney_v11.py
+          python3 lifesim/godot/tests/check_open_city_v11.py
+      - name: Commit vendored models to source branch for offline use
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lifesim/godot/art/third_party/kenney lifesim/godot/credits/KENNEY_ASSETS_V11.json
+          if git diff --cached --quiet; then
+            echo "No licensed asset changes"
+          else
+            git commit -m "assets(lifesim): pin 49 Kenney CC0 meshes and source hashes"
+            git push origin HEAD:lifesim-v011-open-city-interiors
+          fi
+      - name: Archive provenance for audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v011-asset-inventory
+          path: lifesim/godot/credits/
+          if-no-files-found: warn
