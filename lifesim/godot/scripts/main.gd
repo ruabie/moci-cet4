@@ -133,24 +133,24 @@ func _create_world() -> void:
     var sky := Sky.new()
     sky_material = ProceduralSkyMaterial.new()
     var sky_mat := sky_material
-    sky_mat.sky_top_color = Color("#5a83a6")
-    sky_mat.sky_horizon_color = Color("#d7c7ac")
+    sky_mat.sky_top_color = Color("#5b7890")
+    sky_mat.sky_horizon_color = Color("#c3c7c3")
     sky_mat.ground_bottom_color = Color("#525c57")
     sky.sky_material = sky_mat
     env.sky = sky
     env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
     env.reflected_light_source = Environment.REFLECTION_SOURCE_BG
-    env.ambient_light_energy = 0.25
+    env.ambient_light_energy = 0.18
     env.fog_enabled = true
-    env.fog_light_color = Color("#82969c")
-    env.fog_density = 0.0031
+    env.fog_light_color = Color("#859395")
+    env.fog_density = 0.00185
     env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
     ambient_env.environment = env
     add_child(ambient_env)
     sun = DirectionalLight3D.new()
     sun.name = "SunMoonLighting"
     sun.light_color = Color("#ffe2c2")
-    sun.light_energy = 0.64
+    sun.light_energy = 0.80
     sun.shadow_enabled = true
     sun.directional_shadow_max_distance = 70.0
     add_child(sun)
@@ -763,12 +763,12 @@ func _update_sun() -> void:
     var azimuth: float = (hr / 24.0) * TAU
     var elevation: float = maxf(-0.2, sin((hr - 6.0) / 12.0 * PI))
     sun.rotation = Vector3(-0.12 - elevation * 1.25, azimuth, 0.0)
-    sun.light_energy = 0.025 + daylight * 0.56
+    sun.light_energy = 0.035 + daylight * 0.83
     if sky_material != null:
-        sky_material.sky_top_color = Color("#0a1624").lerp(Color("#678a9f"), daylight)
-        sky_material.sky_horizon_color = Color("#293c4a").lerp(Color("#a4b6b3"), daylight)
-    sun.light_color = Color("#ffd0a3").lerp(Color("#fff2de"), daylight)
-    ambient_env.environment.ambient_light_energy = 0.16 + daylight * 0.16
+        sky_material.sky_top_color = Color("#0a1624").lerp(Color("#7c98aa"), daylight)
+        sky_material.sky_horizon_color = Color("#293c4a").lerp(Color("#c7c5b9"), daylight)
+    sun.light_color = Color("#ffd0a3").lerp(Color("#fff1d9"), daylight)
+    ambient_env.environment.ambient_light_energy = 0.11 + daylight * 0.14
 
 func _commit_state(candidate: Dictionary) -> bool:
     if player != null and not in_home and indoor_place == "":
