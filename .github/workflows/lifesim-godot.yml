@@ -43,7 +43,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 "$PROJECT_DIR/tools/build_assets.py"
+          python3 "$PROJECT_DIR/tools/build_street_v07.py"
           python3 "$PROJECT_DIR/tests/check_authored_assets.py"
+          python3 "$PROJECT_DIR/tests/check_integrated_street.py"
       - name: Static checks
         shell: bash
         run: |
@@ -81,6 +83,7 @@ jobs:
           grep -F 'CAPTURE PASS:' godot-visual.log
           test -s "$PROJECT_DIR/tests/visual_evidence.png"
           test -s "$PROJECT_DIR/tests/visual_walk_evidence.png"
+          test -s "$PROJECT_DIR/tests/v07_facade_inspection.png"
       - name: Save logs even when tests fail
         if: always()
         uses: actions/upload-artifact@v4
@@ -92,6 +95,7 @@ jobs:
             godot-visual.log
             lifesim/godot/tests/visual_evidence.png
             lifesim/godot/tests/visual_walk_evidence.png
+            lifesim/godot/tests/v07_facade_inspection.png
             lifesim/godot/art/characters/*.glb
             lifesim/godot/art/architecture/*.glb
           if-no-files-found: warn

@@ -140,17 +140,17 @@ func _create_world() -> void:
     env.sky = sky
     env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
     env.reflected_light_source = Environment.REFLECTION_SOURCE_BG
-    env.ambient_light_energy = 0.40
+    env.ambient_light_energy = 0.25
     env.fog_enabled = true
     env.fog_light_color = Color("#9baba9")
-    env.fog_density = 0.0090
+    env.fog_density = 0.0035
     env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
     ambient_env.environment = env
     add_child(ambient_env)
     sun = DirectionalLight3D.new()
     sun.name = "SunMoonLighting"
     sun.light_color = Color("#ffe2c2")
-    sun.light_energy = 0.80
+    sun.light_energy = 0.55
     sun.shadow_enabled = true
     sun.directional_shadow_max_distance = 70.0
     add_child(sun)
@@ -763,12 +763,12 @@ func _update_sun() -> void:
     var azimuth: float = (hr / 24.0) * TAU
     var elevation: float = maxf(-0.2, sin((hr - 6.0) / 12.0 * PI))
     sun.rotation = Vector3(-0.12 - elevation * 1.25, azimuth, 0.0)
-    sun.light_energy = 0.03 + daylight * 0.64
+    sun.light_energy = 0.025 + daylight * 0.43
     if sky_material != null:
         sky_material.sky_top_color = Color("#0a1624").lerp(Color("#5a83a6"), daylight)
         sky_material.sky_horizon_color = Color("#293c4a").lerp(Color("#d7c7ac"), daylight)
     sun.light_color = Color("#ffd0a3").lerp(Color("#fff2de"), daylight)
-    ambient_env.environment.ambient_light_energy = 0.19 + daylight * 0.27
+    ambient_env.environment.ambient_light_energy = 0.16 + daylight * 0.18
 
 func _commit_state(candidate: Dictionary) -> bool:
     if player != null and not in_home and indoor_place == "":

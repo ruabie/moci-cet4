@@ -1,0 +1,72 @@
+name: LifeSim V0.7 public scene and WebGL smoke
+on:
+  push:
+    branches: [lifesim-v07-integrated-street]
+    paths:
+      - '.github/workflows/lifesim-v07-live.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-view:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Confirm V0.7 publish and server MIME types
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://ruabie.github.io/moci-cet4/lifesim/play-v07"
+          for n in $(seq 1 20); do
+            if curl -fsSL --max-time 30 "$BASE/build-info.json?cache=$n" -o /tmp/info.json \
+                && grep -q '"version": "0.7"' /tmp/info.json; then break; fi
+            sleep 10
+          done
+          cat /tmp/info.json
+          grep -q '"version": "0.7"' /tmp/info.json
+          for f in index.html index.js index.wasm index.pck; do
+            curl --fail --silent --show-error --location --head "$BASE/$f" > "/tmp/header-$f.txt"
+            grep -q '200' "/tmp/header-$f.txt"
+          done
+          grep -qi 'application/wasm' /tmp/header-index.wasm.txt
+          echo "HTTP WEB V0.7 PASS"
+      - name: Install Playwright
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Capture actual live Chromium WebGL scene
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/verify.cjs <<'JS'
+          const { chromium } = require(process.cwd() + '/node_modules/playwright');
+          (async()=>{
+            const browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',headless:true,
+              args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader',
+                    '--use-angle=swiftshader','--use-gl=angle','--enable-webgl']});
+            const page=await browser.newPage({viewport:{width:1280,height:720}});
+            let errors=[];
+            page.on('pageerror',e=>errors.push(String(e)));
+            page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v07/?qa=1',
+              {waitUntil:'domcontentloaded',timeout:60000});
+            const gl2=await page.evaluate(()=>!!document.createElement('canvas').getContext('webgl2'));
+            await page.waitForFunction(()=>typeof window.__LIFESIM_QA__?.getState==='function',
+              {timeout:50000});
+            await page.waitForTimeout(1500);
+            const state=await page.evaluate(()=>window.__LIFESIM_QA__.getState());
+            await page.screenshot({path:'v07-chromium-actual.png',fullPage:true});
+            const title=await page.title();
+            console.log('BROWSER QA',JSON.stringify({gl2,title,state,errors:errors.slice(-10)}));
+            await browser.close();
+            if(!gl2||!state||!title.includes('V0.7')||errors.length) process.exit(1);
+            console.log('V0.7 ACTUAL CHROMIUM SCENE PASS');
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node /tmp/verify.cjs
+      - name: Upload actual browser screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v07-browser-screenshot
+          path: v07-chromium-actual.png
+          if-no-files-found: warn
+          retention-days: 14

@@ -95,10 +95,11 @@ func _ready() -> void:
 func create_city() -> void:
     _ground()
     _roads()
-    _building("APARTMENTS", Vector3(-28, 0, 13), Vector3(21, 18, 18), "#c9b4a1", "#788580", 4, true)
-    _building("AOI MART", Vector3(-28, 0, -14), Vector3(21, 10, 17), "#d1c4b2", "#4c796f", 2, true)
-    _building("KAWA COFFEE", Vector3(28, 0, -14), Vector3(20, 13, 17), "#bbab9a", "#9c6558", 3, false)
-    _building("SLOW LIVING", Vector3(28, 0, 15), Vector3(20, 12, 19), "#9daea2", "#70876f", 3, false)
+    # V0.7 integrated street: no opaque generic building behind an overlay storefront.
+    _integrated_building("公寓", "apartment", Vector3(-28, 0, 13), Vector3(21, 18, 18), true, "青川公寓")
+    _integrated_building("便利店", "mart", Vector3(-28, 0, -14), Vector3(21, 10, 17), true, "AOI MART  ·  24H")
+    _integrated_building("咖啡馆", "coffee", Vector3(28, 0, -14), Vector3(20, 13, 17), false, "KAWA COFFEE")
+    _integrated_building("生活商店", "living", Vector3(28, 0, 15), Vector3(20, 12, 19), false, "SLOW LIVING")
     _building("MIDORI STUDIO", Vector3(-51, 0, -52), Vector3(29, 27, 24), "#9aa7a6", "#334653", 6, true)
     _building("KITA OFFICE", Vector3(51, 0, -52), Vector3(27, 29, 24), "#8ea2a6", "#505e67", 6, false)
     _building("HIGASHI HOTEL", Vector3(-49, 0, 50), Vector3(27, 32, 24), "#bca694", "#786a5a", 7, true)
@@ -107,17 +108,17 @@ func create_city() -> void:
     _life_props()
     _people()
     _detail_pass()
-    _authored_facades()
+    _integrated_forecourts()
 
 func _ground() -> void:
-    _box(self, Vector3(0, -0.36, 0), Vector3(180, 0.6, 180), _color("#8a9180"))
+    _box(self, Vector3(0, -0.36, 0), Vector3(180, 0.6, 180), _color("#66736a"))
     _collision_box(self, Vector3(0, -0.10, 0), Vector3(180, 0.2, 180))
 
 func _roads() -> void:
-    var road := _color("#353c44", 0.99)
-    var walk := _color("#82857f", 0.99)
-    var curb := _color("#696d6b", 0.99)
-    var stripe := _color("#deddd5", 0.95)
+    var road := _color("#303a40", 0.99)
+    var walk := _color("#666e69", 0.99)
+    var curb := _color("#515a57", 0.99)
+    var stripe := _color("#bdc4bc", 0.95)
     _box(self, Vector3(0, 0.005, 0), Vector3(13, 0.04, 177), road, false)
     _box(self, Vector3(0, 0.014, -32), Vector3(177, 0.04, 13), road, false)
     for side in [-1, 1]:
@@ -250,10 +251,10 @@ func _park_and_props() -> void:
         _street_lamp(Vector3(7.65, 0.12, z))
     _bench(Vector3(-16, 0.12, 50))
     _bench(Vector3(-19, 0.12, 58))
-    _box(self, Vector3(-12.6, 0.14, -18), Vector3(1.4, 0.28, 4.5), concrete)
-    _box(self, Vector3(-12.6, 2.50, -18), Vector3(0.09, 4.5, 0.09), black)
-    _box(self, Vector3(-12.6, 4.72, -18), Vector3(3.3, 0.12, 1.4), black)
-    _label(self, "BUS 01", Vector3(-12.6, 3.45, -18), 33, Color("#f0f1e9"))
+    _box(self, Vector3(-12.6, 0.14, -49), Vector3(1.4, 0.28, 4.5), concrete)
+    _box(self, Vector3(-12.6, 2.50, -49), Vector3(0.09, 4.5, 0.09), black)
+    _box(self, Vector3(-12.6, 4.72, -49), Vector3(3.3, 0.12, 1.4), black)
+    _label(self, "BUS 01", Vector3(-12.6, 3.45, -49), 33, Color("#f0f1e9"))
     # Vending machine and bicycle-like street fixtures.
     _box(self, Vector3(12, 1.12, 3), Vector3(1.3, 2.2, 1.05), _color("#d7dcd4"))
     _box(self, Vector3(12, 1.35, 3.54), Vector3(1.12, 1.45, 0.055), _color("#487b90", 0.28))
@@ -462,33 +463,19 @@ func _awning(front: float, z0: float, y: float, width: float, base: String) -> v
 
 func _detail_pass() -> void:
     # Forecourts and shopfronts establish a walkable rather than empty street edge.
-    var tile := _color("#878c86", 0.99)
-    var tile_light := _color("#959891", 0.99)
+    # V0.7: removed stamped 3m sidewalk blocks. They covered the base concrete
+    # with a visible periodic patchwork and intersected shop threshold surfaces.
+    # A single seamless walk mesh is provided by _roads() instead.
     for side in [-1.0, 1.0]:
-        for z in range(-76, 79, 3):
-            if z > -41 and z < -23:
-                continue
-            var mark := tile if int(z / 3.0) % 2 == 0 else tile_light
-            _box(self, Vector3(side * 12.2, 0.065, float(z)), Vector3(1.05, 0.012, 2.72), mark, false)
         for z in [-65.0, -18.0, 13.0, 62.0]:
             _planter(Vector3(side * 11.0, 0.10, z))
         for z in [-78.0, -22.0, 38.0, 79.0]:
             _round_post(self, Vector3(side * 6.65, 0.11, z), 0.90, 0.11, "#505d60")
-    # Actual separately modeled store-front canopies: striped, projecting from facade.
-    _awning(-17.52, -14.0, 4.1, 12.8, "#527b69")
-    _awning(18.1, -14.0, 4.1, 12.3, "#956b60")
-    _awning(18.1, 15.0, 4.1, 12.2, "#828d75")
-    _awning(-17.52, 13.0, 4.1, 12.5, "#748d88")
-    for p in [Vector3(-15.6, 0.10, -8.0), Vector3(-15.6, 0.10, -21.0), Vector3(15.6, 0.10, -8.0), Vector3(15.6, 0.10, 20.0)]:
-        _planter(p, true)
+    # No additional shop canopies or floating planters: details are part of the integrated GLB.
     _parked_bicycle(Vector3(-13.3, 0.10, 2.9))
     _parked_bicycle(Vector3(13.8, 0.10, 29.2))
     # Thin building course lines, floor plates, balcony rails and planted terraces.
     var specs := [
-        ["APARTMENTS", Vector3(-28, 0, 13), 21.0, 18.0, 18.0, true],
-        ["AOI MART", Vector3(-28, 0, -14), 21.0, 10.0, 17.0, true],
-        ["KAWA COFFEE", Vector3(28, 0, -14), 20.0, 13.0, 17.0, false],
-        ["SLOW LIVING", Vector3(28, 0, 15), 20.0, 12.0, 19.0, false],
         ["MIDORI STUDIO", Vector3(-51, 0, -52), 29.0, 27.0, 24.0, true],
         ["KITA OFFICE", Vector3(51, 0, -52), 27.0, 29.0, 24.0, false],
         ["HIGASHI HOTEL", Vector3(-49, 0, 50), 27.0, 32.0, 24.0, true],
@@ -526,25 +513,41 @@ func _detail_pass() -> void:
         _box(self, Vector3(x, height * 0.5, -115.0), Vector3(7.5, height, 11.0), skyline, false)
         _box(self, Vector3(x, height * 0.5, 111.0), Vector3(8.4, height, 12.0), skyline, false)
 
-func _authored_facades() -> void:
-    # Reusable authored glTF architecture, generated by tools/build_assets.py.
-    # Art lives in GLB meshes; Godot owns collisions, player interaction and signage.
-    var mart_scene: PackedScene = load("res://art/architecture/storefront.glb")
-    var lobby_scene: PackedScene = load("res://art/architecture/apartment_lobby.glb")
-    if mart_scene == null or lobby_scene == null:
-        push_error("Authored GLB facades are missing; run python3 tools/build_assets.py")
+func _integrated_building(title: String, variant: String, origin: Vector3, size: Vector3, front_right: bool, signage: String) -> void:
+    # One complete GLB structure per address; local +X faces street.
+    var side: float = 1.0 if front_right else -1.0
+    var root := Node3D.new()
+    root.name = "Authored_%s" % signage.replace(" ", "_")
+    root.position = Vector3(origin.x + side * size.x * 0.5, 0.0, origin.z)
+    root.rotation.y = 0.0 if front_right else PI
+    add_child(root)
+    var path: String = "res://art/architecture/v07_%s_integrated.glb" % variant
+    var packed: PackedScene = load(path) as PackedScene
+    if packed == null:
+        push_error("V0.7 envelope missing: " + path)
         return
-    for item in [
-        [mart_scene, Vector3(-17.46, 0, -14), 0.0, "AOI MART  ·  24H"],
-        [mart_scene, Vector3(18.03, 0, -14), PI, "KAWA COFFEE"],
-        [mart_scene, Vector3(18.03, 0, 15), PI, "SLOW LIVING"],
-        [lobby_scene, Vector3(-17.46, 0, 13), 0.0, "青川公寓"]
-    ]:
-        var instance: Node3D = item[0].instantiate() as Node3D
-        instance.name = "Authored_%s" % str(item[3]).replace(" ", "_")
-        instance.position = item[1]
-        instance.rotation.y = item[2]
-        add_child(instance)
-        var direction: float = -1.0 if is_equal_approx(float(item[2]), PI) else 1.0
-        var sign_pos: Vector3 = item[1] + Vector3(direction * 1.15, 5.18, 0)
-        _label(self, str(item[3]), sign_pos, 43, Color("#213c3a"))
+    var model: Node3D = packed.instantiate() as Node3D
+    model.name = "V07ContinuousEnvelope"
+    root.add_child(model)
+    # Collision behind the front reveals; front face itself is not a full opaque slab.
+    _collision_box(root, Vector3(-size.x * .5 - .60, size.y * .5, 0),
+        Vector3(size.x - 1.2, size.y, size.z - .25))
+    _label(root, signage, Vector3(.49, 4.39, 0), 42, Color("#f0e8d6"))
+
+func _integrated_forecourts() -> void:
+    # Full threshold pavers meet the storefront: no floating trim modules.
+    var paver: Material = _color("#666e69", .99)
+    var edge: Material = _color("#5e665e", .98)
+    var drain: Material = _color("#3a4747", .62, .45)
+    for xcenter in [-15.0, 15.0]:
+        for spec in [[-14.0, 15.9], [14.0, 16.0]]:
+            var zcenter: float = float(spec[0])
+            var width: float = float(spec[1])
+            _box(self, Vector3(xcenter, .095, zcenter),
+                Vector3(4.9, .055, width), paver, false)
+            _box(self, Vector3(xcenter + (2.42 if xcenter < 0 else -2.42), .115, zcenter),
+                Vector3(.08, .07, width), edge, false)
+            _box(self, Vector3(xcenter + (-1.9 if xcenter < 0 else 1.9), .128, zcenter),
+                Vector3(.13, .07, width - .6), drain, false)
+    for pos in [Vector3(-13.1,.10,-20.2), Vector3(13.3,.10,-7.0), Vector3(-13.0,.10,20.1)]:
+        _round_post(self, pos, .71, .07, "#69716e")
