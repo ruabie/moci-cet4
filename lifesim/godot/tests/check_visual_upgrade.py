@@ -12,7 +12,7 @@ checks = {
  'integrated sample facades and planters': '_integrated_building(' in city and '_planter(' in city,
  'local paving textures': all((root / 'art' / 'textures' / name).stat().st_size > 500 for name in ['asphalt.png','concrete.png','stucco.png']),
  'ambient residents': 'AmbientResidents' in city and 'npc.rotation.y = atan2(' in city,
- 'skyline and street furniture': '_parked_bicycle(' in city and 'Distant skyline' in city,
+ 'skyline and street furniture': '_parked_bicycle(' in city and ('Distant skyline' in city or 'DistrictBackdropV10.new()' in city),
  'UI styles': 'StyleBoxFlat.new()' in main,
  'real time preserved': 'WorldClock.snapshot()' in main,
 }

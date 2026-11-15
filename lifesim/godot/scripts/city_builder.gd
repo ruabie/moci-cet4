@@ -190,18 +190,25 @@ func _building(title: String, origin: Vector3, size: Vector3, facade: String, ac
     _collision_box(n, Vector3(0, h / 2.0, 0), Vector3(w, h, d))
 
 func _tree(where: Vector3, big: bool = false) -> void:
+    # Original glTF foliage with tapered limbs and individually shaped leaves.
+    # Three variants break the previous repeated sphere-canopy silhouette.
+    var hash_value: int = absi(roundi(where.x * 19.0 + where.z * 7.0))
+    var variants: Array[String] = ["zelkova_full", "zelkova_narrow", "katsura_warm"]
+    var species: String = variants[hash_value % variants.size()]
+    var path: String = "res://art/vegetation/%s.glb" % species
+    var resource: PackedScene = load(path) as PackedScene
+    if resource == null:
+        push_error("V0.10 vegetation asset not imported: " + path)
+        return
     var root := Node3D.new()
+    root.name = "V10StreetscapeTree_%s_%d_%d" % [species, roundi(where.x * 10.0), roundi(where.z * 10.0)]
     root.position = where
+    root.rotation.y = float(hash_value % 13) * 0.31
+    var random_scale: float = 1.02 + float(hash_value % 5) * 0.035
+    root.scale = Vector3.ONE * (random_scale if big else random_scale * .81)
+    var model: Node3D = resource.instantiate() as Node3D
+    root.add_child(model)
     add_child(root)
-    var trunk := _color("#665e51")
-    var leaf_a := _color("#526d58")
-    var leaf_b := _color("#799277")
-    var height: float = 4.2 if big else 3.3
-    _box(root, Vector3(0, height * 0.45, 0), Vector3(0.37, height * 0.9, 0.37), trunk)
-    _sphere(root, Vector3(0, height, 0), Vector3(2.2, 2.3, 2.0) if big else Vector3(1.75, 1.9, 1.65), leaf_a)
-    _sphere(root, Vector3(-0.8, height + 0.45, -0.3), Vector3(1.22, 1.25, 1.12), leaf_b)
-    _sphere(root, Vector3(0.6, height + 0.28, 0.5), Vector3(1.17, 1.24, 1.16), leaf_a)
-    _sphere(root, Vector3(0.24, height + 1.13, -0.50), Vector3(0.78, 0.61, 0.81), leaf_b)
 
 func _street_lamp(where: Vector3) -> void:
     var n := Node3D.new()
@@ -261,7 +268,13 @@ func _park_and_props() -> void:
     _label(self, "DRINKS", Vector3(12, 2.1, 3.67), 18)
     for z in [12.0, 14.4, 16.8]:
         _box(self, Vector3(-13.2, 0.42, z), Vector3(1.25, 0.86, 0.8), _color("#727d75"))
-        _sphere(self, Vector3(-13.2, 0.88, z), Vector3(0.72, 0.64, 0.6), _color("#658265"))
+        var shrub: PackedScene = load("res://art/vegetation/street_shrub.glb") as PackedScene
+        if shrub != null:
+            var leaves: Node3D = shrub.instantiate() as Node3D
+            leaves.name = "V10ParkVegetation"
+            leaves.position = Vector3(-13.2, .84, z)
+            leaves.scale = Vector3.ONE * .65
+            add_child(leaves)
 
 func _life_props() -> void:
     # Visible affordances make errands legible without requiring a minimap.
@@ -409,10 +422,18 @@ func _planter(where: Vector3, lush: bool = false) -> void:
     add_child(root)
     _box(root, Vector3(0, 0.29, 0), Vector3(1.15, 0.58, 1.05), _color("#90857a"))
     _box(root, Vector3(0, 0.56, 0), Vector3(0.95, 0.05, 0.87), _color("#52483e"))
-    var leaves := _color("#628067")
-    for i in range(5 if lush else 3):
-        var angle := float(i) * 2.38
-        _sphere(root, Vector3(cos(angle) * 0.24, 0.88 + float(i % 3) * 0.16, sin(angle) * 0.22), Vector3(0.32, 0.56, 0.30), leaves)
+    var shrub: PackedScene = load("res://art/vegetation/street_shrub.glb") as PackedScene
+    if shrub == null:
+        push_error("V0.10 street shrub failed to import")
+        return
+    var copy_count: int = 3 if lush else 2
+    for i in range(copy_count):
+        var instance: Node3D = shrub.instantiate() as Node3D
+        instance.name = "V10LeafyPlanter"
+        instance.position = Vector3(-.16 + .21 * float(i), .58, -.12 + .10 * float(i))
+        instance.rotation.y = float(i) * 1.65
+        instance.scale = Vector3.ONE * (.64 + .12 * float(i % 2))
+        root.add_child(instance)
 
 func _bike_rod(root: Node3D, a: Vector3, b: Vector3, material: Material) -> void:
     var bar := MeshInstance3D.new()
@@ -505,13 +526,11 @@ func _detail_pass() -> void:
     for z in [38.0, 62.0]:
         for x in [-32.5, -28.0, -23.5, -19.0]:
             _round_post(self, Vector3(x, 0.12, z), 0.78, 0.055, "#727d77")
-    # Distant skyline silhouettes prevent the street from ending in an empty horizon.
-    var skyline := _color("#758688", 0.94)
-    for idx in range(18):
-        var x := -90.0 + float(idx) * 11.0
-        var height := 12.0 + float((idx * 7) % 6) * 5.0
-        _box(self, Vector3(x, height * 0.5, -115.0), Vector3(7.5, height, 11.0), skyline, false)
-        _box(self, Vector3(x, height * 0.5, 111.0), Vector3(8.4, height, 12.0), skyline, false)
+    # The old skyline was 36 identical empty cubes. This compact backdrop uses
+    # setbacks and batched facade glazing without colliding with the playable city.
+    var backdrop := DistrictBackdropV10.new()
+    backdrop.name = "V10DistantUrbanBackdrop"
+    add_child(backdrop)
 
 func _integrated_building(title: String, variant: String, origin: Vector3, size: Vector3, front_right: bool, signage: String) -> void:
     # One complete GLB structure per address; local +X faces street.

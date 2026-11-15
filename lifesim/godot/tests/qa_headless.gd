@@ -196,6 +196,16 @@ func run_contracts() -> void:
     if district.get_node_or_null("Authored_AOI_MART__·__24H/V08TexturedEnvelopeAndInterior") == null:
         fail("V0.8 integrated mart model missing")
         return
+    if district.get_node_or_null("V10DistantUrbanBackdrop") == null:
+        fail("V0.10 differentiated skyline is not loaded")
+        return
+    var authored_trees: int = 0
+    for detail in district.get_children():
+        if str(detail.name).begins_with("V10StreetscapeTree_"):
+            authored_trees += 1
+    if authored_trees < 12:
+        fail("V0.10 vegetation count too low: %d" % authored_trees)
+        return
     if district.get_node_or_null("Authored_KAWA_COFFEE/V09CuratedCafeAndInterior") == null:
         fail("V0.9 curated cafe mesh missing from live 3D world")
         return
