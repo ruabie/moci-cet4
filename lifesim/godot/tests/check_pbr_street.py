@@ -27,7 +27,7 @@ for kind in ("mart","coffee","apartment","living"):
     assert 1200<count<9000,(f,count)
     materials=obj["materials"]
     assert any("baseColorTexture" in x["pbrMetallicRoughness"] for x in materials)
-    assert any("interior_window" in x["name"] and x.get("alphaMode")=="BLEND" for x in materials)
+    assert any(("interior_window" in x["name"] or "recessed_glazing" in x["name"]) and x.get("alphaMode")=="BLEND" and x["pbrMetallicRoughness"]["baseColorFactor"][3]<0.4 for x in materials)
     assert any("room_floor" in x["name"] for x in materials)
     print("V08 PBR PASS",kind,"triangles",count)
 city=(root/"scripts/city_builder.gd").read_text()
