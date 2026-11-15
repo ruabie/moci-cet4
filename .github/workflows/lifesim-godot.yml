@@ -50,6 +50,8 @@ jobs:
           python3 "$PROJECT_DIR/tests/check_pbr_street.py"
           python3 "$PROJECT_DIR/tools/build_coffee_v09.py"
           python3 "$PROJECT_DIR/tests/check_v09_hero.py"
+          python3 "$PROJECT_DIR/tools/build_landscape_v10.py"
+          python3 "$PROJECT_DIR/tests/check_landscape_v10.py"
       - name: Static checks
         shell: bash
         run: |
@@ -114,11 +116,25 @@ jobs:
           grep -F 'V09 CAPTURE PASS:' godot-v09-visual.log
           test -s "$PROJECT_DIR/tests/v09_cafe_compare.png"
           test -s "$PROJECT_DIR/tests/v09_cafe_street.png"
+      - name: Capture V0.10 landscape, trees and same-view comparison
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v10.gd 2>&1 | tee godot-v10-visual.log
+          grep -F 'V10 CAPTURE PASS:' godot-v10-visual.log
+          test -s "$PROJECT_DIR/tests/v10_cafe_same_camera.png"
+          test -s "$PROJECT_DIR/tests/v10_street_landscape.png"
+          test -s "$PROJECT_DIR/tests/v10_park_trees.png"
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v09-godot-source-verified
+          name: lifesim-v010-godot-source-verified
           path: |
             lifesim/godot/
             !lifesim/godot/.godot/**
@@ -136,8 +152,11 @@ jobs:
             godot-visual.log
             godot-v08-visual.log
             godot-v09-visual.log
+            godot-v10-visual.log
             lifesim/godot/tests/v08_hero_*.png
             lifesim/godot/tests/v09_cafe_*.png
+            lifesim/godot/tests/v10_*.png
+            lifesim/godot/art/vegetation/*.glb
             lifesim/godot/tests/visual_evidence.png
             lifesim/godot/tests/visual_walk_evidence.png
             lifesim/godot/tests/v07_facade_inspection.png
