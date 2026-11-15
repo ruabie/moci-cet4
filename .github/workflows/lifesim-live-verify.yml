@@ -96,8 +96,11 @@ jobs:
                 target: e.target?.tagName
               }), true);
             });
-            await page.keyboard.press('e');
-            await page.waitForTimeout(650);
+            // SwiftShader 3D can run at low FPS; hold key across several frames.
+            await page.keyboard.down('e');
+            await page.waitForTimeout(2700);
+            await page.keyboard.up('e');
+            await page.waitForTimeout(1500);
             console.log('V11_DOM_KEYS',JSON.stringify(await page.evaluate(()=>window.__LIFESIM_KEY_DIAG)));
             const enteredState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
             console.log('V11_ENTRY',JSON.stringify({beforeState,enteredState}));
