@@ -1,9 +1,9 @@
-name: LifeSim V0.9 curated café web preview build
+name: LifeSim V0.11 licensed block and furnished interiors Web preview
 
 on:
   push:
     branches:
-      - lifesim-v010-landscape-depth
+      - lifesim-v011-open-city-interiors
     paths:
       - '.github/workflows/lifesim-web.yml'
       - 'lifesim/godot/**'
@@ -75,6 +75,7 @@ jobs:
           python3 "$PROJECT/tests/check_v09_hero.py"
           python3 "$PROJECT/tools/build_landscape_v10.py"
           python3 "$PROJECT/tests/check_landscape_v10.py"
+          python3 "$PROJECT/tests/check_open_city_v11.py"
           python3 "$PROJECT/tests/check_authored_assets.py"
           python3 "$PROJECT/tests/check_integrated_street.py"
           python3 "$PROJECT/tests/check_pbr_street.py"
@@ -89,7 +90,7 @@ jobs:
           GODOT="/tmp/godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           "$GODOT" --headless --editor --path "$PROJECT" --import --quit 2>&1 | tee godot-web-import.log
           ! grep -E 'SCRIPT ERROR|Parse Error|ERROR:.*Parse' godot-web-import.log
-      - name: Headless game, save, movement and V0.10 scene QA
+      - name: Headless game, save, movement and V0.11 scene QA
         shell: bash
         run: |
           set -euo pipefail
@@ -130,7 +131,7 @@ jobs:
       - name: Upload web build for review; not automatically published
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v010-landscape-depth-build
+          name: lifesim-v011-open-city-interiors-build
           path: lifesim-web-build/
           if-no-files-found: error
           retention-days: 14
@@ -138,7 +139,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v010-landscape-depth-logs
+          name: lifesim-v011-open-city-interiors-logs
           path: |
             godot-web-import.log
             godot-web-qa.log
@@ -148,17 +149,17 @@ jobs:
 
 
   publish-isolated-path:
-    name: Publish only lifesim/play-v10 to main without merging game source
+    name: Publish only lifesim/play-v11 to main without merging game source
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v010-landscape-depth' }}
+    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v011-open-city-interiors' }}
     permissions:
       contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: lifesim-v010-landscape-depth-build
+          name: lifesim-v011-open-city-interiors-build
           path: site-build
       - uses: actions/checkout@v4
         with:
@@ -175,31 +176,31 @@ jobs:
           compgen -G "site-build/*.wasm" >/dev/null
           compgen -G "site-build/*.pck" >/dev/null
           compgen -G "site-build/*.js" >/dev/null
-          test ! -e published-main/lifesim/play-v10/index.html || grep -q 'Godot' published-main/lifesim/play-v10/index.html
+          test ! -e published-main/lifesim/play-v11/index.html || grep -q 'Godot' published-main/lifesim/play-v11/index.html
       - name: Copy only the new Web export to its isolated URL path
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p published-main/lifesim/play-v10
-          find published-main/lifesim/play-v10 -maxdepth 1 -type f -delete
-          cp -a site-build/. published-main/lifesim/play-v10/
+          mkdir -p published-main/lifesim/play-v11
+          find published-main/lifesim/play-v11 -maxdepth 1 -type f -delete
+          cp -a site-build/. published-main/lifesim/play-v11/
           python3 - <<'PY'
           import json, os
           from pathlib import Path
-          (Path('published-main')/'lifesim'/'play-v10'/'build-info.json').write_text(
-              json.dumps({'version':'0.10','source_branch':'lifesim-v010-landscape-depth',
+          (Path('published-main')/'lifesim'/'play-v11'/'build-info.json').write_text(
+              json.dumps({'version':'0.11','source_branch':'lifesim-v011-open-city-interiors',
                           'commit':os.environ['GITHUB_SHA'],
                           'build_system':'Godot 4.7.2 Web single thread'},indent=2)+'\n')
           PY
           cd published-main
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lifesim/play-v10
-          test -z "$(git diff --name-only -- . ':!lifesim/play-v10')" || { echo 'Unexpected modifications outside lifesim/play-v10'; exit 1; }
+          git add lifesim/play-v11
+          test -z "$(git diff --name-only -- . ':!lifesim/play-v11')" || { echo 'Unexpected modifications outside lifesim/play-v11'; exit 1; }
           if git diff --cached --quiet; then
             echo "Unchanged web files: no update needed"
           else
-            git commit -m "deploy(lifesim): publish isolated V0.10 urban landscape Web build"
+            git commit -m "deploy(lifesim): publish isolated V0.11 urban landscape Web build"
             git push origin HEAD:main
           fi
       - name: Read GitHub Pages site status without altering it

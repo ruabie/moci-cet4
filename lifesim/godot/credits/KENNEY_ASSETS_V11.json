@@ -1,0 +1,351 @@
+{
+  "creator": "Kenney",
+  "license": "CC0-1.0",
+  "distribution_repository": "https://github.com/Hidencod/tge-assets",
+  "repository_commit": "3ddcc695adbba9fb918cf31b7c139b3f95b76910",
+  "assets": [
+    {
+      "file": "art/third_party/kenney/city-kit-commercial/building-g.glb",
+      "upstream_path": "packs/city-kit-commercial/building-g.glb",
+      "source_git_blob_sha1": "92c348b70ded73914249c6a77753efac23875f33",
+      "sha256": "f4b44c756ce1478382cd3111a41ea0571140aa5e5e615020a82f5ac06e48ad5f",
+      "bytes": 177400
+    },
+    {
+      "file": "art/third_party/kenney/city-kit-commercial/building-k.glb",
+      "upstream_path": "packs/city-kit-commercial/building-k.glb",
+      "source_git_blob_sha1": "071926508241962d428b9c44be374889d8efb0a5",
+      "sha256": "26b2611c09b600bd5ceccef51f07656c06144d65f230f835ade984cd604ef405",
+      "bytes": 258020
+    },
+    {
+      "file": "art/third_party/kenney/city-kit-roads/dumpster.glb",
+      "upstream_path": "packs/city-kit-roads/dumpster.glb",
+      "source_git_blob_sha1": "4346d91ead95d98d6ca3fbee9f4d37f4d841fb4f",
+      "sha256": "51694b2df0be324a8dca0fa6303a488315fbed5ebe5ad18ba0aa6d4364fbb483",
+      "bytes": 35840
+    },
+    {
+      "file": "art/third_party/kenney/city-kit-roads/light-curved.glb",
+      "upstream_path": "packs/city-kit-roads/light-curved.glb",
+      "source_git_blob_sha1": "fbe00e66616a20b0edc3b8b36039bec1dbc5953a",
+      "sha256": "6d87248cef890381bef8b69eb07e43a18624f33807723f078cd8f349dde0a7bb",
+      "bytes": 20940
+    },
+    {
+      "file": "art/third_party/kenney/city-kit-roads/light-square.glb",
+      "upstream_path": "packs/city-kit-roads/light-square.glb",
+      "source_git_blob_sha1": "6ab94fd35afa21760581242a15be5252c59d0c66",
+      "sha256": "f167dff6392ec4ea186b8d3e5e3cb55aa5279af6a710ff3ce9f690f226234e17",
+      "bytes": 18444
+    },
+    {
+      "file": "art/third_party/kenney/city-kit-roads/road-sign-object-stop.glb",
+      "upstream_path": "packs/city-kit-roads/road-sign-object-stop.glb",
+      "source_git_blob_sha1": "3e9db5e04d3acb75478e9a01cae11c5e43acbc7c",
+      "sha256": "a4a70933561d55eba169e7503e19e237adc56225376047efccf7bca784acdc3e",
+      "bytes": 18052
+    },
+    {
+      "file": "art/third_party/kenney/city-kit-suburban/building-type-a.glb",
+      "upstream_path": "packs/city-kit-suburban/building-type-a.glb",
+      "source_git_blob_sha1": "4aa2f0d0014f1383fad54acebd53cdf73baa2837",
+      "sha256": "7432efbbd3cfbc5f517a470d0475b735d5ba917fbade70eebc393b63a2add65b",
+      "bytes": 110408
+    },
+    {
+      "file": "art/third_party/kenney/city-kit-suburban/building-type-c.glb",
+      "upstream_path": "packs/city-kit-suburban/building-type-c.glb",
+      "source_git_blob_sha1": "defa674771e61714a07e13a55758f6125bd0a7a5",
+      "sha256": "2265b104f11e624a62b357913e30177fa1560b97cf0bfde3939615e67e081054",
+      "bytes": 111408
+    },
+    {
+      "file": "art/third_party/kenney/city-kit-suburban/building-type-g.glb",
+      "upstream_path": "packs/city-kit-suburban/building-type-g.glb",
+      "source_git_blob_sha1": "5c55720d08b8121a4c9015fc3f8090907db9e06b",
+      "sha256": "2ffb4a7217acf141fdbaeaf971d3695fc846f86b49f7bb424dcd78721e900047",
+      "bytes": 105400
+    },
+    {
+      "file": "art/third_party/kenney/city-kit-suburban/building-type-l.glb",
+      "upstream_path": "packs/city-kit-suburban/building-type-l.glb",
+      "source_git_blob_sha1": "3e9dcf05a6c61bda261ccafabada73459d48c38b",
+      "sha256": "b2b7eecd6cb25286d3b521b6901656262027b533d967a58db0a0fe98b2ed83de",
+      "bytes": 121056
+    },
+    {
+      "file": "art/third_party/kenney/city-kit-suburban/planter.glb",
+      "upstream_path": "packs/city-kit-suburban/planter.glb",
+      "source_git_blob_sha1": "f6ed826fcc9eddb524a6483b2df28eb66d229f90",
+      "sha256": "d6f20beb82f391b23e0bde43cbe000ef2645ac13d708ec8c3ce6a535540febb2",
+      "bytes": 32180
+    },
+    {
+      "file": "art/third_party/kenney/food-kit/bread.glb",
+      "upstream_path": "packs/food-kit/bread.glb",
+      "source_git_blob_sha1": "69dc08551a23995a07adf7eb8c705981c1b68d51",
+      "sha256": "f21bd08e3bf28bec12dce82278e32fbd0cbcd92c6afd54f8031a4d960ead70ab",
+      "bytes": 20204
+    },
+    {
+      "file": "art/third_party/kenney/food-kit/burger.glb",
+      "upstream_path": "packs/food-kit/burger.glb",
+      "source_git_blob_sha1": "f2aeb690daf3086c50e4933bcd6cbbfa0ab3eb42",
+      "sha256": "ee2271ee3e4856f6f6a7bd2ee90c13f0434c68d0c4726d178f203c3a8ee7fcf0",
+      "bytes": 45128
+    },
+    {
+      "file": "art/third_party/kenney/food-kit/cake.glb",
+      "upstream_path": "packs/food-kit/cake.glb",
+      "source_git_blob_sha1": "6bdd1dff33eaf41e0cd2fa8fb80078d2efabcf2e",
+      "sha256": "42ea794e62c81966f7f1ab8e83457342c7bd9f0ec92a484a1c1658874b909f78",
+      "bytes": 83468
+    },
+    {
+      "file": "art/third_party/kenney/food-kit/carton-small.glb",
+      "upstream_path": "packs/food-kit/carton-small.glb",
+      "source_git_blob_sha1": "498d23dd224d720a36aa50620b6d57e7bd264fc6",
+      "sha256": "4550e379225f92aa874ba8b1970f33152990edc23715214b3b33788d13aefba2",
+      "bytes": 19092
+    },
+    {
+      "file": "art/third_party/kenney/food-kit/croissant.glb",
+      "upstream_path": "packs/food-kit/croissant.glb",
+      "source_git_blob_sha1": "228048f2bc0f1e1f9b966a945294f1051136f174",
+      "sha256": "a4f7e4e4a30b577095d4cb6a23051f78f12490bdda448bd7b8e9deafdf5d1144",
+      "bytes": 25100
+    },
+    {
+      "file": "art/third_party/kenney/food-kit/cup-coffee.glb",
+      "upstream_path": "packs/food-kit/cup-coffee.glb",
+      "source_git_blob_sha1": "37cff52a462ec1c843ba8abe0ac45e0e7905af50",
+      "sha256": "ec4e98349868f1eb2d4237490d53ccc87f16315f7431004ed018214a35023d5d",
+      "bytes": 18616
+    },
+    {
+      "file": "art/third_party/kenney/food-kit/donut.glb",
+      "upstream_path": "packs/food-kit/donut.glb",
+      "source_git_blob_sha1": "ee7ebf2c5562f996b9d14ca9d8df3066d8eb9821",
+      "sha256": "424e11523abb1fbaf90d02230b049ded10e925ef09f8f70889def1a7df782d60",
+      "bytes": 22104
+    },
+    {
+      "file": "art/third_party/kenney/food-kit/sandwich.glb",
+      "upstream_path": "packs/food-kit/sandwich.glb",
+      "source_git_blob_sha1": "a9cbda644d43c429ae4c4c0dab80c5e99b6023d9",
+      "sha256": "6a9efd5bdfbe103b01dc5447b62b026b0b81cfbfa85f908c3ad7da186f2a012c",
+      "bytes": 30364
+    },
+    {
+      "file": "art/third_party/kenney/food-kit/soda-bottle.glb",
+      "upstream_path": "packs/food-kit/soda-bottle.glb",
+      "source_git_blob_sha1": "6dea17f5ccfb18356e3643ca6cb3b371b0dd2144",
+      "sha256": "76bf603f22df7fda7fd7262f719847b3a045fa51822ae0002deaf704570bacd7",
+      "bytes": 22064
+    },
+    {
+      "file": "art/third_party/kenney/food-kit/soda-can.glb",
+      "upstream_path": "packs/food-kit/soda-can.glb",
+      "source_git_blob_sha1": "3a89c8dfbbdb14e0b40855ff6869746676054180",
+      "sha256": "95336d766ad68d4757cebe2d6cd25ec6ccefbc0eb2e436b0c39535dd1f1962fc",
+      "bytes": 27124
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/beddouble.glb",
+      "upstream_path": "packs/furniture-kit/beddouble.glb",
+      "source_git_blob_sha1": "1b0efacc4dda050a6abc34974cb692010d29b81c",
+      "sha256": "c49b33e7d797d2ba1111895587dba7ff63b17a712eb9b4ceeb40a598f73e476c",
+      "bytes": 23368
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/bookcaseclosedwide.glb",
+      "upstream_path": "packs/furniture-kit/bookcaseclosedwide.glb",
+      "source_git_blob_sha1": "e508f7738fc99a383242c6d0a013351026f6c25e",
+      "sha256": "55b9903e9646dc407ed5237a1c41c1f0a14f9edc22e3392bdb9a4804d846af6a",
+      "bytes": 23140
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/bookcaseopen.glb",
+      "upstream_path": "packs/furniture-kit/bookcaseopen.glb",
+      "source_git_blob_sha1": "9a0cce7691e94277f3409719e9e68c910c25aa2c",
+      "sha256": "750702218d68c062b15dfef6ab06a4014d1cfa8bd05f02e57c53b7e13bec157c",
+      "bytes": 18020
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/bookcaseopenlow.glb",
+      "upstream_path": "packs/furniture-kit/bookcaseopenlow.glb",
+      "source_git_blob_sha1": "3daa396e11c843a5da87ab6547a279731e6eba58",
+      "sha256": "6d4d625faf977a2dbf155f1313cd32c6310e463114a1cd4c08cb9f80a5fb1d75",
+      "bytes": 11520
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/chair.glb",
+      "upstream_path": "packs/furniture-kit/chair.glb",
+      "source_git_blob_sha1": "2d57af4fef2a32910e3af9283d1e45f177068d63",
+      "sha256": "c8a11eec93e89e31250ba91afc1b8d56c3bec7ae86640fd1239f595ff4180883",
+      "bytes": 10756
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/chaircushion.glb",
+      "upstream_path": "packs/furniture-kit/chaircushion.glb",
+      "source_git_blob_sha1": "bffa780b8f8a3efef7756025b2d00a3e01377a41",
+      "sha256": "33544228984857f2cb502b58452fed72157335f9b1caf29e96da5c9094c53fdc",
+      "bytes": 12588
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/chairdesk.glb",
+      "upstream_path": "packs/furniture-kit/chairdesk.glb",
+      "source_git_blob_sha1": "131101f3dbc72f41ca624ddd77ce53d8bafea9ed",
+      "sha256": "46406619186034cbe92b19b79a5f1a8e3f442a17a70a7524ef2c0ad0f35095c6",
+      "bytes": 39016
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/computerkeyboard.glb",
+      "upstream_path": "packs/furniture-kit/computerkeyboard.glb",
+      "source_git_blob_sha1": "77e5b4fc0d2d4c748173068f8ec325497f3c9011",
+      "sha256": "9d9135789de2120e9f41ce3f0a56dd1b15f40adcc7888739bb842a2d820da322",
+      "bytes": 3476
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/computerscreen.glb",
+      "upstream_path": "packs/furniture-kit/computerscreen.glb",
+      "source_git_blob_sha1": "c509093d35ee40bb6791dde9ad8e9de4bc3348dd",
+      "sha256": "5942cbad29a2d2b956619569926e81d50a4174403d592fece6556e57632dc643",
+      "bytes": 6404
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/desk.glb",
+      "upstream_path": "packs/furniture-kit/desk.glb",
+      "source_git_blob_sha1": "8ca187070cd666239ab1d93dda2e98105f7de776",
+      "sha256": "0164fe828f028b321730fb8c74502e353583f751be74da1682d42fff7d3c5a42",
+      "bytes": 15048
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/kitchenbar.glb",
+      "upstream_path": "packs/furniture-kit/kitchenbar.glb",
+      "source_git_blob_sha1": "4202f2783d43c45b6b06cb9d4a083ae1aa6c0a1a",
+      "sha256": "792c3d31e60c8a8d8c7a28cf7d1efe004c5a601adc1b163a8799dde32c1b559d",
+      "bytes": 6004
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/kitchencoffeemachine.glb",
+      "upstream_path": "packs/furniture-kit/kitchencoffeemachine.glb",
+      "source_git_blob_sha1": "f10641b44f34270570796a6115e524b53a4ecb71",
+      "sha256": "063f582c6fa0f00a9f24e3393dac2295491c4becdaf5513c893ab1a2826b6ec3",
+      "bytes": 13332
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/kitchenfridgelarge.glb",
+      "upstream_path": "packs/furniture-kit/kitchenfridgelarge.glb",
+      "source_git_blob_sha1": "4d28fb70cbe14d1ad35a3911ccccbe47b5bec0e2",
+      "sha256": "5851cc59c7e12f6f34a01a2ea93d5b9540be4078c1b703f517239fcede98fb32",
+      "bytes": 30632
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/kitchenfridgesmall.glb",
+      "upstream_path": "packs/furniture-kit/kitchenfridgesmall.glb",
+      "source_git_blob_sha1": "560b1ea51edab2610fb94377292dd20358824e34",
+      "sha256": "35dab7f63711623be321bfd82072f4ab29fe8006aac9371c6e6b78df2e02f5ed",
+      "bytes": 12988
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/kitchenmicrowave.glb",
+      "upstream_path": "packs/furniture-kit/kitchenmicrowave.glb",
+      "source_git_blob_sha1": "1ef2100740f1935324f9ea7d3875d00b9f0659c0",
+      "sha256": "dd6a6c919f4bebc6e2080fe419262cf97a0d6461ead3f3998aa3c9edf4d2bd27",
+      "bytes": 11248
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/kitchensink.glb",
+      "upstream_path": "packs/furniture-kit/kitchensink.glb",
+      "source_git_blob_sha1": "58daf66a6e2ffdc16e24b886cbcd53f3a0973e5d",
+      "sha256": "7b9610277d71f00dcf1bba49cf4d98d77ce5177e84bf76c7da2f8893e542f743",
+      "bytes": 23480
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/lamproundfloor.glb",
+      "upstream_path": "packs/furniture-kit/lamproundfloor.glb",
+      "source_git_blob_sha1": "69f7c9df4fb9e2fb327c59f3b20e8669faf7df0d",
+      "sha256": "50fe1b5b588edf15bfa9cc880f71a02a4fda6036350b24733d0ef4de5cc5e908",
+      "bytes": 6600
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/lamproundtable.glb",
+      "upstream_path": "packs/furniture-kit/lamproundtable.glb",
+      "source_git_blob_sha1": "53776bc3e72a8bd09d96a227adb959153e00debe",
+      "sha256": "75bb644caaa3da003b4fcad7a931722dd61cd2858aab70cf660021d5061fa1b2",
+      "bytes": 6604
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/laptop.glb",
+      "upstream_path": "packs/furniture-kit/laptop.glb",
+      "source_git_blob_sha1": "5a30fe5caac134e2c14aa9ee50a258bc11e456ba",
+      "sha256": "5fa8a1f4a71ab8d82ef64da77a6973ffd350c6d4557516069a4ffd4bb8d808af",
+      "bytes": 5540
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/loungesofa.glb",
+      "upstream_path": "packs/furniture-kit/loungesofa.glb",
+      "source_git_blob_sha1": "7761b15cc9d53b9cd5e28d5a5dc5eaea72a648a7",
+      "sha256": "1886b811c0d3ad0d8525a4fd43adf4112c497c8e0ed906f06877ca3517f4c7dd",
+      "bytes": 9644
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/plantsmall1.glb",
+      "upstream_path": "packs/furniture-kit/plantsmall1.glb",
+      "source_git_blob_sha1": "6c64ddaef49e831446cf673d9d8c6c37e446928b",
+      "sha256": "2b9c022feb47be857b2c4fdc29f36522766ba9b70c578c31d7c05d71b4377d15",
+      "bytes": 8224
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/plantsmall2.glb",
+      "upstream_path": "packs/furniture-kit/plantsmall2.glb",
+      "source_git_blob_sha1": "2e6b8c7d1e1a6ce83d732344e1cc1a219a87adb4",
+      "sha256": "d7c8ff42c66dd4f9238a73570549813d1ca6c5f6f661d7af9cb764c4fce314b9",
+      "bytes": 12996
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/pottedplant.glb",
+      "upstream_path": "packs/furniture-kit/pottedplant.glb",
+      "source_git_blob_sha1": "774d659a2d2be3f9af3fea78e13b2f250fdbb262",
+      "sha256": "5b760eda2766f75fda36b2c5df652a1662f82981ef64cd8fa7fe7bcd386b3a15",
+      "bytes": 7576
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/rugrectangle.glb",
+      "upstream_path": "packs/furniture-kit/rugrectangle.glb",
+      "source_git_blob_sha1": "2ca3bb1a8a54f863d782c62d2bcc32bb15c9a733",
+      "sha256": "a989d2d59c04e3071e0c90388b113a9a8f339ce1814ef984c51cb6dcd7c8e0eb",
+      "bytes": 3188
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/rugrounded.glb",
+      "upstream_path": "packs/furniture-kit/rugrounded.glb",
+      "source_git_blob_sha1": "4827425a7448104a65b9109f8c2fffa53af8c72c",
+      "sha256": "2ef5cc634bb1060a1a5774cfcaf6e11c235791c99d6b59da5fdbc09edfb95a68",
+      "bytes": 10876
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/tablecoffee.glb",
+      "upstream_path": "packs/furniture-kit/tablecoffee.glb",
+      "source_git_blob_sha1": "945caf455a089fcdd2dbe909db6f78326b9b4cc3",
+      "sha256": "e38bea760fbd514efbb75528d09b4752c91af44677bbb97e6d4386c263525179",
+      "bytes": 8256
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/tableround.glb",
+      "upstream_path": "packs/furniture-kit/tableround.glb",
+      "source_git_blob_sha1": "885fdcd356eff8cc379e306d7b3b1ef3c5ca7475",
+      "sha256": "f8daea9124a542a00b7bdacfddac82dc468573d43e44d7b54dd6316e9695754b",
+      "bytes": 6444
+    },
+    {
+      "file": "art/third_party/kenney/furniture-kit/trashcan.glb",
+      "upstream_path": "packs/furniture-kit/trashcan.glb",
+      "source_git_blob_sha1": "7c7d381cd693c9ffcc37a520750f5eb6de56f462",
+      "sha256": "e0ccc1fe50cbd05386477fdff527171d1cf7c0de2ba7ff3233f8d9561feb2561",
+      "bytes": 6452
+    }
+  ]
+}

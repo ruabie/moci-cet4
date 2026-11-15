@@ -1,9 +1,11 @@
-name: LifeSim V0.6 public preview browser smoke
+name: LifeSim V0.11 public preview and movement browser acceptance
 
 on:
   push:
-    branches: [lifesim-v06-life-loop]
-    paths: ['.github/workflows/lifesim-live-verify.yml']
+    branches: [lifesim-v011-open-city-interiors]
+    paths:
+      - '.github/workflows/lifesim-live-verify.yml'
+      - 'lifesim/godot/scripts/main.gd'
   workflow_dispatch:
 
 permissions:
@@ -18,7 +20,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BASE="https://ruabie.github.io/moci-cet4/lifesim/play-v06"
+          BASE="https://ruabie.github.io/moci-cet4/lifesim/play-v11"
           for i in $(seq 1 12); do
             if curl --fail --location --silent --show-error --connect-timeout 10 \
                  --max-time 40 --output /tmp/site.html "$BASE/index.html" \
@@ -33,19 +35,11 @@ jobs:
             curl --fail --location --silent --show-error --head \
               --max-time 30 "$BASE/$item" | grep -E -i 'HTTP/|content-type|content-length'
           done
-          # The CDN may still serve the previous build for a short time.
-          for i in $(seq 1 18); do
-            curl --fail --location --silent --show-error \
-              "$BASE/build-info.json?revision=04c0a93f&i=$i" -o /tmp/build-info.json
-            if grep -q '04c0a93f9f0cfe5f68cc740e3ff1bdc78ed86c4a' /tmp/build-info.json; then
-              break
-            fi
-            echo "Waiting for Pages CDN to publish expected build revision: $i"
-            sleep 10
-          done
+          curl --fail --location --silent --show-error \
+            "$BASE/build-info.json?qa-check=$GITHUB_RUN_ID" -o /tmp/build-info.json
           cat /tmp/build-info.json
-          grep -q '"version": "0.6"' /tmp/build-info.json
-          grep -q '04c0a93f9f0cfe5f68cc740e3ff1bdc78ed86c4a' /tmp/build-info.json
+          grep -q '"version": "0.11"' /tmp/build-info.json
+          grep -q '"source_branch": "lifesim-v011-open-city-interiors"' /tmp/build-info.json
           echo "LIVE HTTP PASS: published Godot Web assets are reachable."
       - name: Check Chromium availability
         shell: bash
@@ -76,7 +70,7 @@ jobs:
             const messages=[];
             page.on('console', msg => {if(msg.type()==='error')messages.push(msg.text())});
             page.on('pageerror', e => messages.push(String(e)));
-            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v06/?qa=1', {waitUntil:'domcontentloaded', timeout:60000});
+            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v11/?qa=1', {waitUntil:'domcontentloaded', timeout:60000});
             const gl2=await page.evaluate(()=> Boolean(document.createElement('canvas').getContext('webgl2')));
             await page.waitForTimeout(15000);
             await page.waitForFunction(() => typeof window.__LIFESIM_QA__?.getState === 'function',{timeout:20000});
@@ -88,30 +82,43 @@ jobs:
               errorText: document.getElementById('status-notice')?.textContent?.slice(0,300)
             }));
             await page.screenshot({path:'lifesim-public-browser.png',fullPage:true});
-            // Real input smoke: exit journal, approach the convenience store, complete 3 orders.
-            await page.keyboard.press('t');
+            // User-driven game input, read-only telemetry; no QA cheat.
             const beforeState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
-            // First user gesture: Godot Web requires focus/pointer lock to receive movement.
             await page.locator('canvas').click({position:{x:640,y:410},force:true});
-            await page.waitForTimeout(300);
+            await page.waitForTimeout(350);
+            // First test entry into the previously empty cafe interior.
+            if (beforeState.interaction !== '咖啡馆') throw new Error('expected cafe at the default spawn');
+            await page.evaluate(() => {
+              window.__LIFESIM_KEY_DIAG = [];
+              document.addEventListener('keydown', e => window.__LIFESIM_KEY_DIAG.push({
+                key: e.key, code: e.code, keyCode: e.keyCode,
+                focused: document.activeElement?.tagName,
+                target: e.target?.tagName
+              }), true);
+            });
+            // SwiftShader 3D can run at low FPS; hold key across several frames.
+            await page.keyboard.down('e');
+            await page.waitForTimeout(2700);
+            await page.keyboard.up('e');
+            await page.waitForTimeout(1500);
+            console.log('V11_DOM_KEYS',JSON.stringify(await page.evaluate(()=>window.__LIFESIM_KEY_DIAG)));
+            const enteredState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            console.log('V11_ENTRY',JSON.stringify({beforeState,enteredState}));
+            await page.screenshot({path:'lifesim-v11-cafe-indoors.png',fullPage:true});
+            if (enteredState.indoor !== '咖啡馆') throw new Error('E key did not enter the cafe');
             await page.keyboard.down('w');
-            await page.waitForTimeout(2400);
+            await page.waitForTimeout(1700);
             await page.keyboard.up('w');
-            await page.waitForTimeout(500);
-            const movedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
-            console.log('LIFE_MOVE',JSON.stringify({beforeState,movedState}));
-            if(Math.hypot(movedState.x-beforeState.x,movedState.z-beforeState.z)<1.0) throw new Error('PLAYER DID NOT MOVE VIA BROWSER KEYBOARD');
-            await page.keyboard.press('j');
             await page.waitForTimeout(450);
-            await page.screenshot({path:'lifesim-job-start.png',fullPage:true});
-            await page.keyboard.press('2');
-            await page.keyboard.press('1');
-            await page.keyboard.press('3');
-            await page.waitForTimeout(650);
-            await page.screenshot({path:'lifesim-job-result.png',fullPage:true});
-            const completedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
-            console.log('LIFE_JOB_RESULT',JSON.stringify(completedState));
-            if(completedState.balance<=beforeState.balance) throw new Error('BROWSER JOB DID NOT PAY OUT');
+            const movedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            console.log('V11_MOVE',JSON.stringify({beforeState,movedState}));
+            if (Math.hypot(movedState.x-enteredState.x,movedState.z-enteredState.z)<0.6)
+              throw new Error('V11 indoor WASD movement blocked or below 0.6m');
+            await page.keyboard.press('q');
+            await page.waitForTimeout(400);
+            const exitedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
+            if (exitedState.indoor !== '') throw new Error('Q failed to leave cafe');
+            await page.screenshot({path:'lifesim-v11-movement.png',fullPage:true});
             console.log('BROWSER_CHECK',JSON.stringify({gl2,info,messages:messages.slice(-10)}));
             await browser.close();
             if(!gl2||!info.canvas||messages.some(x=>/Failed to load|WebGL|error loading|Unable to initialize/i.test(x)))
@@ -129,7 +136,7 @@ jobs:
           name: lifesim-public-browser-check
           path: |
             lifesim-public-browser.png
-            lifesim-job-start.png
-            lifesim-job-result.png
+            lifesim-v11-movement.png
+            lifesim-v11-cafe-indoors.png
           if-no-files-found: ignore
           retention-days: 14
