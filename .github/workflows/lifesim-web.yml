@@ -169,7 +169,7 @@ jobs:
           python3 - <<'PY'
           import json, os
           from pathlib import Path
-          (Path('published-main')/'lifesim'/'play'/'build-info.json').write_text(
+          (Path('published-main')/'lifesim'/'play-v06'/'build-info.json').write_text(
               json.dumps({'version':'0.6','source_branch':'lifesim-v06-life-loop',
                           'commit':os.environ['GITHUB_SHA'],
                           'build_system':'Godot 4.7.2 Web single thread'},indent=2)+'\n')
