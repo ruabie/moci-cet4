@@ -114,3 +114,68 @@ jobs:
             godot-web-export.log
           if-no-files-found: warn
           retention-days: 14
+
+
+  publish-isolated-path:
+    name: Publish only lifesim/play to main without merging game source
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v051-web' }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: lifesim-v051-web-build
+          path: site-build
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: published-main
+          persist-credentials: true
+      - name: Verify existing repository site is preserved
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s published-main/index.html
+          test -e published-main/.nojekyll
+          test -s site-build/index.html
+          compgen -G "site-build/*.wasm" >/dev/null
+          compgen -G "site-build/*.pck" >/dev/null
+          compgen -G "site-build/*.js" >/dev/null
+          test ! -e published-main/lifesim/play/index.html || grep -q 'Godot' published-main/lifesim/play/index.html
+      - name: Copy only the new Web export to its isolated URL path
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p published-main/lifesim/play
+          find published-main/lifesim/play -maxdepth 1 -type f -delete
+          cp -a site-build/. published-main/lifesim/play/
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          (Path('published-main')/'lifesim'/'play'/'build-info.json').write_text(
+              json.dumps({'version':'0.5.1','source_branch':'lifesim-v051-web',
+                          'commit':os.environ['GITHUB_SHA'],
+                          'build_system':'Godot 4.7.2 Web single thread'},indent=2)+'\n')
+          PY
+          cd published-main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lifesim/play
+          test -z "$(git diff --name-only -- . ':!lifesim/play')" || { echo 'Unexpected modifications outside lifesim/play'; exit 1; }
+          if git diff --cached --quiet; then
+            echo "Unchanged web files: no update needed"
+          else
+            git commit -m "deploy(lifesim): publish isolated V0.5.1 Godot Web build"
+            git push origin HEAD:main
+          fi
+      - name: Read GitHub Pages site status without altering it
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          gh api "repos/$GITHUB_REPOSITORY/pages" --jq '{url, status, build_type, source}' || true
+          echo "NOTE: GITHUB_TOKEN git push does not trigger branch-source Pages rebuild. A separate authenticated publish trigger is required."
