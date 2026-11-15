@@ -57,12 +57,16 @@ func _shell(theme: String) -> void:
         _slab(Vector3(x, 5.32, 0), Vector3(.38, .22, 14), wall, false)
     for z in [-6.8, 6.8]:
         _slab(Vector3(0, 5.32, z), Vector3(14, .22, .38), wall, false)
+    # Enclosed roof: no exterior skyline visible through the room ceiling.
+    var ceiling := _material(Color("#e5dfd3") if cafe else Color("#e9e7de"), .92)
+    ceiling.cull_mode = BaseMaterial3D.CULL_DISABLED
+    _slab(Vector3(0, 5.49, 0), Vector3(14.1, .24, 14.1), ceiling, false)
     for x in [-3.6, 3.6]:
         for z in [-3.2, 3.3]:
             var light := OmniLight3D.new()
             light.position = Vector3(x, 4.78, z)
             light.light_color = Color("#ffdeb4") if cafe or living else Color("#f4f8f6")
-            light.light_energy = 0.65
+            light.light_energy = 1.30
             light.omni_range = 7.0
             light.shadow_enabled = false
             add_child(light)
