@@ -157,8 +157,10 @@ func _cafe() -> void:
     # One queue point and a 1.9m unobstructed path from door to counter.
     functional_zones.append("service-counter")
     _panel(Vector3(-.1, .018, 1.0), Vector3(1.65,.025,4.4),ceramic)
-    _sign("KAWA  COFFEE", Vector3(-2.2,3.25,-5.85),39,Color("#344842"))
-    _sign("ESPRESSO  ·  BAKE  ·  TEA", Vector3(-2.2,2.73,-5.84),24,Color("#857457"))
+    # High-contrast signboard: text previously disappeared into ribbed wall.
+    _panel(Vector3(-2.20,3.02,-5.79),Vector3(5.05,1.02,.075),dark)
+    _sign("KAWA  COFFEE", Vector3(-2.2,3.23,-5.68),39,Color("#f6eee2"))
+    _sign("ESPRESSO  ·  BAKE  ·  TEA", Vector3(-2.2,2.78,-5.67),24,Color("#e3c58f"))
     # Seating clusters are adjacent to windows and wall art; not in random rows.
     for table_at in [Vector3(-3.80,.03,1.1),Vector3(3.45,.03,1.55),Vector3(-3.6,.03,3.6)]:
         _prop("furniture-kit", "tableround", table_at, .79, 0, true)
