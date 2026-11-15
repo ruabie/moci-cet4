@@ -89,6 +89,51 @@ func run_contracts() -> void:
     if loaded.get("balance", -1) != 732 or not bool(loaded.get("at_home", false)):
         fail("corrupt QA save did not recover from backup")
         return
+    # V0.6 daily life contracts: old saves, one-time rewards, real world movement destinations.
+    var old_save: Dictionary = CitySave.initial()
+    for key in ["day_key", "daily_done", "npc_talked_today", "photo_spots", "friends", "journal", "skills", "energy", "mood", "jobs_today", "deliveries", "delivery_active"]:
+        old_save.erase(key)
+    var old_read: Dictionary = CitySave.sanitize(old_save)
+    if old_read.is_empty() or int(old_read["balance"]) != 800:
+        fail("v0.5 save cannot migrate to v0.6")
+        return
+    var life: Dictionary = CitySave.initial()
+    var day: String = "2026-11-15"
+    LifeContent.prepare_day(life, day)
+    if not LifeContent.talk(life, "小遥", day) or LifeContent.talk(life, "小遥", day):
+        fail("npc repeated social reward")
+        return
+    if int(life["balance"]) != 830 or int(life["friends"].get("小遥", 0)) != 1:
+        fail("social payout/relationship incorrect")
+        return
+    if not LifeContent.photo(life, "river", day) or LifeContent.photo(life, "river", day) or not LifeContent.photo(life, "crossing", day):
+        fail("photography duplicate/multi-spot contract failed")
+        return
+    if int(life["balance"]) != 855 or not LifeContent.completed(life, "photos"):
+        fail("photography daily reward incorrect")
+        return
+    if not LifeContent.begin_delivery(life, day) or LifeContent.begin_delivery(life, day):
+        fail("delivery can be picked up twice")
+        return
+    if not LifeContent.finish_delivery(life, day) or LifeContent.finish_delivery(life, day):
+        fail("delivery paid twice")
+        return
+    if int(life["balance"]) != 945:
+        fail("delivery wage incorrect")
+        return
+    var wage: int = LifeContent.job_finish(life, "v06-test-job", "便利店", 3, day)
+    if wage != 80 or LifeContent.job_finish(life, "v06-test-job", "便利店", 3, day) != 0:
+        fail("real job payout / idempotence incorrect")
+        return
+    if int(life["balance"]) != 1050 or int(life["jobs_completed"]) != 1:
+        fail("daily work bonus wrong")
+        return
+    if not CitySave.sanitize(life).has("journal"):
+        fail("new life fields lost in save")
+        return
+    if not LifeContent.prepare_day(life, "2026-11-16") or LifeContent.completed(life, "delivery") or not LifeContent.begin_delivery(life, "2026-11-16"):
+        fail("daily reset regression")
+        return
     ProjectSettings.set_setting("application/config/qa_mode", true)
     var scene: PackedScene = load("res://scenes/main.tscn")
     if scene == null:
@@ -116,7 +161,8 @@ func run_contracts() -> void:
         if avatar.rig.find_bone(required_name) < 0:
             fail("V0.5 missing locomotion bone: " + required_name)
             return
-    # Verify keyboard movement changes position and updates the skinned skeleton.
+    # Exercise actual physics movement and animated bone pose rather than
+    # passing only because a Skeleton3D node exists.
     var initial_pos: Vector3 = avatar.global_position
     Input.action_press("move_forward")
     for step in range(12):
@@ -137,6 +183,12 @@ func run_contracts() -> void:
     var district: Node = instance.get_node_or_null("AokawaDistrict")
     if district.get_node_or_null("AmbientResidents") == null:
         fail("V0.4 residents missing")
+        return
+    if district.get_node_or_null("LifeQuestBoard") == null or district.get_node_or_null("RiversideParcelLocker") == null:
+        fail("V0.6 task board and delivery destination missing")
+        return
+    if instance.get_node_or_null("MartInterior") == null or instance.get_node_or_null("CafeInterior") == null:
+        fail("V0.6 store interiors missing")
         return
     if district.npc_rigs.size() != district.npc_figures.size():
         fail("V0.5.1 NPC bone rigs do not match resident count")
