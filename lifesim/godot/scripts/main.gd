@@ -3,6 +3,13 @@ extends Node3D
 const AUTOSAVE_SECONDS: float = 12.0
 const INTERACTION_RADIUS: float = 5.5
 const FONT_COLOR = Color("#edf3ec")
+const FURNITURE: Array = [
+    ["desk_lamp", "阅读灯", 120],
+    ["soft_rug", "棉麻地毯", 180],
+    ["green_plant", "绿植角", 240],
+    ["bookshelf", "木书架", 390],
+    ["computer", "桌面电脑", 620]
+]
 
 var city: CityBuilder
 var player: CityPlayer
@@ -26,6 +33,7 @@ var job_step: int = 0
 var job_correct: int = 0
 var job_seconds: float = -1.0
 var dialogue_npc: int = -1
+var shop_open: bool = false
 var near_npc: int = -1
 var journal_open: bool = false
 var indoor_place: String = ""
@@ -157,14 +165,45 @@ func _create_home() -> void:
     _simple_box(room, Vector3(2.5, 0.84, -3.6), Vector3(2.4, 0.12, 1.3), Color("#8c705a"))
     _simple_box(room, Vector3(2.5, 0.43, -3.6), Vector3(2.2, 0.75, 0.10), Color("#6a564c"))
     _simple_box(room, Vector3(4.2, 1.2, -7.45), Vector3(3.8, 2.2, 0.1), Color("#69899a"))
-    if "desk_lamp" in state.get("owned_items", []):
-        _simple_box(room, Vector3(2.5, 1.45, -3.6), Vector3(0.28, 0.95, 0.28), Color("#e5ca89"))
+    for item_id in state.get("owned_items", []):
+        _home_item(room, str(item_id))
     var light := OmniLight3D.new()
     light.position = Vector3(0, 4.7, 0)
     light.light_color = Color("#ffe8c2")
     light.light_energy = 1.9
     light.omni_range = 17
     room.add_child(light)
+
+func _home_item(room: Node3D, item_id: String) -> void:
+    match item_id:
+        "desk_lamp":
+            _simple_box(room, Vector3(2.5, 1.45, -3.6), Vector3(0.15, 0.68, 0.15), Color("#5e665e"))
+            _simple_box(room, Vector3(2.5, 1.82, -3.6), Vector3(0.72, 0.28, 0.72), Color("#eacb94"))
+        "soft_rug":
+            _simple_box(room, Vector3(-2.0, 0.025, 1.3), Vector3(4.3, 0.04, 2.6), Color("#c5b6aa"))
+            for x in [-3.6, -2.6, -1.6, -0.6]:
+                _simple_box(room, Vector3(x, 0.056, 1.3), Vector3(0.04, 0.007, 2.3), Color("#a69d93"))
+        "green_plant":
+            _simple_box(room, Vector3(5.5, 0.37, 3.6), Vector3(0.85, 0.75, 0.85), Color("#c5ad8f"))
+            var foliage := MeshInstance3D.new()
+            var sphere := SphereMesh.new()
+            sphere.radius = 0.85
+            foliage.mesh = sphere
+            foliage.position = Vector3(5.5, 1.35, 3.6)
+            var mat := StandardMaterial3D.new()
+            mat.albedo_color = Color("#608363")
+            foliage.material_override = mat
+            room.add_child(foliage)
+        "bookshelf":
+            _simple_box(room, Vector3(-6.2, 1.47, 2.5), Vector3(1.45, 2.9, 0.56), Color("#896e57"))
+            for shelf_y in [0.54, 1.22, 1.91, 2.63]:
+                _simple_box(room, Vector3(-6.2, shelf_y, 2.1), Vector3(1.28, 0.10, 0.18), Color("#d5baa0"))
+                for b in range(4):
+                    _simple_box(room, Vector3(-6.65 + b * 0.28, shelf_y + 0.27, 2.35), Vector3(0.18, 0.43, 0.23), Color("#607b7b" if b % 2 == 0 else "#b48378"))
+        "computer":
+            _simple_box(room, Vector3(2.5, 1.25, -3.6), Vector3(1.5, 0.9, 0.12), Color("#303b40"))
+            _simple_box(room, Vector3(2.5, 1.26, -3.52), Vector3(1.31, 0.70, 0.035), Color("#6b8c99"))
+            _simple_box(room, Vector3(2.5, 0.96, -2.96), Vector3(0.95, 0.06, 0.26), Color("#bdbcb4"))
 
 func _create_business_interiors() -> void:
     # Visit actual enclosed rooms rather than menu-only store interactions.
@@ -320,12 +359,18 @@ func _create_ui() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
+        if shop_open and event.physical_keycode >= KEY_1 and event.physical_keycode <= KEY_5:
+            _purchase_furniture(int(event.physical_keycode) - int(KEY_1))
+            return
         if job_mode != "" and event.physical_keycode in [KEY_1, KEY_2, KEY_3]:
             _job_answer(int(event.physical_keycode) - int(KEY_1) + 1)
             return
         if dialogue_npc >= 0 and event.physical_keycode in [KEY_1, KEY_2, KEY_3]:
             _dialogue_choice(int(event.physical_keycode) - int(KEY_1) + 1)
             return
+    if shop_open and (event.is_action_pressed("interact") or event.is_action_pressed("exit_interior") or event.is_action_pressed("ui_cancel")):
+        shop_open = false
+        return
     if event.is_action_pressed("journal"):
         journal_open = not journal_open
         _notify("已%s生活日志，右侧查看。" % ("打开" if journal_open else "关闭"), 3.0)
@@ -369,7 +414,7 @@ func _interact() -> void:
         "便利店", "咖啡馆":
             _enter_business(current_interaction)
         "生活商店":
-            _notify("生活商店：按 B 购买台灯（120 城币），可带回家。", 6.0)
+            _open_shop()
         "委托板":
             journal_open = true
             _notify("委托板：完成每日打工、交友、摄影；K 在便利店领取配送单。", 6.0)
@@ -529,37 +574,50 @@ func _rest() -> void:
     if _commit_state(candidate):
         _notify("休息完成：精力 %d，心情 %d。" % [state["energy"], state["mood"]], 5.0)
 
+func _open_shop() -> void:
+    if in_home or indoor_place != "":
+        return
+    shop_open = true
+    journal_open = false
+    _notify("生活商店：在右侧菜单按数字购买家具，E 返回。", 5.0)
+
+func _purchase_furniture(index: int) -> void:
+    if not shop_open or index < 0 or index >= FURNITURE.size():
+        return
+    var product: Array = FURNITURE[index]
+    var candidate: Dictionary = state.duplicate(true)
+    if not CitySave.purchase(candidate, str(product[0]), int(product[2])):
+        _notify("无法购买：余额不足，或已经拥有此件家具。", 4.0)
+        return
+    LifeContent.note(candidate, "买了%s，回家可以看到新家具。" % str(product[1]))
+    if not _commit_state(candidate):
+        _notify("保存失败，本次购买没有生效。", 5.0)
+        return
+    var room := get_node_or_null("ApartmentInterior") as Node3D
+    if room != null:
+        _home_item(room, str(product[0]))
+    shop_open = false
+    _notify("购买了%s，支付 %d 城币。回家看看新布置！" % [product[1], product[2]], 6.0)
+
 func _buy_item() -> void:
     if in_home:
         return
-    var candidate: Dictionary = state.duplicate(true)
-    var product_name := ""
-    var success := false
-    var furniture := false
     if current_interaction == "生活商店":
-        product_name = "台灯"
-        success = CitySave.purchase(candidate, "desk_lamp", 120)
-        furniture = true
-    elif current_interaction == "咖啡馆":
-        product_name = "咖啡"
-        success = CitySave.spend(candidate, 18)
+        _open_shop()
+        return
+    if current_interaction != "咖啡馆":
+        return
+    var candidate: Dictionary = state.duplicate(true)
+    if not CitySave.spend(candidate, 18):
+        _notify("余额不足，无法购买咖啡。", 4.0)
+        return
+    candidate["energy"] = mini(100, int(candidate.get("energy", 50)) + 8)
+    candidate["mood"] = mini(100, int(candidate.get("mood", 50)) + 6)
+    LifeContent.note(candidate, "在 KAWA COFFEE 喝了一杯咖啡。")
+    if _commit_state(candidate):
+        _notify("咖啡 -18 城币；精力 +8，心情 +6。", 5.0)
     else:
-        return
-    if not success:
-        _notify("无法购买：余额不足，或已经拥有这件家具。", 4.0)
-        return
-    if not furniture:
-        candidate["energy"] = mini(100, int(candidate.get("energy", 50)) + 8)
-        candidate["mood"] = mini(100, int(candidate.get("mood", 50)) + 6)
-        LifeContent.note(candidate, "在 KAWA COFFEE 喝了一杯咖啡。")
-    if not _commit_state(candidate):
-        _notify("保存失败，本次交易未生效。", 5.0)
-        return
-    if furniture:
-        var room := get_node_or_null("ApartmentInterior")
-        if room != null:
-            _simple_box(room, Vector3(2.5, 1.45, -3.6), Vector3(0.28, 0.95, 0.28), Color("#e5ca89"))
-    _notify("已购买%s，支付 %d 城币。" % [product_name, 120 if furniture else 18], 4.0)
+        _notify("消费存档失败，余额没有变化。", 5.0)
 
 func _nearest_place() -> String:
     near_npc = -1
@@ -599,6 +657,8 @@ func _process(delta: float) -> void:
     if notice_time <= 0.0 and ui_notice != null:
         ui_notice.text = ""
     current_interaction = _nearest_place()
+    if shop_open and current_interaction != "生活商店":
+        shop_open = false
     if in_home:
         ui_place.text = "你的公寓 · 私人生活空间"
         ui_hint.text = "R 休息  ·  Q / E 返回街道  ·  T 日志"
@@ -617,7 +677,9 @@ func _process(delta: float) -> void:
             job_mode = ""
             job_seconds = -1.0
             _notify("订单超时：本次未获得工资，可以重新尝试。", 6.0)
-    if job_mode != "":
+    if shop_open:
+        ui_activity.text = "生活商店 / 选择家具\n1 阅读灯    120 城币\n2 棉麻地毯 180 城币\n3 绿植角    240 城币\n4 木书架    390 城币\n5 桌面电脑 620 城币\nE 返回  ·  已拥有 %d/5" % mini(5, state.get("owned_items", []).size())
+    elif job_mode != "":
         var task: Array = LifeContent.JOB_TASKS[job_mode][job_step]
         ui_activity.text = "%s · 订单 %d/3
 %s
