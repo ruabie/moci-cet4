@@ -70,9 +70,9 @@ class AuthoredPBR(Gltf):
     def material(self,name,color,metal=0.0,rough=.84,emissive=None):
         idx = super().material(name,color,metal,rough,emissive)
         key = None
-        if 'continuous_masonry' in name or 'stone_reveals' in name: key='masonry'
-        elif 'warm_wood' in name: key='timber'
-        elif 'metal_fascia' in name or 'anodized' in name or 'roof_zinc' in name: key='metal'
+        if 'continuous_masonry' in name or 'stone_reveal' in name: key='masonry'
+        elif 'warm_wood' in name or 'interior_oak' in name: key='timber'
+        elif 'metal_fascia' in name or 'anodized' in name or 'roof_zinc' in name or 'integrated_fascia' in name or 'window_joinery' in name or 'zinc_roof' in name: key='metal'
         elif 'floor' in name: key='floor'
         elif 'paver' in name: key='stone'
         if key is not None:
@@ -82,7 +82,7 @@ class AuthoredPBR(Gltf):
             reference={'masonry':.69,'timber':.56,'metal':.46,'floor':.54,'stone':.62}[key]
             self.materials[idx]['pbrMetallicRoughness']['baseColorFactor']=[
                 min(1.0, float(c) / reference) for c in color]+[1.0]
-        if 'interior_window' in name:
+        if 'interior_window' in name or 'recessed_glazing' in name:
             self.materials[idx]['alphaMode']='BLEND'
             self.materials[idx]['pbrMetallicRoughness']['baseColorFactor']=[.57,.70,.72,.27]
             self.materials[idx]['doubleSided']=True
@@ -204,10 +204,10 @@ class AuthoredPBR(Gltf):
         name=name.replace('v07_','v08_')
         kind=next((x for x in ('mart','coffee','apartment','living') if ('_'+x+'_') in name),None)
         self.variant=kind or 'mart'
-        profile=previous.COLORS[self.variant]
-        self.building_depth=profile['w']
-        self.building_halfwidth=profile['d']/2
-        self._height=profile['h']
+        profile=previous.SPECS[self.variant]
+        self.building_depth=profile[0]
+        self.building_halfwidth=profile[2]/2
+        self._height=profile[1]
         self._interior()
         primitives=[]
         for mat in sorted(self.prims):
@@ -228,6 +228,10 @@ class AuthoredPBR(Gltf):
             images.append({'name':name_tex+'_original_tile','mimeType':'image/png','bufferView':len(self.views)-1})
             textures.append({'source':len(images)-1,'sampler':0})
             texmap[name_tex]=len(textures)-1
+        for material in self.materials:
+            if 'recessed_glazing' in material['name']:
+                material['alphaMode']='BLEND'
+                material['pbrMetallicRoughness']['baseColorFactor'][3]=.28
         for idx,tex in self.mat_to_texture.items():
             self.materials[idx]['pbrMetallicRoughness']['baseColorTexture']={'index':texmap[tex]}
         doc={'asset':{'version':'2.0','generator':'SameTime City V0.8 authored integrated PBR'},
@@ -250,5 +254,5 @@ class AuthoredPBR(Gltf):
 if __name__=='__main__':
     # All four variants remain separately authored with their own dimensions and openings.
     previous.Gltf=AuthoredPBR
-    for kind, profile in previous.COLORS.items():
-        previous.facade(kind,profile)
+    for kind, spec in previous.SPECS.items():
+        previous.one(kind,spec)
