@@ -114,8 +114,12 @@ jobs:
             console.log('V12_MOVE',JSON.stringify({beforeState,movedState}));
             if (Math.hypot(movedState.x-enteredState.x,movedState.z-enteredState.z)<0.6)
               throw new Error('V12 indoor WASD movement blocked or below 0.6m');
-            await page.keyboard.press('q');
-            await page.waitForTimeout(400);
+            // Headless SwiftShader can deliver fewer frames than keystroke duration;
+            // keep the release action active across several rendered frames.
+            await page.keyboard.down('q');
+            await page.waitForTimeout(2500);
+            await page.keyboard.up('q');
+            await page.waitForTimeout(1300);
             const exitedState = await page.evaluate(() => window.__LIFESIM_QA__.getState());
             if (exitedState.indoor !== '') throw new Error('Q failed to leave cafe');
             await page.screenshot({path:'lifesim-v12-movement.png',fullPage:true});
