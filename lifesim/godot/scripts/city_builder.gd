@@ -111,14 +111,14 @@ func create_city() -> void:
     _integrated_forecourts()
 
 func _ground() -> void:
-    _box(self, Vector3(0, -0.36, 0), Vector3(180, 0.6, 180), _color("#8a9180"))
+    _box(self, Vector3(0, -0.36, 0), Vector3(180, 0.6, 180), _color("#66736a"))
     _collision_box(self, Vector3(0, -0.10, 0), Vector3(180, 0.2, 180))
 
 func _roads() -> void:
-    var road := _color("#353c44", 0.99)
-    var walk := _color("#82857f", 0.99)
-    var curb := _color("#696d6b", 0.99)
-    var stripe := _color("#deddd5", 0.95)
+    var road := _color("#303a40", 0.99)
+    var walk := _color("#666e69", 0.99)
+    var curb := _color("#515a57", 0.99)
+    var stripe := _color("#bdc4bc", 0.95)
     _box(self, Vector3(0, 0.005, 0), Vector3(13, 0.04, 177), road, false)
     _box(self, Vector3(0, 0.014, -32), Vector3(177, 0.04, 13), road, false)
     for side in [-1, 1]:
@@ -540,8 +540,8 @@ func _integrated_building(title: String, variant: String, origin: Vector3, size:
 
 func _integrated_forecourts() -> void:
     # Full threshold pavers meet the storefront: no floating trim modules.
-    var paver: Material = _color("#aaa99f", .96)
-    var edge: Material = _color("#817c71", .98)
+    var paver: Material = _color("#727970", .96)
+    var edge: Material = _color("#5e665e", .98)
     var drain: Material = _color("#3a4747", .62, .45)
     for xcenter in [-15.0, 15.0]:
         for spec in [[-14.0, 15.9], [14.0, 16.0]]:
