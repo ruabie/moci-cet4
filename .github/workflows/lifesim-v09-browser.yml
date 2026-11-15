@@ -19,12 +19,12 @@ jobs:
           for i in $(seq 1 20); do
             curl --fail --location --silent --show-error --max-time 30 \
               "$BASE/build-info.json?check=$i" -o /tmp/info.json || true
-            if grep -q "dfe7e44e1b0c8832f447c79580c787521aa0951e" /tmp/info.json 2>/dev/null; then break; fi
+            if grep -q "9a549d6e57e3a0c2855b79f34da6155e9fe9097d" /tmp/info.json 2>/dev/null; then break; fi
             echo "Pages V0.9 revision not yet live: retry $i"
             sleep 10
           done
           grep -q '"version": "0.9"' /tmp/info.json
-          grep -q 'dfe7e44e1b0c8832f447c79580c787521aa0951e' /tmp/info.json
+          grep -q '9a549d6e57e3a0c2855b79f34da6155e9fe9097d' /tmp/info.json
           for f in index.html index.js index.wasm index.pck; do
             curl --fail --location --silent --show-error --head "$BASE/$f" | grep -E -i 'HTTP/|content-type|content-length'
           done
@@ -59,7 +59,7 @@ jobs:
             await page.screenshot({path:'v09-public-chrome.png',fullPage:true});
             console.log('V09 CHROME SNAPSHOT',JSON.stringify({state,errors:errors.slice(-6)}));
             await browser.close();
-            if(!state.canvas||!state.webgl2||errors.some(x=>/Failed to load|WebGL|error loading|Unable to initialize|CompileError/i.test(x)))
+            if(!state.canvas||!state.webgl2||errors.some(x=>/Failed to load|WebGL|error loading|Unable to initialize|CompileError|NotAllowedError.*Pointer Lock/i.test(x)))
               process.exit(1);
             console.log('V09 CHROME WEBGL2 RENDER PASS — not a full gameplay, FPS or art review');
           })().catch(e=>{console.error(e);process.exit(1)});
