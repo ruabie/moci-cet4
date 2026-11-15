@@ -7,7 +7,7 @@ checks = {
  'consumable payment separated from furniture': 'static func spend(state:' in state and 'CitySave.spend(candidate, 18)' in main,
  'isolated engine test writes': 'qa_temp_' in test and 'CitySave.write_save(state, qa_file, qa_backup)' in test,
  'scene QA does not modify live save': 'ProjectSettings.set_setting("application/config/qa_mode", true)' in test and 'if not qa_mode and not CitySave.write_save' in main,
- 'state must persist before money commits': 'if not _commit_state(candidate):' in main and 'CitySave.pay_job_once(candidate' in main,
+ 'state must persist before money commits': '_commit_state(candidate)' in main and 'LifeContent.job_finish(candidate' in main and 'CitySave.pay_job_once(s, job_id' in (root / 'scripts/life_content.gd').read_text(encoding='utf-8'),
  'apartment state persists': '"at_home": false' in state and 'if in_home:' in main,
 }
 for name, passed in checks.items():
