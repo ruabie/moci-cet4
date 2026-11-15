@@ -463,14 +463,10 @@ func _awning(front: float, z0: float, y: float, width: float, base: String) -> v
 
 func _detail_pass() -> void:
     # Forecourts and shopfronts establish a walkable rather than empty street edge.
-    var tile := _color("#878c86", 0.99)
-    var tile_light := _color("#959891", 0.99)
+    # V0.7: removed stamped 3m sidewalk blocks. They covered the base concrete
+    # with a visible periodic patchwork and intersected shop threshold surfaces.
+    # A single seamless walk mesh is provided by _roads() instead.
     for side in [-1.0, 1.0]:
-        for z in range(-76, 79, 3):
-            if z > -41 and z < -23:
-                continue
-            var mark := tile if int(z / 3.0) % 2 == 0 else tile_light
-            _box(self, Vector3(side * 12.2, 0.065, float(z)), Vector3(1.05, 0.012, 2.72), mark, false)
         for z in [-65.0, -18.0, 13.0, 62.0]:
             _planter(Vector3(side * 11.0, 0.10, z))
         for z in [-78.0, -22.0, 38.0, 79.0]:
@@ -540,7 +536,7 @@ func _integrated_building(title: String, variant: String, origin: Vector3, size:
 
 func _integrated_forecourts() -> void:
     # Full threshold pavers meet the storefront: no floating trim modules.
-    var paver: Material = _color("#727970", .96)
+    var paver: Material = _color("#666e69", .99)
     var edge: Material = _color("#5e665e", .98)
     var drain: Material = _color("#3a4747", .62, .45)
     for xcenter in [-15.0, 15.0]:
