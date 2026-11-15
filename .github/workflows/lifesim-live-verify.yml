@@ -3,7 +3,9 @@ name: LifeSim V0.11 public preview and movement browser acceptance
 on:
   push:
     branches: [lifesim-v011-open-city-interiors]
-    paths: ['.github/workflows/lifesim-live-verify.yml']
+    paths:
+      - '.github/workflows/lifesim-live-verify.yml'
+      - 'lifesim/godot/scripts/main.gd'
   workflow_dispatch:
 
 permissions:
