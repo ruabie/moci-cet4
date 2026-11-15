@@ -1,6 +1,6 @@
 {
   "version": "0.6",
   "source_branch": "lifesim-v06-life-loop",
-  "commit": "62da5f01f503c344e0e09cc12abc0aad9d4d99b7",
+  "commit": "04c0a93f9f0cfe5f68cc740e3ff1bdc78ed86c4a",
   "build_system": "Godot 4.7.2 Web single thread"
 }
