@@ -111,7 +111,7 @@ class Gltf:
   out=ROOT/name;out.parent.mkdir(parents=True,exist_ok=True);out.write_bytes(result)
   print(name, len(result),'bytes',sum(len(self.prims[k]['p'])//3 for k in keys),'vertices')
 
-def person():
+def person(filename='art/characters/commuter_rig.glb', coat_color=(0.27,.335,.34), trouser_color=(.13,.175,.22), hair_color=(.08,.084,.09)):
  g=Gltf()
  # Each vertex is bound to a named bone. Root rest transforms are identity/translation.
  bone_defs=[
@@ -134,13 +134,13 @@ def person():
   g.nodes.append(node)
  g.skin={'joints':[1+i for i in range(len(bone_defs))],'world':[world[name] for name,_,_ in bone_defs]}
  def m(name,c,metal=0,rough=.83):return g.material(name,c,metal,rough)
- coat=m('warm_gray_suede',(0.27,.335,.34),0.02,.89)
+ coat=m('warm_gray_suede',coat_color,0.02,.89)
  coat_high=m('jacket_lapel',(0.38,.435,.43),0.02,.91)
  coat_dark=m('jacket_stitch',(0.16,.22,.23),0.0,.88)
- trousers=m('indigo_trouser',(.13,.175,.22),0.0,.94)
+ trousers=m('indigo_trouser',trouser_color,0.0,.94)
  denim_light=m('denim_seam',(.22,.29,.34))
  skin=m('warm_skin',(.78,.59,.47),0,.72)
- hair=m('charcoal_hair',(.08,.084,.09),0,.91)
+ hair=m('charcoal_hair',hair_color,0,.91)
  shoes=m('cream_canvas',(.78,.77,.71),0,.90)
  rubber=m('dark_sole',(.21,.24,.24),0,.95)
  bag=m('canvas_sling',(.23,.26,.28),0,.94)
@@ -189,7 +189,7 @@ def person():
  # A slim shoulder messenger bag with folded flap is a distinctive readable detail
  g.box(bag,(.21,1.18,.235),(.25,.29,.102),idx['Spine'])
  g.box(coat_dark,(.21,1.27,.299),(.27,.018,.008),idx['Spine'])
- g.save('art/characters/commuter_rig.glb')
+ g.save(filename)
 
 def shop():
  g=Gltf();
@@ -286,4 +286,4 @@ def lobby():
  g.save('art/architecture/apartment_lobby.glb')
 
 if __name__=='__main__':
- person();shop();lobby()
+ person();person('art/characters/resident_olive.glb',(.29,.38,.30),(.20,.23,.20),(.12,.10,.09));person('art/characters/resident_sand.glb',(.53,.40,.30),(.18,.23,.30),(.16,.12,.10));shop();lobby()
