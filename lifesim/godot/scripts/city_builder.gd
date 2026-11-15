@@ -109,6 +109,8 @@ func create_city() -> void:
     _people()
     _detail_pass()
     _integrated_forecourts()
+    var legal_block := LicensedBlockV11.new()
+    add_child(legal_block)
 
 func _ground() -> void:
     _box(self, Vector3(0, -0.36, 0), Vector3(180, 0.6, 180), _color("#66736a"))
