@@ -26,9 +26,9 @@ func capture() -> void:
     camera.fov = 69
     stage.add_child(camera)
     var scenes: Array = [
-        ["v11_cafe", Vector3(0.0, 2.8, 228.4), Vector3(0, 1.6, 219.7)],
-        ["v11_mart", Vector3(0.0, 2.7, 196.1), Vector3(0, 1.6, 188.1)],
-        ["v11_home", Vector3(0.5, 3.2, 154.6), Vector3(0, 1.7, 146.1)],
+        ["v11_cafe", Vector3(0.0, 2.45, 225.65), Vector3(-1.8, 1.50, 218.15)],
+        ["v11_mart", Vector3(0.0, 2.45, 193.65), Vector3(1.2, 1.50, 186.25)],
+        ["v11_home", Vector3(0.15, 2.45, 153.65), Vector3(-2.0, 1.35, 146.25)],
         ["v11_licensed_block", Vector3(-2.4, 3.4, -48.0), Vector3(-25, 5.0, -66)]
     ]
     for view in scenes:
