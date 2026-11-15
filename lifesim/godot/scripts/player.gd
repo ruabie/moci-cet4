@@ -9,7 +9,7 @@ const RUN_SPEED: float = 7.5
 const TURN_SPEED: float = 9.0
 const MOUSE_SENSITIVITY: float = 0.0024
 
-var camera_yaw: float = 0.30
+var camera_yaw: float = -1.23
 var camera_pitch: float = -0.12
 var camera_distance: float = 4.6
 var camera: Camera3D
@@ -60,7 +60,9 @@ func _ready() -> void:
     camera.fov = 63.0
     camera.near = 0.08
     add_child(camera)
-    Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+    # Browsers permit Pointer Lock only after a real mouse gesture.
+    if not OS.has_feature("web"):
+        Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
     _update_camera(0.0)
 
 func _find_skeleton(node: Node) -> Skeleton3D:

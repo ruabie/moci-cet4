@@ -13,7 +13,7 @@ static func initial() -> Dictionary:
         "balance": 800,
         "jobs_completed": 0,
         "owned_items": [],
-        "position": [-11.0, 0.2, -5.0],
+        "position": [8.3, 0.2, -14.0],
         "at_home": false,
         "last_seen_utc": int(Time.get_unix_time_from_system()),
         "completed_job_ids": [],

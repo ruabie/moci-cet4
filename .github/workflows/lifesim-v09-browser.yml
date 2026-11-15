@@ -1,0 +1,76 @@
+name: LifeSim V0.9 public browser evidence
+on:
+  push:
+    branches: [lifesim-v09-curated-cafe]
+    paths: ['.github/workflows/lifesim-v09-browser.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  online-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Verify exact V0.9 Pages publication and dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://ruabie.github.io/moci-cet4/lifesim/play-v09"
+          for i in $(seq 1 20); do
+            curl --fail --location --silent --show-error --max-time 30 \
+              "$BASE/build-info.json?check=$i" -o /tmp/info.json || true
+            if grep -q "9a549d6e57e3a0c2855b79f34da6155e9fe9097d" /tmp/info.json 2>/dev/null; then break; fi
+            echo "Pages V0.9 revision not yet live: retry $i"
+            sleep 10
+          done
+          grep -q '"version": "0.9"' /tmp/info.json
+          grep -q '9a549d6e57e3a0c2855b79f34da6155e9fe9097d' /tmp/info.json
+          for f in index.html index.js index.wasm index.pck; do
+            curl --fail --location --silent --show-error --head "$BASE/$f" | grep -E -i 'HTTP/|content-type|content-length'
+          done
+          echo 'V09 HTTP LIVE PASS'
+      - uses: actions/checkout@v4
+      - name: Install Playwright client
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Actual Chrome + WebGL2 render smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/lifesim-v09-chrome.cjs <<'JS'
+          const {chromium}=require(process.cwd()+'/node_modules/playwright');
+          (async()=>{
+            const browser=await chromium.launch({
+              executablePath:'/usr/bin/google-chrome',headless:true,
+              args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader',
+                    '--use-angle=swiftshader','--use-gl=angle','--enable-webgl']});
+            const page=await browser.newPage({viewport:{width:1280,height:720}});
+            const errors=[];
+            page.on('pageerror', e=>errors.push(String(e)));
+            page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v09/?qa=1',{
+              waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForTimeout(18000);
+            const state=await page.evaluate(()=>({
+              title:document.title,
+              canvas:!!document.querySelector('canvas'),
+              webgl2:!!document.createElement('canvas').getContext('webgl2'),
+              qa:typeof window.__LIFESIM_QA__?.getState==='function',
+              notice:document.getElementById('status-notice')?.textContent?.slice(0,120)}));
+            await page.screenshot({path:'v09-public-chrome.png',fullPage:true});
+            console.log('V09 CHROME SNAPSHOT',JSON.stringify({state,errors:errors.slice(-6)}));
+            await browser.close();
+            if(!state.canvas||!state.webgl2||errors.some(x=>/Failed to load|WebGL|error loading|Unable to initialize|CompileError|NotAllowedError.*Pointer Lock/i.test(x)))
+              process.exit(1);
+            console.log('V09 CHROME WEBGL2 RENDER PASS — not a full gameplay, FPS or art review');
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node /tmp/lifesim-v09-chrome.cjs
+          test -s v09-public-chrome.png
+      - name: Preserve actual public screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v09-public-browser-evidence
+          path: v09-public-chrome.png
+          retention-days: 14
+          if-no-files-found: warn

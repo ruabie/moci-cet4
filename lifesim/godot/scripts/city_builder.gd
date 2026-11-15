@@ -521,18 +521,29 @@ func _integrated_building(title: String, variant: String, origin: Vector3, size:
     root.position = Vector3(origin.x + side * size.x * 0.5, 0.0, origin.z)
     root.rotation.y = 0.0 if front_right else PI
     add_child(root)
-    var path: String = "res://art/architecture/v08_%s_integrated.glb" % variant
+    var path: String = "res://art/architecture/v09_coffee_integrated.glb" if variant == "coffee" else "res://art/architecture/v08_%s_integrated.glb" % variant
     var packed: PackedScene = load(path) as PackedScene
     if packed == null:
         push_error("V0.7 envelope missing: " + path)
         return
     var model: Node3D = packed.instantiate() as Node3D
-    model.name = "V08TexturedEnvelopeAndInterior"
+    model.name = "V09CuratedCafeAndInterior" if variant == "coffee" else "V08TexturedEnvelopeAndInterior"
     root.add_child(model)
     # Collision behind the front reveals; front face itself is not a full opaque slab.
     _collision_box(root, Vector3(-size.x * .5 - .60, size.y * .5, 0),
         Vector3(size.x - 1.2, size.y, size.z - .25))
-    _label(root, signage, Vector3(.49, 4.39, 0), 42, Color("#f0e8d6"))
+    if variant == "coffee":
+        _label(root, "KAWA 珈琲", Vector3(.80, 4.42, 4.35), 51, Color("#312823"))
+        var evening_light := OmniLight3D.new()
+        evening_light.name = "CafeWindowWarmth"
+        evening_light.position = Vector3(-1.90, 2.57, -0.4)
+        evening_light.light_color = Color("#ffdfb0")
+        evening_light.light_energy = 0.74
+        evening_light.omni_range = 8.0
+        evening_light.shadow_enabled = false
+        root.add_child(evening_light)
+    else:
+        _label(root, signage, Vector3(.49, 4.39, 0), 42, Color("#f0e8d6"))
 
 func _integrated_forecourts() -> void:
     # Full threshold pavers meet the storefront: no floating trim modules.

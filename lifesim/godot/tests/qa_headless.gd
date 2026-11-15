@@ -196,7 +196,10 @@ func run_contracts() -> void:
     if district.get_node_or_null("Authored_AOI_MART__·__24H/V08TexturedEnvelopeAndInterior") == null:
         fail("V0.8 integrated mart model missing")
         return
-    for address in ["Authored_KAWA_COFFEE", "Authored_SLOW_LIVING", "Authored_青川公寓"]:
+    if district.get_node_or_null("Authored_KAWA_COFFEE/V09CuratedCafeAndInterior") == null:
+        fail("V0.9 curated cafe mesh missing from live 3D world")
+        return
+    for address in ["Authored_SLOW_LIVING", "Authored_青川公寓"]:
         if district.get_node_or_null(address + "/V08TexturedEnvelopeAndInterior") == null:
             fail("V0.8 integrated facade missing: " + address)
             return
