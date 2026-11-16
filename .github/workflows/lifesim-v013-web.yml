@@ -1,4 +1,4 @@
-name: LifeSim V0.13 lived-in rooms Web preview
+name: LifeSim V0.13 curated art direction Web preview
 
 on:
   push:
@@ -157,7 +157,7 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    if: false # Release gated on fixed-camera art review; do not publish yet
+    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v013-art-direction' }}
     permissions:
       contents: write
     steps:
