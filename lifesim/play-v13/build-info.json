@@ -1,0 +1,6 @@
+{
+  "version": "0.13",
+  "source_branch": "lifesim-v013-art-direction",
+  "commit": "34fe8bfbba646c44916ea587f4d560c49ca73e14",
+  "build_system": "Godot 4.7.2 Web single thread"
+}
