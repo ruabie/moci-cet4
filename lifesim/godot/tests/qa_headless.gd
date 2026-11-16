@@ -194,11 +194,15 @@ func run_contracts() -> void:
         return
     # A moving skeleton is not necessarily an upright skeleton. Assert the
     # model's actual post-animation head/foot positions in world space.
-    for [upper_name, lower_name, separation] in [
+    var posture_checks: Array = [
         ["Head", "Hips", 0.25],
         ["Hips", "Foot.L", 0.30],
         ["UpperArm.L", "Hand.L", 0.10]
-    ]:
+    ]
+    for check in posture_checks:
+        var upper_name: String = str(check[0])
+        var lower_name: String = str(check[1])
+        var separation: float = float(check[2])
         var upper_idx: int = avatar.rig.find_bone(upper_name)
         var lower_idx: int = avatar.rig.find_bone(lower_name)
         if upper_idx < 0 or lower_idx < 0:
