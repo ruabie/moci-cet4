@@ -33,8 +33,8 @@ for mesh in hero['meshes'][0]['primitives']:
     assert {'POSITION','NORMAL','TEXCOORD_0'}.issubset(attr)
     assert hero['accessors'][attr['POSITION']]['count']==hero['accessors'][attr['TEXCOORD_0']]['count']
 scene=(ROOT/'scripts/city_builder.gd').read_text(encoding='utf-8')
-assert 'v09_coffee_integrated.glb' in scene and 'v08_%s_integrated.glb' in scene
+assert 'v14_cafe_upper_only.glb' in scene and 'v08_%s_integrated.glb' in scene
 qa=(ROOT/'tests/qa_headless.gd').read_text(encoding='utf-8')
-assert 'Authored_KAWA_COFFEE/V09CuratedCafeAndInterior' in qa
+assert 'Authored_KAWA_COFFEE/V14UpperStoreys' in qa
 print('V09 ASSET PASS:', triangles(hero),'hero triangles, embedded original PBR textures and normals, non-cafe V08 preserved')
 print('QUALITY GATE: still requires real Godot viewport image and human review')
