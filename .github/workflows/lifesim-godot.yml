@@ -53,6 +53,8 @@ jobs:
           python3 "$PROJECT_DIR/tools/build_landscape_v10.py"
           python3 "$PROJECT_DIR/tests/check_landscape_v10.py"
           python3 "$PROJECT_DIR/tests/check_open_city_v11.py"
+          python3 "$PROJECT_DIR/tools/build_art_v13.py"
+          python3 "$PROJECT_DIR/tests/check_art_v13.py"
           python3 "$PROJECT_DIR/tools/build_interiors_v12.py"
           python3 "$PROJECT_DIR/tests/check_compact_interiors_v12.py"
       - name: Static checks
@@ -109,11 +111,25 @@ jobs:
           test -s "$PROJECT_DIR/tests/v12_cafe_front.png"
           test -s "$PROJECT_DIR/tests/v12_mart_front.png"
           test -s "$PROJECT_DIR/tests/v12_home_front.png"
+      - name: Capture V0.13 coherent cafe art and camera comparisons
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v13.gd 2>&1 | tee godot-v13-visual.log
+          grep -F 'V13 CAPTURE PASS:' godot-v13-visual.log
+          test -s "$PROJECT_DIR/tests/v13_cafe_same_camera.png"
+          test -s "$PROJECT_DIR/tests/v13_cafe_service.png"
+          test -s "$PROJECT_DIR/tests/v13_cafe_window.png"
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v012-godot-source-verified
+          name: lifesim-v013-godot-source-verified
           path: |
             lifesim/godot/
             !lifesim/godot/.godot/**
@@ -133,6 +149,8 @@ jobs:
             godot-v09-visual.log
             godot-v10-visual.log
             godot-v11-visual.log
+            godot-v13-visual.log
+            lifesim/godot/tests/v13_*.png
             godot-v12-visual.log
             lifesim/godot/tests/v11_*.png
             lifesim/godot/tests/v12_*.png
