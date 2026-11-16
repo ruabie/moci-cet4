@@ -6,7 +6,7 @@ const fs = require('node:fs');
 
 const BASE = 'https://ruabie.github.io/moci-cet4/kotoba/';
 const FILES = [
-  'book-data.js','vocab-13.js','vocab-14.js','vocab-15.js',
+  'book-data.js','vocab-03-page08.js','vocab-04.js','vocab-05.js','vocab-13.js','vocab-14.js','vocab-15.js',
   'vocab-16.js','extra-words.js','app.js','styles.css'
 ];
 const LOCAL = fs.readFileSync('kotoba/index.html', 'utf8');
