@@ -542,17 +542,28 @@ func _integrated_building(title: String, variant: String, origin: Vector3, size:
     root.position = Vector3(origin.x + side * size.x * 0.5, 0.0, origin.z)
     root.rotation.y = 0.0 if front_right else PI
     add_child(root)
-    var path: String = "res://art/architecture/v09_coffee_integrated.glb" if variant == "coffee" else "res://art/architecture/v08_%s_integrated.glb" % variant
+    var path: String = "res://art/architecture/v14_cafe_upper_only.glb" if variant == "coffee" else "res://art/architecture/v08_%s_integrated.glb" % variant
     var packed: PackedScene = load(path) as PackedScene
     if packed == null:
         push_error("V0.7 envelope missing: " + path)
         return
     var model: Node3D = packed.instantiate() as Node3D
-    model.name = "V09CuratedCafeAndInterior" if variant == "coffee" else "V08TexturedEnvelopeAndInterior"
+    model.name = "V14UpperStoreys" if variant == "coffee" else "V08TexturedEnvelopeAndInterior"
     root.add_child(model)
-    # Collision behind the front reveals; front face itself is not a full opaque slab.
-    _collision_box(root, Vector3(-size.x * .5 - .60, size.y * .5, 0),
-        Vector3(size.x - 1.2, size.y, size.z - .25))
+    if variant != "coffee":
+        _collision_box(root, Vector3(-size.x * .5 - .60, size.y * .5, 0),
+            Vector3(size.x - 1.2, size.y, size.z - .25))
+    else:
+        # The former collision filled the entire ground floor. It is now hollow.
+        _collision_box(root, Vector3(-size.x * .5 - .60, 8.4, 0.0),
+            Vector3(size.x - 1.2, 9.2, size.z - .25))
+        var wing: Material = _color("#c9b4a1", .84)
+        var edge: Material = _color("#6c746f", .69, .08)
+        for side in [-1.0, 1.0]:
+            var z: float = side * 6.6
+            _box(root, Vector3(-.13, 1.73, z), Vector3(.32, 3.46, 3.79), wing)
+            _box(root, Vector3(.08, 3.50, z), Vector3(.43, .20, 3.78), edge)
+            _collision_box(root, Vector3(-.13, 1.73, z), Vector3(.32, 3.46, 3.79))
     if variant == "coffee":
         _label(root, "KAWA 珈琲", Vector3(.80, 4.42, 4.35), 51, Color("#312823"))
         var evening_light := OmniLight3D.new()
