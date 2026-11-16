@@ -169,11 +169,11 @@ func run_contracts() -> void:
     if visual == null or not avatar.animation_verified:
         fail("V0.5 authored skinned avatar not initialized")
         return
-    if avatar.rig == null or avatar.rig.get_bone_count() < 15:
+    if avatar.rig == null or avatar.rig.get_bone_count() < 40:
         fail("V0.5 Skeleton3D missing or unrigged")
         return
     for required_name in ["LeftThigh", "RightThigh", "LeftShin", "RightShin"]:
-        if avatar.rig.find_bone(required_name) < 0:
+        if not CharacterArtV18.has_bone(avatar.rig, required_name):
             fail("V0.5 missing locomotion bone: " + required_name)
             return
     # Exercise actual physics movement and animated bone pose rather than
@@ -187,7 +187,7 @@ func run_contracts() -> void:
     if travelled < 0.10:
         fail("V0.5.1 input did not move player, displacement: %f" % travelled)
         return
-    var thigh_idx: int = avatar.rig.find_bone("LeftThigh")
+    var thigh_idx: int = avatar.rig.find_bone(CharacterArtV18.joint_name(avatar.rig, "LeftThigh"))
     var pose: Quaternion = avatar.rig.get_bone_pose_rotation(thigh_idx)
     if absf(pose.get_angle()) < 0.01:
         fail("V0.5.1 locomotion didn't update skinned left thigh")
@@ -216,6 +216,15 @@ func run_contracts() -> void:
     if district.get_node_or_null("AmbientResidents") == null:
         fail("V0.4 residents missing")
         return
+    # V0.18: distinct CC0 civilians all need real imported bone rigs.
+    if district.npc_figures.size() != 6 or district.npc_rigs.size() != 6:
+        fail("V18 expected six differently dressed residents")
+        return
+    for civilian_rig in district.npc_rigs:
+        if civilian_rig == null or civilian_rig.get_bone_count() < 40 or not CharacterArtV18.has_bone(civilian_rig, "LeftThigh"):
+            fail("V18 humanoid bone import failed")
+            return
+    print("V18 QA PASS: seven licensed civilians, actual rigged bone poses")
     if district.get_node_or_null("LifeQuestBoard") == null or district.get_node_or_null("RiversideParcelLocker") == null:
         fail("V0.6 task board and delivery destination missing")
         return
@@ -273,7 +282,7 @@ func run_contracts() -> void:
         fail("V0.5.1 NPC bone rigs do not match resident count")
         return
     for npc_rig in district.npc_rigs:
-        if npc_rig == null or npc_rig.get_bone_count() < 15:
+        if npc_rig == null or npc_rig.get_bone_count() < 40:
             fail("V0.5.1 unrigged resident")
             return
     var v13_cafe: CuratedInteriorsV13 = instance.get_node_or_null("CafeInterior") as CuratedInteriorsV13

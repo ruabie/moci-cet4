@@ -331,24 +331,20 @@ func _citizen_ellipsoid(parent: Node3D, pos: Vector3, dimensions: Vector3, mat: 
     inst.material_override = mat
     parent.add_child(inst)
 
-func _find_resident_skeleton(node: Node) -> Skeleton3D:
-    if node is Skeleton3D:
-        return node as Skeleton3D
-    for child in node.get_children():
-        var nested: Skeleton3D = _find_resident_skeleton(child)
-        if nested != null:
-            return nested
-    return null
-
 func _people() -> void:
     npc_root = Node3D.new()
     npc_root.name = "AmbientResidents"
     add_child(npc_root)
-    var residents: Array[PackedScene] = [
-        load("res://art/characters/resident_olive.glb"),
-        load("res://art/characters/resident_sand.glb"),
-        load("res://art/characters/commuter_rig.glb")
-    ]
+    var residents: Array[PackedScene] = []
+    for model_path in CharacterArtV18.RESIDENT_FILES:
+        var scene_resource: PackedScene = load(model_path) as PackedScene
+        if scene_resource == null:
+            push_error("V18 resident resource missing: " + model_path)
+        else:
+            residents.append(scene_resource)
+    if residents.size() != 6:
+        push_error("V18 expected six distinguishable street residents")
+        return
     var spots: Array[Vector3] = [Vector3(-10, 0, -15), Vector3(-9, 0, 16), Vector3(10, 0, -10), Vector3(8, 0, 24), Vector3(-11, 0, -55), Vector3(11, 0, 55)]
     for i in range(spots.size()):
         var npc := Node3D.new()
@@ -360,21 +356,17 @@ func _people() -> void:
         npc_root.add_child(npc)
         var figure: Node3D = residents[i % residents.size()].instantiate() as Node3D
         figure.name = "ResidentRigModel"
-        figure.scale = Vector3.ONE * (0.77 + float(i % 3) * 0.025)
         npc.add_child(figure)
-        var skeleton: Skeleton3D = _find_resident_skeleton(figure)
-        if skeleton == null or skeleton.find_bone("LeftThigh") < 0:
+        var normalized_height: float = CharacterArtV18.fit_to_height(figure, 1.62 + float(i % 3) * 0.08)
+        var skeleton: Skeleton3D = CharacterArtV18.find_rig(figure)
+        if normalized_height < 1.6 or skeleton == null or skeleton.get_bone_count() < 40:
             push_error("Missing resident Skeleton3D for " + npc.name)
         npc_rigs.append(skeleton)
         npc_figures.append(npc)
         _label(npc, str(npc.get_meta("resident_name")), Vector3(0, 2.6, 0), 28, Color("#e6d4b2"))
 
 func _resident_pose(rig: Skeleton3D, name: String, rotation: float) -> void:
-    if rig == null:
-        return
-    var idx: int = rig.find_bone(name)
-    if idx >= 0:
-        rig.set_bone_pose_rotation(idx, Quaternion(Vector3.RIGHT, rotation))
+    CharacterArtV18.pose(rig, name, rotation)
 
 func update_ambience(daylight: float, elapsed: float) -> void:
     for light in lamps:

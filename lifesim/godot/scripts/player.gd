@@ -3,7 +3,7 @@ class_name CityPlayer
 
 # V0.5: a self-contained glTF 2.0 skinned character, animated through Skeleton3D.
 # No external runtime asset/CDN dependency.
-const AVATAR_SCENE: String = "res://art/characters/commuter_rig.glb"
+const AVATAR_SCENE: String = CharacterArtV18.PLAYER_FILE
 const WALK_SPEED: float = 4.7
 const RUN_SPEED: float = 7.5
 const TURN_SPEED: float = 9.0
@@ -46,15 +46,18 @@ func _ready() -> void:
     if avatar == null:
         push_error("glTF character did not import as a 3D scene")
         return
-    avatar.name = "OriginalRiggedCommuter"
-    avatar.scale = Vector3.ONE * 0.90
+    avatar.name = "V18QuaterniusCivilian"
     character_visual.add_child(avatar)
-    rig = _find_skeleton(avatar)
-    if rig == null or rig.get_bone_count() < 15:
+    var height: float = CharacterArtV18.fit_to_height(avatar, 1.80)
+    if height < 1.7:
+        push_error("V18 avatar scale normalization failed")
+        return
+    rig = CharacterArtV18.find_rig(avatar)
+    if rig == null or rig.get_bone_count() < 40:
         push_error("Rigged avatar requires at least 15 Skeleton3D bones")
         return
     for required_bone in ["Hips", "Spine", "Chest", "Head", "LeftUpperArm", "RightUpperArm", "LeftThigh", "RightThigh", "LeftShin", "RightShin"]:
-        if rig.find_bone(required_bone) < 0:
+        if not CharacterArtV18.has_bone(rig, required_bone):
             push_error("glTF character is missing bone " + required_bone)
             return
     animation_verified = true
@@ -76,22 +79,8 @@ func _ready() -> void:
         Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
     _update_camera(0.0)
 
-func _find_skeleton(node: Node) -> Skeleton3D:
-    if node is Skeleton3D:
-        return node as Skeleton3D
-    for child in node.get_children():
-        var found: Skeleton3D = _find_skeleton(child)
-        if found != null:
-            return found
-    return null
-
 func _pose(name: String, x: float, y: float = 0.0) -> void:
-    if rig == null:
-        return
-    var bone: int = rig.find_bone(name)
-    if bone < 0:
-        return
-    rig.set_bone_pose_rotation(bone, Quaternion(Vector3.UP, y) * Quaternion(Vector3.RIGHT, x))
+    CharacterArtV18.pose(rig, name, x, y)
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
