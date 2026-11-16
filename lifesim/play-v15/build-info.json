@@ -1,0 +1,6 @@
+{
+  "version": "0.15",
+  "source_branch": "lifesim-v015-walkable-mart-camera",
+  "commit": "af0b6c0071a4869350fe58ad42edfe0c2afd0935",
+  "build_system": "Godot 4.7.2 Web single thread"
+}
