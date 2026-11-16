@@ -1,0 +1,217 @@
+name: LifeSim V0.13 curated art direction Web preview
+
+on:
+  push:
+    branches:
+      - lifesim-v013-art-direction
+    paths:
+      - '.github/workflows/lifesim-v013-web.yml'
+      - 'lifesim/godot/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lifesim-web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      PROJECT: 'lifesim/godot'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.7.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip" \
+            -o /tmp/godot-linux.zip
+          mkdir -p /tmp/godot-bin
+          unzip -q /tmp/godot-linux.zip -d /tmp/godot-bin
+          chmod +x "/tmp/godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "/tmp/godot-bin" >> "$GITHUB_PATH"
+      - name: Obtain official Web export templates (single-thread)
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz" \
+            -o /tmp/export_templates.tpz
+          DEST="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$DEST"
+          for template in web_nothreads_release.zip web_nothreads_debug.zip; do
+            unzip -p /tmp/export_templates.tpz "templates/$template" > "$DEST/$template"
+            test -s "$DEST/$template"
+            unzip -tq "$DEST/$template" >/dev/null
+          done
+      - name: Bundle OFL-licensed Simplified Chinese font for Web UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$PROJECT/art/fonts"
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf" \
+            -o "$PROJECT/art/fonts/NotoSansCJKsc-Regular.otf"
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/LICENSE" \
+            -o "$PROJECT/art/fonts/OFL-LICENSE.txt"
+          test "$(stat -c%s "$PROJECT/art/fonts/NotoSansCJKsc-Regular.otf")" -gt 1000000
+          grep -q "SIL OPEN FONT LICENSE" "$PROJECT/art/fonts/OFL-LICENSE.txt"
+          sha256sum "$PROJECT/art/fonts/NotoSansCJKsc-Regular.otf"
+      - name: Regenerate original glTF models and run static checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT/tools/build_assets.py"
+          python3 "$PROJECT/tools/build_street_v07.py"
+          python3 "$PROJECT/tools/build_street_v08.py"
+          python3 "$PROJECT/tools/build_coffee_v09.py"
+          python3 "$PROJECT/tests/check_v09_hero.py"
+          python3 "$PROJECT/tools/build_landscape_v10.py"
+          python3 "$PROJECT/tests/check_landscape_v10.py"
+          python3 "$PROJECT/tests/check_open_city_v11.py"
+          python3 "$PROJECT/tools/build_interiors_v12.py"
+          python3 "$PROJECT/tests/check_compact_interiors_v12.py"
+          python3 "$PROJECT/tools/build_art_v13.py"
+          python3 "$PROJECT/tests/check_art_v13.py"
+          python3 "$PROJECT/tests/check_authored_assets.py"
+          python3 "$PROJECT/tests/check_integrated_street.py"
+          python3 "$PROJECT/tests/check_pbr_street.py"
+          python3 "$PROJECT/tests/check_structure.py"
+          python3 "$PROJECT/tests/check_delimiters.py"
+          python3 "$PROJECT/tests/check_regressions.py"
+          python3 "$PROJECT/tests/check_visual_upgrade.py"
+      - name: Import assets and validate GDScript in Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          GODOT="/tmp/godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          "$GODOT" --headless --editor --path "$PROJECT" --import --quit 2>&1 | tee godot-web-import.log
+          ! grep -E 'SCRIPT ERROR|Parse Error|ERROR:.*Parse' godot-web-import.log
+      - name: Headless game, save, movement and V0.13 scene QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          GODOT="/tmp/godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          "$GODOT" --headless --path "$PROJECT" --script res://tests/qa_headless.gd 2>&1 | tee godot-web-qa.log
+          ! grep -E 'QA FAIL|SCRIPT ERROR|Parse Error' godot-web-qa.log
+          grep -F 'QA PASS:' godot-web-qa.log
+      - name: Export playable HTML5 build
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/lifesim-web"
+          GODOT="/tmp/godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          "$GODOT" --headless --path "$PROJECT" --export-release Web \
+            "$RUNNER_TEMP/lifesim-web/index.html" 2>&1 | tee godot-web-export.log
+          ! grep -E 'SCRIPT ERROR|Parse Error|ERROR:.*Parse|ERROR: Cannot export' godot-web-export.log
+          test -s "$RUNNER_TEMP/lifesim-web/index.html"
+          find "$RUNNER_TEMP/lifesim-web" -maxdepth 1 -type f -printf '%f %k KB\\n'
+          compgen -G "$RUNNER_TEMP/lifesim-web/*.wasm" >/dev/null
+          compgen -G "$RUNNER_TEMP/lifesim-web/*.pck" >/dev/null
+          compgen -G "$RUNNER_TEMP/lifesim-web/*.js" >/dev/null
+          cp -r "$RUNNER_TEMP/lifesim-web/." "$GITHUB_WORKSPACE/lifesim-web-build/"
+      - name: Validate built files are portable
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('lifesim-web-build')
+          assert (p/'index.html').is_file()
+          assert any(p.glob('*.wasm'))
+          assert any(p.glob('*.pck'))
+          assert any(p.glob('*.js'))
+          html=(p/'index.html').read_text(encoding='utf8')
+          assert 'Godot' in html or '.wasm' in html
+          print('WEB EXPORT PASS: HTML, WebAssembly, PCK, JS exist')
+          PY
+      - name: Upload web build for review; not automatically published
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v013-art-direction-build
+          path: lifesim-web-build/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v013-art-direction-logs
+          path: |
+            godot-web-import.log
+            godot-web-qa.log
+            godot-web-export.log
+          if-no-files-found: warn
+          retention-days: 14
+
+
+  publish-isolated-path:
+    name: Publish only lifesim/play-v13 to main without merging game source
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v013-art-direction' }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: lifesim-v013-art-direction-build
+          path: site-build
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: published-main
+          persist-credentials: true
+      - name: Verify existing repository site is preserved
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s published-main/index.html
+          test -e published-main/.nojekyll
+          test -s site-build/index.html
+          compgen -G "site-build/*.wasm" >/dev/null
+          compgen -G "site-build/*.pck" >/dev/null
+          compgen -G "site-build/*.js" >/dev/null
+          test ! -e published-main/lifesim/play-v13/index.html || grep -q 'Godot' published-main/lifesim/play-v13/index.html
+      - name: Copy only the new Web export to its isolated URL path
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p published-main/lifesim/play-v13
+          find published-main/lifesim/play-v13 -maxdepth 1 -type f -delete
+          cp -a site-build/. published-main/lifesim/play-v13/
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          (Path('published-main')/'lifesim'/'play-v13'/'build-info.json').write_text(
+              json.dumps({'version':'0.13','source_branch':'lifesim-v013-art-direction',
+                          'commit':os.environ['GITHUB_SHA'],
+                          'build_system':'Godot 4.7.2 Web single thread'},indent=2)+'\n')
+          PY
+          cd published-main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lifesim/play-v13
+          test -z "$(git diff --name-only -- . ':!lifesim/play-v13')" || { echo 'Unexpected modifications outside lifesim/play-v13'; exit 1; }
+          if git diff --cached --quiet; then
+            echo "Unchanged web files: no update needed"
+          else
+            git commit -m "deploy(lifesim): publish isolated V0.13 urban landscape Web build"
+            git push origin HEAD:main
+          fi
+      - name: Read GitHub Pages site status without altering it
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          gh api "repos/$GITHUB_REPOSITORY/pages" --jq '{url, status, build_type, source}' || true
+          echo "NOTE: GITHUB_TOKEN git push does not trigger branch-source Pages rebuild. A separate authenticated publish trigger is required."

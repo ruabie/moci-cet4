@@ -11,7 +11,7 @@ assets=set(Path(p['file']).name.removesuffix('.glb') for p in manifest['assets']
 refs=re.findall(r'_prop\("(?:furniture-kit|food-kit)"\s*,\s*"([\w-]+)"',source)
 missing=sorted(set(refs)-assets)
 assert not missing, f'V12 references unbundled CC0 assets: {missing}'
-assert 'CuratedInteriorsV12.new()' in main
+assert 'CuratedInteriorsV12.new()' in main or 'CuratedInteriorsV13.new()' in main  # subclass preserves V12 contracts
 assert 'v12_mart.displayed_products' in qa
 assert 'func _home' in source and 'func _cafe' in source and 'func _mart' in source
 assert 'room_dimensions = Vector2(w, d)' in source

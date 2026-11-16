@@ -276,6 +276,16 @@ func run_contracts() -> void:
         if npc_rig == null or npc_rig.get_bone_count() < 15:
             fail("V0.5.1 unrigged resident")
             return
+    var v13_cafe: CuratedInteriorsV13 = instance.get_node_or_null("CafeInterior") as CuratedInteriorsV13
+    if v13_cafe == null:
+        fail("V0.13 art-directed cafe missing")
+        return
+    if v13_cafe.quaternius_assets < 12 or v13_cafe.art_lights < 4 or v13_cafe.finish_systems < 4:
+        fail("V0.13 cafe authored geometry or lighting missing")
+        return
+    if v13_cafe.clear_aisle_width < 2.0 or v13_cafe.room_dimensions.x * v13_cafe.room_dimensions.y > 90.0:
+        fail("V0.13 cramped aisle or oversized cafe")
+        return
     print("QA PASS: V0.8 integrated facade and clock, old-save migration, daily quest idempotence, real-work payout, delivery, residents, photography, interiors, rigged characters, save and scene")
     instance.queue_free()
     ProjectSettings.set_setting("application/config/qa_mode", false)
