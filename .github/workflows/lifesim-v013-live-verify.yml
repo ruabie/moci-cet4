@@ -4,7 +4,7 @@ on:
   push:
     branches: [lifesim-v013-art-direction]
     paths:
-      - '.github/workflows/lifesim-v012-live-verify.yml'
+      - '.github/workflows/lifesim-v013-live-verify.yml'
       - 'lifesim/godot/scripts/main.gd'
   workflow_dispatch:
 
