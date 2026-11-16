@@ -49,7 +49,7 @@ func _capture() -> void:
         return
     var preview_root := Node3D.new()
     preview_root.name = "V18ArtLineupQAOnly"
-    preview_root.position = Vector3(132,0,0)
+    preview_root.position = Vector3(250,0,0)
     scene.add_child(preview_root)
     var floor := MeshInstance3D.new()
     var floor_mesh := BoxMesh.new()
@@ -65,16 +65,21 @@ func _capture() -> void:
         var res: PackedScene = load(CharacterArtV18.RESIDENT_FILES[i]) as PackedScene
         var figure: Node3D = res.instantiate() as Node3D
         preview_root.add_child(figure)
+        figure.rotation.y = PI
         figure.position.x = -5.2 + float(i)*2.0
         if CharacterArtV18.fit_to_height(figure,1.72) < 1.7:
             printerr("V18 CAPTURE FAIL: resident dimensions " + str(i))
             quit(1)
             return
+        var preview_rig: Skeleton3D = CharacterArtV18.find_rig(figure)
+        if preview_rig != null:
+            CharacterArtV18.pose(preview_rig, "LeftUpperArm", -1.13)
+            CharacterArtV18.pose(preview_rig, "RightUpperArm", -1.13)
     var preview_light := DirectionalLight3D.new()
     preview_light.rotation_degrees = Vector3(-50,-20,-10)
     preview_light.light_energy = .50
     preview_root.add_child(preview_light)
-    if not await _save_view("v18_six_residents",camera,Vector3(132,2.35,-12),Vector3(132,1.05,0)):
+    if not await _save_view("v18_six_residents",camera,Vector3(250,2.35,-12),Vector3(250,1.05,0)):
         quit(1)
         return
     ProjectSettings.set_setting("application/config/qa_mode", false)

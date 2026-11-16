@@ -356,6 +356,7 @@ func _people() -> void:
         npc_root.add_child(npc)
         var figure: Node3D = residents[i % residents.size()].instantiate() as Node3D
         figure.name = "ResidentRigModel"
+        figure.rotation.y = PI
         npc.add_child(figure)
         var normalized_height: float = CharacterArtV18.fit_to_height(figure, 1.62 + float(i % 3) * 0.08)
         var skeleton: Skeleton3D = CharacterArtV18.find_rig(figure)

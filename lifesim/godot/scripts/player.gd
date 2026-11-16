@@ -47,6 +47,8 @@ func _ready() -> void:
         push_error("glTF character did not import as a 3D scene")
         return
     avatar.name = "V18QuaterniusCivilian"
+    # The upstream FBX-converted CC0 rig points local +Z; our game walks -Z.
+    avatar.rotation.y = PI
     character_visual.add_child(avatar)
     var height: float = CharacterArtV18.fit_to_height(avatar, 1.80)
     if height < 1.7:
