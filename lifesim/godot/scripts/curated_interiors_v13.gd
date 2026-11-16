@@ -137,6 +137,7 @@ func _shell(theme: String) -> void:
     for point in [Vector3(-3.0,3.12,-1.8),Vector3(2.0,3.10,-2.6),Vector3(-3.0,3.04,2.10),Vector3(3.05,3.03,2.15)]:
         _light_at(point,Color("#ffe6c4"),.85,6.3)
     _light_at(Vector3(.2,2.8,3.10),Color("#d8e6e4"),.43,5.4)
+    _exterior_window_view()
     functional_zones.append("glazed-entrance")
 
 func _cafe() -> void:
@@ -206,3 +207,42 @@ func _cafe() -> void:
     functional_zones.append("window-banquette")
     functional_zones.append("reading-corner")
     functional_zones.append("table-seating")
+
+func _exterior_window_view() -> void:
+    # View-through-glass dressing for the current instanced cafe interior.
+    # This is *not* claimed as continuous exterior navigation. Visual only.
+    var sidewalk := _finish("terrazzo", Color("#c4c6c1"), .92)
+    var wall := _finish("plaster",Color("#aab1ac"), .91)
+    var brick := _material(Color("#837968"), .91)
+    var asphalt := _material(Color("#4d5657"), .97)
+    var frames := _material(Color("#3f5150"), .56, .12)
+    var window := _material(Color("#657779"), .15, .08)
+    var accent := _material(Color("#a28463"), .67)
+    # Ground plane must be continuous from the door sill to the street.
+    _panel(Vector3(0,-.13,6.20),Vector3(13.6,.21,3.65),sidewalk)
+    _panel(Vector3(0,-.12,8.04),Vector3(13.6,.21,.18),accent)
+    _panel(Vector3(0,-.23,12.0),Vector3(30,.17,7.9),asphalt)
+    _panel(Vector3(0,-.135,16.22),Vector3(30,.20,1.6),sidewalk)
+    # One unified opposite facade; recesses and rooflines give distance cues.
+    _panel(Vector3(0,4.20,18.4),Vector3(20,8.4,.38),wall)
+    _panel(Vector3(0,8.43,18.34),Vector3(20.4,.35,.58),brick)
+    _panel(Vector3(0,.58,18.15),Vector3(20,1.16,.20),brick)
+    for x in [-6.9,-3.25,.4,4.05,7.7]:
+        for y in [2.64,5.63]:
+            _panel(Vector3(x,y,18.16),Vector3(1.8,2.12,.09),frames)
+            _panel(Vector3(x,y,18.07),Vector3(1.57,1.88,.07),window)
+            _panel(Vector3(x,y,17.99),Vector3(.05,1.93,.11),accent)
+            _panel(Vector3(x,y,17.98),Vector3(1.63,.045,.11),accent)
+    # Shop curtain glow and modest tree soften the geometric background.
+    _panel(Vector3(0,1.45,18.03),Vector3(3.1,2.75,.09),frames)
+    _panel(Vector3(0,1.45,17.94),Vector3(2.82,2.47,.06),_material(Color("#c3ac85"),.91))
+    _panel(Vector3(0,3.31,17.98),Vector3(4.6,.59,.25),accent)
+    _light_at(Vector3(0,2.65,5.0),Color("#d0e8f0"),.36,6.4)
+    var tree: PackedScene = load("res://art/vegetation/zelkova_narrow.glb") as PackedScene
+    if tree != null:
+        var plant := tree.instantiate() as Node3D
+        plant.name="CafeWindowStreetTree"
+        plant.position=Vector3(-3.75,.01,9.2)
+        plant.scale=Vector3.ONE*.82
+        add_child(plant)
+    branded_details += 4
