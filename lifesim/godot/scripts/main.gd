@@ -184,7 +184,7 @@ func _simple_box(parent: Node3D, pos: Vector3, size: Vector3, color: Color, coll
         parent.add_child(b)
 
 func _create_home() -> void:
-    var room := CuratedInteriorsV12.new()
+    var room := CuratedInteriorsV13.new()
     room.name = "ApartmentInterior"
     room.position = Vector3(0, 0, 150)
     room.scale = Vector3(0.78, 1.0, 0.78)
@@ -193,7 +193,7 @@ func _create_home() -> void:
 
 func _create_business_interiors() -> void:
     for place in ["便利店", "咖啡馆"]:
-        var room := CuratedInteriorsV12.new()
+        var room := CuratedInteriorsV13.new()
         room.name = "MartInterior" if place == "便利店" else "CafeInterior"
         room.position = Vector3(0, 0, 190 if place == "便利店" else 222)
         room.scale = Vector3(0.78, 1.0, 0.78)
@@ -556,7 +556,7 @@ func _purchase_furniture(index: int) -> void:
     if not _commit_state(candidate):
         _notify("保存失败，本次购买没有生效。", 5.0)
         return
-    var room := get_node_or_null("ApartmentInterior") as CuratedInteriorsV12
+    var room := get_node_or_null("ApartmentInterior") as CuratedInteriorsV13
     if room != null:
         room.add_purchased_item(str(product[0]))
     shop_open = false
