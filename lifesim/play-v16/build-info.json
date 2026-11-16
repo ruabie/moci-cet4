@@ -1,6 +1,6 @@
 {
   "version": "0.16",
   "source_branch": "lifesim-v016-merchandising-art",
-  "commit": "3a4815d583b8288b3643bbb9001fc3cfc6e9fc69",
+  "commit": "53e44bc9c6101c0b0439a0cb272f464020b56b26",
   "build_system": "Godot 4.7.2 Web single thread"
 }
