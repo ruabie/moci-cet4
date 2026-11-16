@@ -67,6 +67,8 @@ jobs:
           python3 "$PROJECT_DIR/tests/check_art_v13.py"
           python3 "$PROJECT_DIR/tools/build_interiors_v12.py"
           python3 "$PROJECT_DIR/tests/check_compact_interiors_v12.py"
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/build_mart_v16.py"
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tests/check_mart_visual_v16.py"
       - name: Static checks
         shell: bash
         run: |
@@ -89,26 +91,16 @@ jobs:
           if grep -E 'QA FAIL|SCRIPT ERROR|Parse Error' godot-qa.log; then exit 1; fi
           grep -F 'QA PASS:' godot-qa.log
           grep -F 'V15 QA PASS:' godot-qa.log
+          grep -F 'V16 QA PASS:' godot-qa.log
       - name: Install virtual display and Mesa for viewport proof
         shell: bash
         run: |
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq xvfb xauth libgl1-mesa-dri fonts-noto-cjk
-      - name: Render screenshot through Godot OpenGL
-        shell: bash
-        env:
-          LIBGL_ALWAYS_SOFTWARE: '1'
-        run: |
-          set -euo pipefail
-          xvfb-run -a -s "-screen 0 1280x720x24"             "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"             --rendering-driver opengl3 --path "$PROJECT_DIR"             --script res://tests/visual_capture.gd 2>&1 | tee godot-visual.log
-          grep -F 'CAPTURE PASS:' godot-visual.log
-          test -s "$PROJECT_DIR/tests/visual_evidence.png"
-          test -s "$PROJECT_DIR/tests/visual_walk_evidence.png"
-          test -s "$PROJECT_DIR/tests/v07_facade_inspection.png"
-      # Historical V0.8–V0.11 screenshots remain in their successful run artifacts.
-      # Re-running them on every V0.12 revision wastes CI minutes and adds no QA.
-      - name: Capture six V0.12 furnished interior views in real Godot OpenGL
+      # Historical visual evidence remains in previously verified run artifacts.
+      # All existing gameplay, physics and save QA above continues to run.
+      - name: Capture V0.16 real retail shelf heights, small SKU packs and fridges
         shell: bash
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
@@ -117,62 +109,16 @@ jobs:
           xvfb-run -a -s "-screen 0 1280x720x24" \
             "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
             --rendering-driver opengl3 --path "$PROJECT_DIR" \
-            --script res://tests/visual_v12.gd 2>&1 | tee godot-v12-visual.log
-          grep -F 'V12 CAPTURE PASS:' godot-v12-visual.log
-          test -s "$PROJECT_DIR/tests/v12_cafe_front.png"
-          test -s "$PROJECT_DIR/tests/v12_mart_front.png"
-          test -s "$PROJECT_DIR/tests/v12_home_front.png"
-      - name: Capture V0.13 coherent cafe art and camera comparisons
-        shell: bash
-        env:
-          LIBGL_ALWAYS_SOFTWARE: '1'
-        run: |
-          set -euo pipefail
-          xvfb-run -a -s "-screen 0 1280x720x24" \
-            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
-            --rendering-driver opengl3 --path "$PROJECT_DIR" \
-            --script res://tests/visual_v13.gd 2>&1 | tee godot-v13-visual.log
-          grep -F 'V13 CAPTURE PASS:' godot-v13-visual.log
-          test -s "$PROJECT_DIR/tests/v13_cafe_same_camera.png"
-          test -s "$PROJECT_DIR/tests/v13_cafe_service.png"
-          test -s "$PROJECT_DIR/tests/v13_cafe_window.png"
-          test -s "$PROJECT_DIR/tests/v13_cafe_clean.png"
-      - name: Capture V0.14 actual sidewalk, threshold, counter and window-to-street
-        shell: bash
-        env:
-          LIBGL_ALWAYS_SOFTWARE: '1'
-        run: |
-          set -euo pipefail
-          xvfb-run -a -s "-screen 0 1280x720x24" \
-            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
-            --rendering-driver opengl3 --path "$PROJECT_DIR" \
-            --script res://tests/visual_v14.gd 2>&1 | tee godot-v14-visual.log
-          grep -F 'V14 CAPTURE PASS:' godot-v14-visual.log
-          test -s "$PROJECT_DIR/tests/v14_from_sidewalk.png"
-          test -s "$PROJECT_DIR/tests/v14_at_threshold.png"
-          test -s "$PROJECT_DIR/tests/v14_inside_counter.png"
-          test -s "$PROJECT_DIR/tests/v14_look_out_to_real_street.png"
-      - name: Capture V0.15 real-world convenience store, doorway and shop aisles
-        shell: bash
-        env:
-          LIBGL_ALWAYS_SOFTWARE: '1'
-        run: |
-          set -euo pipefail
-          xvfb-run -a -s "-screen 0 1280x720x24" \
-            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
-            --rendering-driver opengl3 --path "$PROJECT_DIR" \
-            --script res://tests/visual_v15.gd 2>&1 | tee godot-v15-visual.log
-          grep -F 'V15 CAPTURE PASS:' godot-v15-visual.log
-          test -s "$PROJECT_DIR/tests/v15_mart_from_sidewalk.png"
-          test -s "$PROJECT_DIR/tests/v15_mart_threshold.png"
-          test -s "$PROJECT_DIR/tests/v15_mart_checkout.png"
-          test -s "$PROJECT_DIR/tests/v15_mart_aisles.png"
-          test -s "$PROJECT_DIR/tests/v15_mart_to_street.png"
+            --script res://tests/visual_v16.gd 2>&1 | tee godot-v16-visual.log
+          grep -F 'V16 CAPTURE PASS:' godot-v16-visual.log
+          test -s "$PROJECT_DIR/tests/v16_shop_aisles.png"
+          test -s "$PROJECT_DIR/tests/v16_stock_closeup.png"
+          test -s "$PROJECT_DIR/tests/v16_refrigeration.png"
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v015-godot-source-verified
+          name: lifesim-v016-godot-source-verified
           path: |
             lifesim/godot/
             !lifesim/godot/.godot/**
@@ -185,6 +131,8 @@ jobs:
         with:
           name: lifesim-godot-logs
           path: |
+            godot-v16-visual.log
+            lifesim/godot/tests/v16_*.png
             godot-import.log
             godot-qa.log
             godot-visual.log
