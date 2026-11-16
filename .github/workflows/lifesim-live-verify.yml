@@ -1,8 +1,8 @@
-name: LifeSim V0.17 live public Chromium verification
+name: LifeSim V0.18 live public Chromium verification
 
 on:
   push:
-    branches: [lifesim-v017-refrigeration-art]
+    branches: [lifesim-v018-humanoid-art-pass]
     paths:
       - '.github/workflows/lifesim-live-verify.yml'
   workflow_dispatch:
@@ -15,20 +15,20 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - name: Confirm public V0.17 assets and exact edition
+      - name: Confirm public V0.18 assets and exact edition
         shell: bash
         run: |
           set -euo pipefail
-          BASE="https://ruabie.github.io/moci-cet4/lifesim/play-v17"
+          BASE="https://ruabie.github.io/moci-cet4/lifesim/play-v18"
           for retry in $(seq 1 36); do
             if curl -fsSL --retry 2 --connect-timeout 10 --max-time 50 "$BASE/build-info.json?check=$GITHUB_RUN_ID" -o /tmp/v17-info.json; then
-              if grep -q '"version": "0.17"' /tmp/v17-info.json && grep -q 'lifesim-v017-refrigeration-art' /tmp/v17-info.json; then break; fi
+              if grep -q '"version": "0.18"' /tmp/v17-info.json && grep -q 'lifesim-v018-humanoid-art-pass' /tmp/v17-info.json; then break; fi
             fi
             sleep 8
           done
           cat /tmp/v17-info.json
-          grep -q '"version": "0.17"' /tmp/v17-info.json
-          grep -q 'lifesim-v017-refrigeration-art' /tmp/v17-info.json
+          grep -q '"version": "0.18"' /tmp/v17-info.json
+          grep -q 'lifesim-v018-humanoid-art-pass' /tmp/v17-info.json
           for file in index.html index.js index.wasm index.pck; do
             curl -fLsS --head --connect-timeout 10 --max-time 45 "$BASE/$file" | grep -iE 'HTTP/|content-length'
           done
@@ -43,7 +43,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > /tmp/v17-browser.cjs <<'JS'
+          cat > /tmp/v18-browser.cjs <<'JS'
           const {chromium}=require(process.cwd()+'/node_modules/playwright');
           (async()=>{
             const browser=await chromium.launch({
@@ -56,7 +56,7 @@ jobs:
             const errors=[];
             page.on('pageerror',e=>errors.push(String(e)));
             page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
-            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v17/?qa=1',{waitUntil:'domcontentloaded',timeout:60000});
+            await page.goto('https://ruabie.github.io/moci-cet4/lifesim/play-v18/?qa=1',{waitUntil:'domcontentloaded',timeout:60000});
             const gl2=await page.evaluate(()=>!!document.createElement('canvas').getContext('webgl2'));
             if(!gl2)throw Error('Chromium did not expose WebGL2');
             await page.waitForFunction(()=>typeof window.__LIFESIM_QA__?.getState==='function',null,{timeout:85000});
@@ -64,7 +64,7 @@ jobs:
             const read=()=>page.evaluate(()=>window.__LIFESIM_QA__.getState());
             const before=await read();
             if(!Number.isFinite(before.x)||!Number.isFinite(before.z))throw Error('missing read-only game position');
-            await page.screenshot({path:'v17-public-start.png',fullPage:true});
+            await page.screenshot({path:'v18-public-start.png',fullPage:true});
             const canvas=page.locator('canvas');
             if(!await canvas.count())throw Error('Godot rendering canvas missing');
             await canvas.click({position:{x:630,y:440},force:true});
@@ -75,8 +75,8 @@ jobs:
             await page.waitForTimeout(1000);
             const after=await read();
             const moved=Math.hypot(after.x-before.x,after.z-before.z);
-            console.log('V17_REAL_MOVE',JSON.stringify({before,after,metres:moved}));
-            await page.screenshot({path:'v17-public-movement.png',fullPage:true});
+            console.log('V18_REAL_MOVE',JSON.stringify({before,after,metres:moved}));
+            await page.screenshot({path:'v18-public-movement.png',fullPage:true});
             if(moved<0.25 || moved>40)throw Error('published 3D game failed real keyboard movement: '+moved);
             // Verify the HUD shortcut by using the real keyboard, never a state mutation.
             await page.keyboard.down('h');
@@ -85,25 +85,25 @@ jobs:
             await page.waitForTimeout(800);
             await page.waitForFunction(previous => window.__LIFESIM_QA__?.getState()?.hud_visible !== previous, after.hud_visible, {timeout:30000,polling:400});
             const afterHud=await read();
-            console.log('V17_REAL_HUD',JSON.stringify({before:after.hud_visible,after:afterHud.hud_visible}));
-            await page.screenshot({path:'v17-public-hud-toggle.png',fullPage:true});
+            console.log('V18_REAL_HUD',JSON.stringify({before:after.hud_visible,after:afterHud.hud_visible}));
+            await page.screenshot({path:'v18-public-hud-toggle.png',fullPage:true});
             if(afterHud.hud_visible===after.hud_visible)throw Error('H keyboard HUD toggle failed');
-            console.log('V17_BROWSER_ERRORS',JSON.stringify(errors.slice(-15)));
+            console.log('V18_BROWSER_ERRORS',JSON.stringify(errors.slice(-15)));
             if(errors.some(s=>/Failed to load|WebGL|Unable to initialize|Missing Resource|Cannot open file|SCRIPT ERROR|Parse Error/i.test(s)))
               throw Error('Godot browser runtime errors: '+errors.join(' | '));
             await browser.close();
             console.log('V15 PUBLIC CHROMIUM REAL INPUT PASS (not an art-quality or Windows FPS certification)');
           })().catch(err=>{console.error(err);process.exit(1)});
           JS
-          node /tmp/v17-browser.cjs
+          node /tmp/v18-browser.cjs
       - name: Upload real browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v017-public-chromium-evidence
+          name: lifesim-v018-public-chromium-evidence
           path: |
-            v17-public-start.png
-            v17-public-movement.png
-            v17-public-hud-toggle.png
+            v18-public-start.png
+            v18-public-movement.png
+            v18-public-hud-toggle.png
           if-no-files-found: warn
           retention-days: 14
