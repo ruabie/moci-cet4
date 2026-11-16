@@ -1,0 +1,6 @@
+{
+  "version": "0.14",
+  "source_branch": "lifesim-v014-seamless-cafe",
+  "commit": "32304ca62febf6ee1edcaa01d38de4a6e0caae1d",
+  "build_system": "Godot 4.7.2 Web single thread"
+}
