@@ -26,9 +26,9 @@ func capture() -> void:
     camera.near = .07
     scene.add_child(camera)
     var frames: Array = [
-        ["v13_cafe_same_camera", Vector3(0, 2.8, 226.0), Vector3(-1.0, 1.5, 217.5)],
-        ["v13_cafe_service", Vector3(3.25, 2.45, 224.8), Vector3(-1.4, 1.35, 219.0)],
-        ["v13_cafe_window", Vector3(-2.5, 2.20, 221.3), Vector3(1.6, 1.45, 225.15)]
+        ["v13_cafe_same_camera", cafe.to_global(Vector3(0,2.8,4.0)), cafe.to_global(Vector3(-1.0,1.5,-4.5))],
+        ["v13_cafe_service", cafe.to_global(Vector3(3.25,2.45,2.8)), cafe.to_global(Vector3(-1.4,1.35,-3.0))],
+        ["v13_cafe_window", cafe.to_global(Vector3(-2.5,2.20,-.7)), cafe.to_global(Vector3(1.6,1.45,3.15))]
     ]
     for frame in frames:
         camera.global_position=frame[1]
