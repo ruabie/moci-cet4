@@ -47,7 +47,16 @@ static func pose(rig: Skeleton3D, semantic: String, pitch: float, yaw: float = 0
     var name: String = joint_name(rig, semantic)
     if name == "":
         return
-    rig.set_bone_pose_rotation(rig.find_bone(name), Quaternion(Vector3.UP, yaw) * Quaternion(Vector3.RIGHT, pitch))
+    var bone_idx: int = rig.find_bone(name)
+    # Quaternius imports an authored bind-pose quaternion for each bone.
+    # Overwriting that orientation with identity flips the entire torso/legs.
+    # Cache the imported initial pose once; animations are deltas from it.
+    var cache_key: String = "v18_bind_pose_" + str(bone_idx)
+    if not rig.has_meta(cache_key):
+        rig.set_meta(cache_key, rig.get_bone_pose_rotation(bone_idx))
+    var imported_bind: Quaternion = rig.get_meta(cache_key)
+    var motion: Quaternion = Quaternion(Vector3.UP, yaw) * Quaternion(Vector3.RIGHT, pitch)
+    rig.set_bone_pose_rotation(bone_idx, imported_bind * motion)
 
 static func _measure(node: Node, root_model: Node3D, bounds: Dictionary) -> void:
     if node is MeshInstance3D:
