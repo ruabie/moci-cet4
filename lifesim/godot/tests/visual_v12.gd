@@ -21,14 +21,15 @@ func capture() -> void:
             printerr("V12 CAPTURE FAIL: missing room zones " + room_name)
             quit(1)
             return
+    var cafe: Node3D = stage.get_node("CafeInterior") as Node3D
     var camera := Camera3D.new()
     camera.name = "V12EvidenceCamera"
     camera.fov = 66
     camera.near = .08
     stage.add_child(camera)
     var views: Array = [
-        ["v12_cafe_front", Vector3(0,2.8,226.0), Vector3(-1.0,1.5,217.5)],
-        ["v12_cafe_service", Vector3(3.95,2.55,224.1), Vector3(-2.0,1.5,218.55)],
+        ["v12_cafe_front", cafe.to_global(Vector3(0,2.8,4.0)), cafe.to_global(Vector3(-1.0,1.5,-4.5))],
+        ["v12_cafe_service", cafe.to_global(Vector3(3.95,2.55,2.1)), cafe.to_global(Vector3(-2.0,1.5,-3.45))],
         ["v12_mart_front", Vector3(0.2,2.8,194.2), Vector3(0,1.5,186.0)],
         ["v12_mart_aisles", Vector3(1.8,2.4,192.8), Vector3(-1.8,1.55,188.5)],
         ["v12_home_front", Vector3(.35,2.45,152.3), Vector3(-1.8,1.55,147.2)],

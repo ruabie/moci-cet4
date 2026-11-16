@@ -12,6 +12,7 @@ const FURNITURE: Array = [
 ]
 
 var city: CityBuilder
+var walkable_cafe: WalkableCafeV14
 var player: CityPlayer
 var state: Dictionary = {}
 var sun: DirectionalLight3D
@@ -196,13 +197,19 @@ func _create_home() -> void:
     room.build_home(state.get("owned_items", []))
 
 func _create_business_interiors() -> void:
-    for place in ["便利店", "咖啡馆"]:
+    for place in ["便利店"]:
         var room := CuratedInteriorsV13.new()
         room.name = "MartInterior" if place == "便利店" else "CafeInterior"
         room.position = Vector3(0, 0, 190 if place == "便利店" else 222)
         room.scale = Vector3(0.78, 1.0, 0.78)
         add_child(room)
         room.build_shop(place)
+    walkable_cafe = WalkableCafeV14.new()
+    walkable_cafe.name = "CafeInterior"
+    walkable_cafe.position = Vector3(22.5, 0.0, -14.0)
+    walkable_cafe.rotation.y = -PI * 0.5
+    add_child(walkable_cafe)
+    walkable_cafe.build_shop("咖啡馆")
 
 func _create_player() -> void:
     player = CityPlayer.new()
@@ -365,15 +372,20 @@ func _input(event: InputEvent) -> void:
     elif event.is_action_pressed("exit_interior"):
         if in_home:
             _leave_home()
-        elif indoor_place != "":
+        elif indoor_place == "便利店":
             _leave_business()
+        elif indoor_place == "咖啡馆":
+            _notify("咖啡馆与街道连通，直接朝玻璃门走即可出门。", 4.0)
 
 func _interact() -> void:
     if in_home:
         _leave_home()
         return
-    if indoor_place != "":
+    if indoor_place == "便利店":
         _leave_business()
+        return
+    if indoor_place == "咖啡馆":
+        _notify("从门口直接走回街道，无需切换场景。", 3.0)
         return
     match current_interaction:
         "公寓":
@@ -408,6 +420,10 @@ func _interact() -> void:
             _notify("靠近场所入口、居民或委托板，再按 E。", 3.0)
 
 func _enter_business(place: String) -> void:
+    if place == "咖啡馆":
+        # The entrance is a physical opening. Pressing E NEVER teleports.
+        _notify("KAWA 珈琲已营业：直接走入玻璃门，吧台按 J 打工、B 买咖啡。", 7.0)
+        return
     if not _save_progress():
         return
     indoor_place = place
@@ -595,6 +611,21 @@ func _buy_item() -> void:
     else:
         _notify("消费存档失败，余额没有变化。", 5.0)
 
+func _sync_walkable_cafe() -> void:
+    if walkable_cafe == null or player == null or in_home or indoor_place == "便利店":
+        return
+    var is_inside: bool = walkable_cafe.is_inside_world(player.global_position)
+    if is_inside and indoor_place == "":
+        indoor_place = "咖啡馆"
+        outdoor_camera_distance = player.camera_distance
+        player.camera_distance = minf(player.camera_distance, 2.9)
+        walkable_cafe.entry_events += 1
+        _notify("你已步行进入 KAWA 珈琲。橱窗外是真实的青川町。", 5.0)
+    elif not is_inside and indoor_place == "咖啡馆":
+        indoor_place = ""
+        player.camera_distance = outdoor_camera_distance
+        _notify("你已步行回到青川町街道。", 3.0)
+
 func _nearest_place() -> String:
     near_npc = -1
     if in_home:
@@ -633,6 +664,7 @@ func _process(delta: float) -> void:
         photo_preview.visible = false
     if notice_time <= 0.0 and ui_notice != null:
         ui_notice.text = ""
+    _sync_walkable_cafe()
     current_interaction = _nearest_place()
     if shop_open and current_interaction != "生活商店":
         shop_open = false
@@ -641,7 +673,10 @@ func _process(delta: float) -> void:
         ui_hint.text = "R 休息  ·  Q / E 返回街道  ·  T 日志"
     elif indoor_place != "":
         ui_place.text = "室内 · %s" % indoor_place
-        ui_hint.text = "J 工作  ·  B 消费  ·  K 接配送（便利店）  ·  Q / E 出门"
+        if indoor_place == "咖啡馆":
+            ui_hint.text = "与街道连续 · 直接走出玻璃门  ·  J 工作  ·  B 买咖啡"
+        else:
+            ui_hint.text = "J 工作  ·  B 消费  ·  K 接配送（便利店）  ·  Q / E 出门"
     elif current_interaction != "":
         ui_place.text = "附近：%s%s" % [current_interaction, (" · " + LifeContent.RESIDENTS[near_npc]) if near_npc >= 0 else ""]
         ui_hint.text = "E 互动 · J 工作 · K 配送 · B 购买 · P 拍照 · R 休息 · T 日志"
@@ -716,7 +751,7 @@ func _update_sun() -> void:
     ambient_env.environment.ambient_light_energy = 0.11 + daylight * 0.14
 
 func _commit_state(candidate: Dictionary) -> bool:
-    if player != null and not in_home and indoor_place == "":
+    if player != null and not in_home and indoor_place != "便利店":
         candidate["position"] = [player.position.x, player.position.y, player.position.z]
     candidate["at_home"] = in_home
     if not qa_mode and not CitySave.write_save(candidate):
