@@ -559,8 +559,8 @@ func _integrated_building(title: String, variant: String, origin: Vector3, size:
             Vector3(size.x - 1.2, 9.2, size.z - .25))
         var wing: Material = _color("#c9b4a1", .84)
         var edge: Material = _color("#6c746f", .69, .08)
-        for side in [-1.0, 1.0]:
-            var z: float = side * 6.6
+        for wing_sign in [-1.0, 1.0]:
+            var z: float = wing_sign * 6.6
             _box(root, Vector3(-.13, 1.73, z), Vector3(.32, 3.46, 3.79), wing)
             _box(root, Vector3(.08, 3.50, z), Vector3(.43, .20, 3.78), edge)
             _collision_box(root, Vector3(-.13, 1.73, z), Vector3(.32, 3.46, 3.79))
