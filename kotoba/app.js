@@ -8,6 +8,8 @@
   const $=id=>document.getElementById(id);
   const SUPPLEMENT_WORDS=Array.isArray(window.KOTOBA_SUPPLEMENTS)?window.KOTOBA_SUPPLEMENTS.filter(w=>w&&w.jp&&w.cn&&w.lesson):[];
   for(const entry of [
+    {id:'4',name:'日本－東と西－',cn:'日本——东与西',pages:'8–11',isPartial:false},
+    {id:'5',name:'戦国武将の天下統一',cn:'战国武将的天下统一',pages:'11–14',isPartial:true},
     {id:'14',name:'研修',cn:'研修',pages:'38–39',isPartial:false},
     {id:'15',name:'ゼミ',cn:'研讨课',pages:'39–42',isPartial:false},
     {id:'16',name:'忘年会',cn:'忘年会',pages:'42–46',isPartial:true}
