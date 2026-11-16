@@ -542,18 +542,18 @@ func _integrated_building(title: String, variant: String, origin: Vector3, size:
     root.position = Vector3(origin.x + side * size.x * 0.5, 0.0, origin.z)
     root.rotation.y = 0.0 if front_right else PI
     add_child(root)
-    var path: String = "res://art/architecture/v14_cafe_upper_only.glb" if variant == "coffee" else "res://art/architecture/v08_%s_integrated.glb" % variant
+    var path: String = "res://art/architecture/v14_cafe_upper_only.glb" if variant == "coffee" else ("res://art/architecture/v15_mart_upper_only.glb" if variant == "mart" else "res://art/architecture/v08_%s_integrated.glb" % variant)
     var packed: PackedScene = load(path) as PackedScene
     if packed == null:
         push_error("V0.7 envelope missing: " + path)
         return
     var model: Node3D = packed.instantiate() as Node3D
-    model.name = "V14UpperStoreys" if variant == "coffee" else "V08TexturedEnvelopeAndInterior"
+    model.name = "V14UpperStoreys" if variant == "coffee" else ("V15UpperStoreys" if variant == "mart" else "V08TexturedEnvelopeAndInterior")
     root.add_child(model)
-    if variant != "coffee":
+    if variant != "coffee" and variant != "mart":
         _collision_box(root, Vector3(-size.x * .5 - .60, size.y * .5, 0),
             Vector3(size.x - 1.2, size.y, size.z - .25))
-    else:
+    elif variant == "coffee":
         # The former collision filled the entire ground floor. It is now hollow.
         _collision_box(root, Vector3(-size.x * .5 - .60, 8.4, 0.0),
             Vector3(size.x - 1.2, 9.2, size.z - .25))
@@ -564,6 +564,25 @@ func _integrated_building(title: String, variant: String, origin: Vector3, size:
             _box(root, Vector3(-.13, 1.73, z), Vector3(.32, 3.46, 3.79), wing)
             _box(root, Vector3(.08, 3.50, z), Vector3(.43, .20, 3.78), edge)
             _collision_box(root, Vector3(-.13, 1.73, z), Vector3(.32, 3.46, 3.79))
+    if variant == "mart":
+        # Remove the old solid full-block collider; only upper-storey geometry
+        # and the two true street-level wings should block movement.
+        _collision_box(root, Vector3(-size.x*.5-.60, 7.1, 0), Vector3(size.x-1.2, 5.9, size.z-.25))
+        var wall_mat: Material = _color("#c0c5bd", .82)
+        var trim_mat: Material = _color("#445c57", .61, .22)
+        for direction in [-1.0, 1.0]:
+            var wing_z: float = direction * 7.27
+            _box(root, Vector3(2.21, 2.08, wing_z), Vector3(.40, 4.15, 2.55), wall_mat)
+            _box(root, Vector3(2.44, 4.11, wing_z), Vector3(.30, .19, 2.52), trim_mat)
+            _collision_box(root, Vector3(2.21, 2.08, wing_z), Vector3(.40, 4.15, 2.55))
+        _label(root, "AOI MART / 24H", Vector3(2.52, 4.29, 0), 40, Color("#edf5ed"))
+        var mart_glow := OmniLight3D.new()
+        mart_glow.name = "MartWindowWarmth"
+        mart_glow.position = Vector3(.5, 2.7, 0)
+        mart_glow.light_color = Color("#eef6e8")
+        mart_glow.light_energy = .48
+        mart_glow.omni_range = 9.0
+        root.add_child(mart_glow)
     if variant == "coffee":
         _label(root, "KAWA 珈琲", Vector3(.80, 4.42, 4.35), 51, Color("#312823"))
         var evening_light := OmniLight3D.new()
@@ -574,7 +593,7 @@ func _integrated_building(title: String, variant: String, origin: Vector3, size:
         evening_light.omni_range = 8.0
         evening_light.shadow_enabled = false
         root.add_child(evening_light)
-    else:
+    elif variant != "mart":
         _label(root, signage, Vector3(.49, 4.39, 0), 42, Color("#f0e8d6"))
 
 func _integrated_forecourts() -> void:

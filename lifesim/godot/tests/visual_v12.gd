@@ -22,6 +22,7 @@ func capture() -> void:
             quit(1)
             return
     var cafe: Node3D = stage.get_node("CafeInterior") as Node3D
+    var mart: Node3D = stage.get_node("MartInterior") as Node3D
     var camera := Camera3D.new()
     camera.name = "V12EvidenceCamera"
     camera.fov = 66
@@ -30,8 +31,8 @@ func capture() -> void:
     var views: Array = [
         ["v12_cafe_front", cafe.to_global(Vector3(0,2.8,4.0)), cafe.to_global(Vector3(-1.0,1.5,-4.5))],
         ["v12_cafe_service", cafe.to_global(Vector3(3.95,2.55,2.1)), cafe.to_global(Vector3(-2.0,1.5,-3.45))],
-        ["v12_mart_front", Vector3(0.2,2.8,194.2), Vector3(0,1.5,186.0)],
-        ["v12_mart_aisles", Vector3(1.8,2.4,192.8), Vector3(-1.8,1.55,188.5)],
+        ["v12_mart_front", mart.to_global(Vector3(.2,2.8,4.3)), mart.to_global(Vector3(0,1.5,-4.1))],
+        ["v12_mart_aisles", mart.to_global(Vector3(1.8,2.4,2.2)), mart.to_global(Vector3(-1.8,1.55,-3.7))],
         ["v12_home_front", Vector3(.35,2.45,152.3), Vector3(-1.8,1.55,147.2)],
         ["v12_home_corner", Vector3(3.15,2.4,151.5), Vector3(-3.1,1.35,147.2)]
     ]

@@ -30,7 +30,7 @@ if project.count('[application]') != 1:
     failures.append('Duplicate application section')
 source = '\n'.join(p.read_text() for p in (root / 'scripts').glob('*.gd'))
 for snippet in ('Time.get_datetime_dict_from_system', 'Time.get_unix_time_from_system',
-                'move_and_slide()', 'intersect_ray(', 'purchase(', 'pay_job_once(',
+                'move_and_slide()', 'cast_motion(', 'purchase(', 'pay_job_once(',
                 'write_save(', 'read_save(', 'OmniLight3D', 'CollisionShape3D',
                 'DirectionalLight3D', 'WorldEnvironment', 'get_vector('):
     if snippet not in source:
