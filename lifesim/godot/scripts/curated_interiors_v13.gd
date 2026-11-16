@@ -162,7 +162,7 @@ func _cafe() -> void:
         _detail_box(Vector3(3.30,level,-4.13),Vector3(2.30,.06,.38),oak)
     _detail_box(Vector3(3.31,1.64,-4.28),Vector3(2.57,1.92,.075),linen)
     _prop("furniture-kit","kitchencoffeemachine",Vector3(-3.52,1.10,-3.45),.54)
-    _prop("furniture-kit","kitchenblender",Vector3(-2.69,1.11,-3.51),.38)
+    # Keep the counter clear; the old kitchenblender reference was not in the bundled CC0 pack.
     _prop("furniture-kit","kitchenfridgesmall",Vector3(4.08,.02,-3.72),1.53,PI,true)
     _qprop("Shelf_Large",Vector3(3.38,.02,-3.94),2.14,PI,true)
     for k in range(9):
