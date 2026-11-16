@@ -48,5 +48,20 @@ func capture() -> void:
             quit(1)
             return
         print("V13 CAPTURE PASS: ",dest)
+    # Additional clean architectural proof with UI removed: not a game-HUD claim.
+    var hud: CanvasLayer = scene.get_node_or_null("HUD") as CanvasLayer
+    if hud != null:
+        hud.visible = false
+    camera.global_position = Vector3(3.25, 2.45, 224.8)
+    camera.look_at(Vector3(-1.4,1.35,219.0))
+    for k in range(26):
+        await process_frame
+    await RenderingServer.frame_post_draw
+    var clean: Image = root.get_texture().get_image()
+    if clean == null or clean.is_empty() or clean.save_png("res://tests/v13_cafe_clean.png") != OK:
+        printerr("V13 CAPTURE FAIL: clean art evidence")
+        quit(1)
+        return
+    print("V13 CAPTURE PASS: res://tests/v13_cafe_clean.png")
     scene.queue_free()
     quit(0)
