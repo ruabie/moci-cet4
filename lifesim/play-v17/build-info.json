@@ -1,0 +1,6 @@
+{
+  "version": "0.17",
+  "source_branch": "lifesim-v017-refrigeration-art",
+  "commit": "6616887de39ba3a3f1e72f3be3454535806c312f",
+  "build_system": "Godot 4.7.2 Web single thread"
+}
