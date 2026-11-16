@@ -350,6 +350,14 @@ func run_contracts() -> void:
         if curated.get_node_or_null("V16_Stock_" + sku) == null:
             fail("V16 optimized stock batch not rendered: " + sku)
             return
+    # V0.17: inspect the actual runtime instantiation, not only GLB files.
+    var v17: WalkableMartV17 = mart as WalkableMartV17
+    if v17 == null or v17.open_refrigerator_bays != 3 or v17.refrigerated_skus != 72:
+        fail("V17 art: refrigerators are missing or incorrectly stocked")
+        return
+    if v17.cold_led_strips != 6 or v17.finish_surfaces < 3:
+        fail("V17 art: in-cabinet LEDs and original material surfaces not loaded")
+        return
     var mart_approach: Vector3 = mart.street_door_world()
     var mart_in: Vector3 = mart.interior_probe_world()
     if mart.is_inside_world(mart_approach) or not mart.is_inside_world(mart_in):
@@ -406,6 +414,7 @@ func run_contracts() -> void:
         fail("V15 camera collision failed to retract behind wall")
         return
     test_wall.queue_free()
+    print("V17 QA PASS: 3 recessed fridges / 72 chilled goods / 6 LED rails / 3 texture surfaces")
     print("V16 QA PASS: walkable four-rack mart, 170+ stocked instances, coherent lighting")
     print("V15 QA PASS: walkable mart/cafe, reversible physical doors, bounded camera collision, unchanged save/economy")
     print("QA PASS: V0.8 integrated facade and clock, old-save migration, daily quest idempotence, real-work payout, delivery, residents, photography, interiors, rigged characters, save and scene")
