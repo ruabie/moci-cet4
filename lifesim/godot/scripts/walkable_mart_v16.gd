@@ -86,6 +86,11 @@ func _rack(center: Vector3, frame: Material, deck: Material) -> void:
     for xoff in [-.68,.68]:
         for zoff in [-1.20,1.20]:
             _panel(center+Vector3(xoff,.85,zoff),Vector3(.05,1.47,.06),frame)
+    # Warm paper price rails are attached to each tier, not floating signage.
+    var rail: Material = _vmat("#ddd3b9", .80)
+    for level in [.48,.92,1.36]:
+        for side in [-1.0,1.0]:
+            _panel(center+Vector3(side*.74,level-.075,0),Vector3(.038,.10,2.48),rail)
     rack_count += 1
     collidable_assets += 1
 
@@ -102,10 +107,10 @@ func _stock_rack(center: Vector3, salt: int) -> void:
         var shelf: float = [.48,.92,1.36][tier]
         for side in range(2):
             var x: float = center.x + (-.41 if side == 0 else .41)
-            for k in range(5):
+            for k in range(7):
                 var sku: String = SKU_IDS[(salt*3+tier*2+k+side)%SKU_IDS.size()]
                 var ph: float = .245 + .023*float((k+salt+tier)%3)
-                var z: float = center.z - .94 + .47*float(k)
+                var z: float = center.z - .99 + .33*float(k)
                 _stock_item(sku,Vector3(x,shelf+.045+ph*.5,z),ph,PI*.5 if side==0 else -PI*.5)
 
 func _stock_fridge(center_x: float, start: int) -> void:
@@ -135,8 +140,18 @@ func _finalize_stock() -> void:
             continue
         var mat: StandardMaterial3D = _vmat("#ffffff",.82)
         mat.albedo_texture = load(SKU_ROOT + "pack_" + sku + ".png") as Texture2D
-        var pack: BoxMesh = BoxMesh.new()
-        pack.size = Vector3(.18,1.0,.12)
+        var pack: PrimitiveMesh
+        if sku in ["ocha", "coffee", "juice"]:
+            var can: CylinderMesh = CylinderMesh.new()
+            can.height = 1.0
+            can.top_radius = .108
+            can.bottom_radius = .108
+            can.radial_segments = 16
+            pack = can
+        else:
+            var carton: BoxMesh = BoxMesh.new()
+            carton.size = Vector3(.18,1.0,.12)
+            pack = carton
         pack.material = mat
         var mm: MultiMesh = MultiMesh.new()
         mm.transform_format = MultiMesh.TRANSFORM_3D

@@ -340,7 +340,7 @@ func run_contracts() -> void:
         fail("V15 mart not furnished at usable scale")
         return
     var curated: WalkableMartV16 = mart as WalkableMartV16
-    if curated == null or curated.rack_count != 4 or curated.stocked_sku_instances < 170:
+    if curated == null or curated.rack_count != 4 or curated.stocked_sku_instances < 240:
         fail("V16 curated shelves / real-size stock missing")
         return
     if curated.lit_fixture_count != 4 or curated.shelf_clear_center_width < 2.30:

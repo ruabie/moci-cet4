@@ -14,13 +14,16 @@ func _capture() -> void:
     root.add_child(stage)
     await process_frame
     var mart: WalkableMartV16 = stage.get_node_or_null("MartInterior") as WalkableMartV16
-    if mart == null or mart.stocked_sku_instances < 170 or mart.rack_count != 4:
+    if mart == null or mart.stocked_sku_instances < 240 or mart.rack_count != 4:
         printerr("V16 CAPTURE FAIL: custom mart not created")
         quit(1)
         return
     var avatar: Node3D = stage.get_node_or_null("Player") as Node3D
     if avatar != null:
         avatar.visible = false
+    var hud: CanvasLayer = stage.get_node_or_null("HUD") as CanvasLayer
+    if hud != null:
+        hud.visible = false
     var cam: Camera3D = Camera3D.new()
     cam.fov = 69
     stage.add_child(cam)
