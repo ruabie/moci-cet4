@@ -37,6 +37,16 @@ jobs:
           done
           curl --fail --location --silent --show-error \
             "$BASE/build-info.json?qa-check=$GITHUB_RUN_ID" -o /tmp/build-info.json
+          # Do not accidentally certify a cached/older Pages build.
+          EXPECTED="0780421ca766e4c5da549b04b81bc51a5e11a4f1"
+          for i in $(seq 1 18); do
+            curl --fail --silent --location \
+              "$BASE/build-info.json?revision=$EXPECTED&retry=$i" -o /tmp/build-info.json
+            if grep -q "$EXPECTED" /tmp/build-info.json; then break; fi
+            echo "Waiting for latest V0.13 Pages revision ($i)"
+            sleep 10
+          done
+          grep -q "$EXPECTED" /tmp/build-info.json
           cat /tmp/build-info.json
           grep -q '"version": "0.13"' /tmp/build-info.json
           grep -q '"source_branch": "lifesim-v013-art-direction"' /tmp/build-info.json
@@ -138,7 +148,7 @@ jobs:
             await page.screenshot({path:'lifesim-v13-movement.png',fullPage:true});
             console.log('BROWSER_CHECK',JSON.stringify({gl2,info,messages:messages.slice(-10)}));
             await browser.close();
-            if(!gl2||!info.canvas||messages.some(x=>/Failed to load|WebGL|error loading|Unable to initialize/i.test(x)))
+            if(!gl2||!info.canvas||messages.some(x=>/ERROR:|SCRIPT ERROR:|Failed to load|WebGL|error loading|Unable to initialize/i.test(x)))
               process.exit(1);
             console.log('BROWSER WEBGL2 SMOKE PASS (not a gameplay-quality guarantee)');
           })().catch(err=>{console.error(err);process.exit(1)});
