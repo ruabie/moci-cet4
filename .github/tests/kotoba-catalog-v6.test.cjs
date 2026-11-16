@@ -5,12 +5,12 @@ const vm=require('node:vm');
 const read=p=>fs.readFileSync(p,'utf8');
 const dataContext={window:{}};
 vm.createContext(dataContext);
-for(const p of ['kotoba/book-data.js','kotoba/vocab-13.js','kotoba/vocab-14.js','kotoba/vocab-15.js','kotoba/vocab-16.js'])vm.runInContext(read(p),dataContext,{filename:p});
+for(const p of ['kotoba/book-data.js','kotoba/vocab-03-page08.js','kotoba/vocab-04.js','kotoba/vocab-05.js','kotoba/vocab-13.js','kotoba/vocab-14.js','kotoba/vocab-15.js','kotoba/vocab-16.js'])vm.runInContext(read(p),dataContext,{filename:p});
 const source=dataContext.window.KOTOBA_BOOK;
 const added=dataContext.window.KOTOBA_SUPPLEMENTS;
 assert.ok(Array.isArray(source.words)&&source.words.length>=250,'Original textbook corpus retained');
-assert.equal(added.length,372,'All supplementary entries must be present');
-const lessonCounts={'13':118,'14':37,'15':79,'16':138};
+assert.equal(added.length,543,'All supplementary entries must be present');
+const lessonCounts={'3':18,'4':61,'5':92,'13':118,'14':37,'15':79,'16':138};
 for(const [lesson,count] of Object.entries(lessonCounts))assert.equal(added.filter(x=>x.lesson===lesson).length,count,'unexpected number of '+lesson+' entries');
 const printed=new Set();
 for(const w of added){
@@ -40,7 +40,7 @@ const validVersion=ref=>{
   const v=ref.split('?v=')[1];
   return !!v&&v.split('.').every(part=>part.length>0&&[...part].every(ch=>ch>='0'&&ch<='9'));
 };
-for(const file of ['book-data.js','vocab-13.js','vocab-14.js','vocab-15.js','vocab-16.js','extra-words.js','app.js','styles.css']){
+for(const file of ['book-data.js','vocab-03-page08.js','vocab-04.js','vocab-05.js','vocab-13.js','vocab-14.js','vocab-15.js','vocab-16.js','extra-words.js','app.js','styles.css']){
   assert.ok(assetRefs.some(ref=>ref.startsWith(file+'?v=')&&validVersion(ref)),
     'Missing versioned script or stylesheet '+file);
 }
@@ -91,10 +91,24 @@ function course(el,id){
   return result;
 }
 const el=boot();
+const c3=course(el,'3');
+const c4=course(el,'4');
+const c5=course(el,'5');
 const c13=course(el,'13');
 const c14=course(el,'14');
 const c15=course(el,'15');
 const c16=course(el,'16');
+assert.ok(c4.size===61&&c5.size===92,'Lesson 4/5 photograph corpus incomplete');
+assert.equal(c4.get('異なる').cn,'不同，不一样');
+assert.equal(c4.get('物産').cn,'物产；特产');
+assert.equal(c4.get('海水浴').cn,'海水浴');
+assert.equal(c4.get('スポーツサークル').cn,'体育社团');
+assert.equal(c5.get('戦国').cn,'战国');
+assert.equal(c5.get('幕藩').cn,'幕藩（体制）');
+assert.equal(c5.get('明').kana,'みん');
+assert.equal(c5.get('羅針盤').cn,'罗盘，指南针');
+assert.equal(c5.get('話が弾む').cn,'聊得起劲');
+assert.equal(c3.get('立春').cn,'立春');
 assert.ok(c13.size>=110&&c14.size>=35&&c15.size>=70&&c16.size>=125,'Lesson corpus unexpectedly small');
 assert.equal(c13.get('メニュー').cn,'菜单','Previous approximate gloss must be replaced by new photo');
 assert.ok(c13.get('上げる').cn.includes('举，抬')&&c13.get('上げる').cn.includes('发出（声音）'),'Multiple original senses retained');
@@ -105,6 +119,6 @@ assert.equal(c15.get('新入部員').kana,'しんにゅうぶいん');
 assert.equal(c16.get('住民票').cn,'居民卡');
 const totalUnique=new Set([...source.words,...added].map(x=>x.jp));
 assert.equal(Number(el('totalWords').textContent),totalUnique.size,'Large library must dedupe words');
-console.log('Catalog V6 verified: original '+source.words.length+', photo records '+added.length+
- ', unique total '+totalUnique.size+', course cards '+[c13.size,c14.size,c15.size,c16.size].join('/')+
+console.log('Catalog V7 verified: original '+source.words.length+', photo records '+added.length+
+ ', unique total '+totalUnique.size+', course cards '+[c4.size,c5.size,c13.size,c14.size,c15.size,c16.size].join('/')+
  ', source Chinese gloss, POS study-only, cross-lesson meanings and prior words preserved.');
