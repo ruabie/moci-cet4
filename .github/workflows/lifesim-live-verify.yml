@@ -83,6 +83,7 @@ jobs:
             await page.waitForTimeout(1200);
             await page.keyboard.up('h');
             await page.waitForTimeout(800);
+            await page.waitForFunction(previous => window.__LIFESIM_QA__?.getState()?.hud_visible !== previous, after.hud_visible, {timeout:30000,polling:400});
             const afterHud=await read();
             console.log('V15_REAL_HUD',JSON.stringify({before:after.hud_visible,after:afterHud.hud_visible}));
             await page.screenshot({path:'v15-public-hud-toggle.png',fullPage:true});
