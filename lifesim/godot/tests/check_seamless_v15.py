@@ -6,7 +6,7 @@ r = Path(__file__).resolve().parents[1]
 main = (r/'scripts/main.gd').read_text(encoding='utf8')
 city = (r/'scripts/city_builder.gd').read_text(encoding='utf8')
 player = (r/'scripts/player.gd').read_text(encoding='utf8')
-assert any(n in main for n in ('walkable_mart = WalkableMartV15.new()', 'walkable_mart = WalkableMartV16.new()'))
+assert any(n in main for n in ('walkable_mart = WalkableMartV15.new()', 'walkable_mart = WalkableMartV16.new()', 'walkable_mart = WalkableMartV17.new()'))
 assert 'walkable_mart.build_shop("便利店")' in main
 assert 'walkable_mart.position = Vector3(-22.35, 0.0, -14.0)' in main
 assert '_sync_walkable_mart()' in main
