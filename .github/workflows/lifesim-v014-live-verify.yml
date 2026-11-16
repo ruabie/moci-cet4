@@ -73,7 +73,7 @@ jobs:
             console.log('V14_MOVE',JSON.stringify({afterE,moved}));
             if(Math.hypot(moved.x-afterE.x,moved.z-afterE.z)<.6)
               throw new Error('W key did not move the avatar more than 0.6m');
-            if(!gl2 || !document)throw new Error('WebGL2 missing');
+            if(!gl2)throw new Error('WebGL2 missing');
             if(errors.some(x=>/SCRIPT ERROR|ERROR:|Failed to load|Unable to initialize|WebGL/i.test(x)))
               throw new Error('Browser game error: '+errors.slice(-8).join(' / '));
             console.log('V14 BROWSER PASS: public 3D game renders, E never teleports, W moves, no asset errors');
