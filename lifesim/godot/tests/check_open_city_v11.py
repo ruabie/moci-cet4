@@ -26,7 +26,7 @@ for a in manifest['assets']:
 for script in ('scripts/curated_interiors_v11.gd','scripts/licensed_block_v11.gd'):
     assert (root/script).exists()
 s = (root/'scripts/main.gd').read_text(encoding='utf8')
-assert 'room.build_shop(place)' in s and 'room.build_home(' in s
+assert 'walkable_mart.build_shop("便利店")' in s and 'room.build_home(' in s
 assert 'room.add_purchased_item(' in s
 city=(root/'scripts/city_builder.gd').read_text(encoding='utf8')
 assert 'LicensedBlockV11.new()' in city

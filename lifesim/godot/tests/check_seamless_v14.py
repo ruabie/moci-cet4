@@ -5,7 +5,7 @@ source = (base / "scripts/main.gd").read_text(encoding="utf8")
 assert 'class_name WalkableCafeV14' in (base / "scripts/walkable_cafe_v14.gd").read_text(encoding="utf8")
 assert 'walkable_cafe.position = Vector3(22.5, 0.0, -14.0)' in source
 assert 'walkable_cafe.build_shop("咖啡馆")' in source
-assert 'if place == "咖啡馆":\n        # The entrance is a physical opening.' in source
+assert 'if place in ["咖啡馆", "便利店"]:' in source
 assert '_exterior_window_view() -> void:' in (base / "scripts/walkable_cafe_v14.gd").read_text(encoding="utf8")
 assert 'V14UpperStoreys' in (base / "scripts/city_builder.gd").read_text(encoding="utf8")
 upper = trimesh.load(base / "art/architecture/v14_cafe_upper_only.glb", force="scene")

@@ -193,8 +193,8 @@ func run_contracts() -> void:
         fail("V0.5.1 locomotion didn't update skinned left thigh")
         return
     var district: Node = instance.get_node_or_null("AokawaDistrict")
-    if district.get_node_or_null("Authored_AOI_MART__·__24H/V08TexturedEnvelopeAndInterior") == null:
-        fail("V0.8 integrated mart model missing")
+    if district.get_node_or_null("Authored_AOI_MART__·__24H/V15UpperStoreys") == null:
+        fail("V15 integrated mart upper shell missing")
         return
     if district.get_node_or_null("V10DistantUrbanBackdrop") == null:
         fail("V0.10 differentiated skyline is not loaded")
@@ -330,6 +330,72 @@ func run_contracts() -> void:
         fail("V14 could not physically leave cafe: pos=" + str(avatar.global_position) + " indoor=" + str(instance.indoor_place))
         return
     print("V14 QA PASS: genuine contiguous street/interior, threshold ray, actual physical entry and exit")
+    # V0.15: the convenience store is also in the actual road scene. No
+    # isolated z=190 teleport, no opaque solid collider through its entrance.
+    var mart: WalkableMartV15 = instance.get_node_or_null("MartInterior") as WalkableMartV15
+    if mart == null or mart.global_position.distance_to(Vector3(-22.35,0,-14)) > .01:
+        fail("V15 mart is still off-map or missing")
+        return
+    if mart.room_dimensions.x < 11.0 or mart.displayed_products < 45:
+        fail("V15 mart not furnished at usable scale")
+        return
+    var mart_approach: Vector3 = mart.street_door_world()
+    var mart_in: Vector3 = mart.interior_probe_world()
+    if mart.is_inside_world(mart_approach) or not mart.is_inside_world(mart_in):
+        fail("V15 mart physical doorway invalid")
+        return
+    var mart_ray := PhysicsRayQueryParameters3D.create(
+        mart.to_global(Vector3(0,1.2,8.0)),
+        mart.to_global(Vector3(0,1.2,3.3)), 1)
+    if not avatar.get_world_3d().direct_space_state.intersect_ray(mart_ray).is_empty():
+        fail("V15 mart storefront collider blocks open doorway")
+        return
+    avatar.global_position = mart_approach
+    avatar.camera_yaw = PI * .5
+    avatar.velocity = Vector3.ZERO
+    instance.indoor_place = ""
+    Input.action_press("move_forward")
+    for ticks in range(56):
+        await physics_frame
+        await process_frame
+    Input.action_release("move_forward")
+    if not mart.is_inside_world(avatar.global_position) or instance.indoor_place != "便利店":
+        fail("V15 cannot walk into street-level mart: " + str(avatar.global_position))
+        return
+    if avatar.global_position.distance_to(mart_approach) > 7.5:
+        fail("V15 unintended mart teleport on entry")
+        return
+    Input.action_press("move_back")
+    for ticks in range(105):
+        await physics_frame
+        await process_frame
+    Input.action_release("move_back")
+    if mart.is_inside_world(avatar.global_position) or instance.indoor_place != "":
+        fail("V15 cannot walk back out of street-level mart")
+        return
+    # Camera near an injected opaque wall: actual physics sweep must retract
+    # behind it rather than let the third-person view pass through the wall.
+    avatar.global_position = Vector3(0, .2, 0)
+    avatar.camera_yaw = 0.0
+    avatar.camera_pitch = 0.0
+    avatar.camera_distance = 4.6
+    var test_wall := StaticBody3D.new()
+    test_wall.collision_layer = 1
+    var wall_shape := CollisionShape3D.new()
+    var wall_box := BoxShape3D.new()
+    wall_box.size = Vector3(5.0, 3.4, .35)
+    wall_shape.shape = wall_box
+    test_wall.add_child(wall_shape)
+    root.add_child(test_wall)
+    test_wall.global_position = Vector3(0, 1.65, 2.6)
+    avatar.camera_collision_activations = 0
+    for ticks in range(18):
+        await physics_frame
+    if avatar.camera_collision_activations == 0 or avatar.camera.global_position.z > 2.4:
+        fail("V15 camera collision failed to retract behind wall")
+        return
+    test_wall.queue_free()
+    print("V15 QA PASS: walkable mart/cafe, reversible physical doors, bounded camera collision, unchanged save/economy")
     print("QA PASS: V0.8 integrated facade and clock, old-save migration, daily quest idempotence, real-work payout, delivery, residents, photography, interiors, rigged characters, save and scene")
     instance.queue_free()
     ProjectSettings.set_setting("application/config/qa_mode", false)

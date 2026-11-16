@@ -8,7 +8,7 @@ city = (root / 'scripts' / 'city_builder.gd').read_text(encoding='utf-8')
 main = (root / 'scripts' / 'main.gd').read_text(encoding='utf-8')
 checks = {
  'actual skinned glTF locomotion': all(x in player for x in ['Skeleton3D','LeftThigh','RightThigh','LeftShin','RightShin','anim_weight']),
- 'camera occlusion': 'intersect_ray(query)' in player,
+ 'camera occlusion': 'cast_motion(camera_sweep_query)' in player,
  'integrated sample facades and planters': '_integrated_building(' in city and '_planter(' in city,
  'local paving textures': all((root / 'art' / 'textures' / name).stat().st_size > 500 for name in ['asphalt.png','concrete.png','stucco.png']),
  'ambient residents': 'AmbientResidents' in city and 'npc.rotation.y = atan2(' in city,

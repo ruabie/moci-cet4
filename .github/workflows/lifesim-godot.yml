@@ -56,8 +56,10 @@ jobs:
           python3 "$PROJECT_DIR/tests/check_pbr_street.py"
           python3 "$PROJECT_DIR/tools/build_coffee_v09.py"
           /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/build_upper_cafe_v14.py"
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/build_upper_mart_v15.py"
           python3 "$PROJECT_DIR/tests/check_v09_hero.py"
           /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tests/check_seamless_v14.py"
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tests/check_seamless_v15.py"
           python3 "$PROJECT_DIR/tools/build_landscape_v10.py"
           python3 "$PROJECT_DIR/tests/check_landscape_v10.py"
           python3 "$PROJECT_DIR/tests/check_open_city_v11.py"
@@ -86,6 +88,7 @@ jobs:
           "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"             --headless --path "$PROJECT_DIR" --script res://tests/qa_headless.gd 2>&1 | tee godot-qa.log
           if grep -E 'QA FAIL|SCRIPT ERROR|Parse Error' godot-qa.log; then exit 1; fi
           grep -F 'QA PASS:' godot-qa.log
+          grep -F 'V15 QA PASS:' godot-qa.log
       - name: Install virtual display and Mesa for viewport proof
         shell: bash
         run: |
@@ -149,11 +152,27 @@ jobs:
           test -s "$PROJECT_DIR/tests/v14_at_threshold.png"
           test -s "$PROJECT_DIR/tests/v14_inside_counter.png"
           test -s "$PROJECT_DIR/tests/v14_look_out_to_real_street.png"
+      - name: Capture V0.15 real-world convenience store, doorway and shop aisles
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v15.gd 2>&1 | tee godot-v15-visual.log
+          grep -F 'V15 CAPTURE PASS:' godot-v15-visual.log
+          test -s "$PROJECT_DIR/tests/v15_mart_from_sidewalk.png"
+          test -s "$PROJECT_DIR/tests/v15_mart_threshold.png"
+          test -s "$PROJECT_DIR/tests/v15_mart_checkout.png"
+          test -s "$PROJECT_DIR/tests/v15_mart_aisles.png"
+          test -s "$PROJECT_DIR/tests/v15_mart_to_street.png"
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v014-godot-source-verified
+          name: lifesim-v015-godot-source-verified
           path: |
             lifesim/godot/
             !lifesim/godot/.godot/**
@@ -175,6 +194,8 @@ jobs:
             godot-v11-visual.log
             godot-v13-visual.log
             godot-v14-visual.log
+            godot-v15-visual.log
+            lifesim/godot/tests/v15_*.png
             lifesim/godot/tests/v14_*.png
             lifesim/godot/tests/v13_*.png
             godot-v12-visual.log

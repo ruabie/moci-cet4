@@ -13,6 +13,10 @@ var camera_yaw: float = -1.23
 var camera_pitch: float = -0.12
 var camera_distance: float = 4.6
 var camera: Camera3D
+var camera_occlusion_radius: float = .23
+var camera_collision_activations: int = 0
+var camera_collision_shape: SphereShape3D
+var camera_sweep_query: PhysicsShapeQueryParameters3D
 var character_visual: Node3D
 var rig: Skeleton3D
 var anim_clock: float = 0.0
@@ -60,6 +64,13 @@ func _ready() -> void:
     camera.fov = 63.0
     camera.near = 0.08
     add_child(camera)
+    # Reuse the sweep shape/query rather than allocating 60 collision shapes/sec.
+    camera_collision_shape = SphereShape3D.new()
+    camera_collision_shape.radius = camera_occlusion_radius
+    camera_sweep_query = PhysicsShapeQueryParameters3D.new()
+    camera_sweep_query.shape = camera_collision_shape
+    camera_sweep_query.collision_mask = 1
+    camera_sweep_query.exclude = [get_rid()]
     # Browsers permit Pointer Lock only after a real mouse gesture.
     if not OS.has_feature("web"):
         Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -144,10 +155,19 @@ func _update_camera(delta: float) -> void:
     var pivot: Vector3 = global_position + Vector3.UP * 1.56
     var aim: Vector3 = pivot + Vector3(sin(camera_yaw) * camera_distance * cos(camera_pitch), camera_distance * (0.12 - sin(camera_pitch)), cos(camera_yaw) * camera_distance * cos(camera_pitch))
     if delta > 0.0:
-        var query := PhysicsRayQueryParameters3D.create(pivot, aim, 1)
-        var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
-        if not hit.is_empty():
-            aim = pivot.lerp(hit["position"], .86)
-    var smoothing: float = minf(1.0, delta * 16.0) if delta > 0.0 else 1.0
+        # Sphere sweep is safer than a single ray: it keeps the camera near-plane
+        # from clipping through narrow door frames and interior walls.
+        camera_sweep_query.transform = Transform3D(Basis(), pivot)
+        camera_sweep_query.motion = aim - pivot
+        var sweep: PackedFloat32Array = get_world_3d().direct_space_state.cast_motion(camera_sweep_query)
+        if sweep.size() >= 2 and sweep[0] < 0.999:
+            var distance_factor: float = clampf(sweep[0] - .035, .05, 1.0)
+            aim = pivot.lerp(aim, distance_factor)
+            camera_collision_activations += 1
+    # A camera backing into a wall must retract immediately; returning outward
+    # can ease in slowly. Never interpolate through an obstructing surface.
+    var current_radius: float = pivot.distance_to(camera.global_position)
+    var desired_radius: float = pivot.distance_to(aim)
+    var smoothing: float = minf(1.0, delta * (34.0 if desired_radius < current_radius else 5.5)) if delta > 0.0 else 1.0
     camera.global_position = camera.global_position.lerp(aim, smoothing)
     camera.look_at(pivot + Vector3.UP * .02)
