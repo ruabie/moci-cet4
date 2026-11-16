@@ -29,10 +29,11 @@ jobs:
           cat /tmp/v16-info.json
           grep -q '"version": "0.16"' /tmp/v16-info.json
           grep -q 'lifesim-v016-merchandising-art' /tmp/v16-info.json
+          grep -q '53e44bc9c6101c0b0439a0cb272f464020b56b26' /tmp/v16-info.json
           for file in index.html index.js index.wasm index.pck; do
             curl -fLsS --head --connect-timeout 10 --max-time 45 "$BASE/$file" | grep -iE 'HTTP/|content-length'
           done
-          echo 'V15 PUBLIC ASSETS PASS'
+          echo 'V16 PUBLIC ASSETS PASS'
       - name: Setup Playwright and system Chromium
         shell: bash
         run: |
