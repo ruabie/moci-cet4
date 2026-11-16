@@ -199,7 +199,7 @@ func _create_home() -> void:
 
 func _create_business_interiors() -> void:
     # A genuine street-level mart replaces the old off-map z=190 room.
-    walkable_mart = WalkableMartV15.new()
+    walkable_mart = WalkableMartV16.new()
     walkable_mart.name = "MartInterior"
     walkable_mart.position = Vector3(-22.35, 0.0, -14.0)
     walkable_mart.rotation.y = PI * .5

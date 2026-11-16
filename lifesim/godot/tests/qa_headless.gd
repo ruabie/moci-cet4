@@ -228,7 +228,7 @@ func run_contracts() -> void:
     if cafe_v11 == null or mart_v11 == null or home_v11 == null:
         fail("V0.11 furnished interiors not instantiated")
         return
-    if cafe_v11.placed_assets < 20 or mart_v11.placed_assets < 20 or home_v11.placed_assets < 10:
+    if cafe_v11.placed_assets < 20 or (mart_v11.placed_assets < 20 and not mart_v11 is WalkableMartV16) or home_v11.placed_assets < 10:
         fail("V0.11 imported furniture missing")
         return
     if cafe_v11.collidable_assets < 5 or mart_v11.collidable_assets < 5:
@@ -241,7 +241,7 @@ func run_contracts() -> void:
     if v12_cafe == null or v12_mart == null or v12_home == null:
         fail("V0.12 compact interiors missing")
         return
-    if v12_cafe.placed_assets < 25 or v12_mart.placed_assets < 48 or v12_home.placed_assets < 14:
+    if v12_cafe.placed_assets < 25 or (v12_mart.placed_assets < 48 and not v12_mart is WalkableMartV16) or v12_home.placed_assets < 14:
         fail("V0.12 insufficient functional interior density")
         return
     if v12_cafe.displayed_products < 12 or v12_mart.displayed_products < 45:
@@ -339,6 +339,17 @@ func run_contracts() -> void:
     if mart.room_dimensions.x < 11.0 or mart.displayed_products < 45:
         fail("V15 mart not furnished at usable scale")
         return
+    var curated: WalkableMartV16 = mart as WalkableMartV16
+    if curated == null or curated.rack_count != 4 or curated.stocked_sku_instances < 170:
+        fail("V16 curated shelves / real-size stock missing")
+        return
+    if curated.lit_fixture_count != 4 or curated.shelf_clear_center_width < 2.30:
+        fail("V16 light and accessible center aisle contract missing")
+        return
+    for sku in curated.SKU_IDS:
+        if curated.get_node_or_null("V16_Stock_" + sku) == null:
+            fail("V16 optimized stock batch not rendered: " + sku)
+            return
     var mart_approach: Vector3 = mart.street_door_world()
     var mart_in: Vector3 = mart.interior_probe_world()
     if mart.is_inside_world(mart_approach) or not mart.is_inside_world(mart_in):
@@ -395,6 +406,7 @@ func run_contracts() -> void:
         fail("V15 camera collision failed to retract behind wall")
         return
     test_wall.queue_free()
+    print("V16 QA PASS: walkable four-rack mart, 170+ stocked instances, coherent lighting")
     print("V15 QA PASS: walkable mart/cafe, reversible physical doors, bounded camera collision, unchanged save/economy")
     print("QA PASS: V0.8 integrated facade and clock, old-save migration, daily quest idempotence, real-work payout, delivery, residents, photography, interiors, rigged characters, save and scene")
     instance.queue_free()
