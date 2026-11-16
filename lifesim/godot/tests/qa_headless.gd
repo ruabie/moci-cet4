@@ -192,6 +192,24 @@ func run_contracts() -> void:
     if absf(pose.get_angle()) < 0.01:
         fail("V0.5.1 locomotion didn't update skinned left thigh")
         return
+    # A moving skeleton is not necessarily an upright skeleton. Assert the
+    # model's actual post-animation head/foot positions in world space.
+    for [upper_name, lower_name, separation] in [
+        ["Head", "Hips", 0.25],
+        ["Hips", "Foot.L", 0.30],
+        ["UpperArm.L", "Hand.L", 0.10]
+    ]:
+        var upper_idx: int = avatar.rig.find_bone(upper_name)
+        var lower_idx: int = avatar.rig.find_bone(lower_name)
+        if upper_idx < 0 or lower_idx < 0:
+            fail("V18 pose-height bones missing: " + upper_name + "/" + lower_name)
+            return
+        var upper_pos: Vector3 = avatar.rig.global_transform * avatar.rig.get_bone_global_pose(upper_idx).origin
+        var lower_pos: Vector3 = avatar.rig.global_transform * avatar.rig.get_bone_global_pose(lower_idx).origin
+        if upper_pos.y < lower_pos.y + float(separation):
+            fail("V18 rendered civilian pose inverted or T-posed: " + upper_name + " vs " + lower_name + " " + str([upper_pos.y, lower_pos.y]))
+            return
+    print("V18 ART POSE PASS: upright head above hips, feet below hips, arms lowered")
     var district: Node = instance.get_node_or_null("AokawaDistrict")
     if district.get_node_or_null("Authored_AOI_MART__·__24H/V15UpperStoreys") == null:
         fail("V15 integrated mart upper shell missing")
