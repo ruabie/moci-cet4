@@ -1,9 +1,9 @@
-name: LifeSim V0.15 licensed block and furnished interiors Web preview
+name: LifeSim V0.16 licensed block and furnished interiors Web preview
 
 on:
   push:
     branches:
-      - lifesim-v015-walkable-mart-camera
+      - lifesim-v016-merchandising-art
     paths:
       - '.github/workflows/lifesim-web.yml'
       - 'lifesim/godot/**'
@@ -84,6 +84,8 @@ jobs:
           python3 "$PROJECT/tests/check_art_v13.py"
           python3 "$PROJECT/tools/build_interiors_v12.py"
           python3 "$PROJECT/tests/check_compact_interiors_v12.py"
+          /tmp/lifesim-v15-python/bin/python "$PROJECT/tools/build_mart_v16.py"
+          /tmp/lifesim-v15-python/bin/python "$PROJECT/tests/check_mart_visual_v16.py"
           python3 "$PROJECT/tests/check_landscape_v10.py"
           python3 "$PROJECT/tests/check_open_city_v11.py"
           python3 "$PROJECT/tests/check_authored_assets.py"
@@ -100,7 +102,7 @@ jobs:
           GODOT="/tmp/godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           "$GODOT" --headless --editor --path "$PROJECT" --import --quit 2>&1 | tee godot-web-import.log
           ! grep -E 'SCRIPT ERROR|Parse Error|ERROR:.*Parse' godot-web-import.log
-      - name: Headless game, save, movement and V0.15 scene QA
+      - name: Headless game, save, movement and V0.16 scene QA
         shell: bash
         run: |
           set -euo pipefail
@@ -109,6 +111,7 @@ jobs:
           ! grep -E 'QA FAIL|SCRIPT ERROR|Parse Error' godot-web-qa.log
           grep -F 'QA PASS:' godot-web-qa.log
           grep -F 'V15 QA PASS:' godot-web-qa.log
+          grep -F 'V16 QA PASS:' godot-web-qa.log
       - name: Export playable HTML5 build
         shell: bash
         run: |
@@ -140,10 +143,10 @@ jobs:
           assert 'Godot' in html or '.wasm' in html
           print('WEB EXPORT PASS: HTML, WebAssembly, PCK, JS exist')
           PY
-      - name: Upload verified V0.15 Web build for review and isolated publication
+      - name: Upload verified V0.16 Web build for review and isolated publication
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v015-walkable-mart-camera-build
+          name: lifesim-v016-merchandising-art-build
           path: lifesim-web-build/
           if-no-files-found: error
           retention-days: 14
@@ -151,7 +154,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v015-walkable-mart-camera-logs
+          name: lifesim-v016-merchandising-art-logs
           path: |
             godot-web-import.log
             godot-web-qa.log
@@ -161,17 +164,17 @@ jobs:
 
 
   publish-isolated-path:
-    name: Publish only lifesim/play-v15 to main without merging game source
+    name: Publish only lifesim/play-v16 to main without merging game source
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v015-walkable-mart-camera' }}
+    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v016-merchandising-art' }}
     permissions:
       contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: lifesim-v015-walkable-mart-camera-build
+          name: lifesim-v016-merchandising-art-build
           path: site-build
       - uses: actions/checkout@v4
         with:
@@ -188,31 +191,31 @@ jobs:
           compgen -G "site-build/*.wasm" >/dev/null
           compgen -G "site-build/*.pck" >/dev/null
           compgen -G "site-build/*.js" >/dev/null
-          test ! -e published-main/lifesim/play-v15/index.html || grep -q 'Godot' published-main/lifesim/play-v15/index.html
+          test ! -e published-main/lifesim/play-v16/index.html || grep -q 'Godot' published-main/lifesim/play-v16/index.html
       - name: Copy only the new Web export to its isolated URL path
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p published-main/lifesim/play-v15
-          find published-main/lifesim/play-v15 -maxdepth 1 -type f -delete
-          cp -a site-build/. published-main/lifesim/play-v15/
+          mkdir -p published-main/lifesim/play-v16
+          find published-main/lifesim/play-v16 -maxdepth 1 -type f -delete
+          cp -a site-build/. published-main/lifesim/play-v16/
           python3 - <<'PY'
           import json, os
           from pathlib import Path
-          (Path('published-main')/'lifesim'/'play-v15'/'build-info.json').write_text(
-              json.dumps({'version':'0.15','source_branch':'lifesim-v015-walkable-mart-camera',
+          (Path('published-main')/'lifesim'/'play-v16'/'build-info.json').write_text(
+              json.dumps({'version':'0.16','source_branch':'lifesim-v016-merchandising-art',
                           'commit':os.environ['GITHUB_SHA'],
                           'build_system':'Godot 4.7.2 Web single thread'},indent=2)+'\n')
           PY
           cd published-main
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lifesim/play-v15
-          test -z "$(git diff --name-only -- . ':!lifesim/play-v15')" || { echo 'Unexpected modifications outside lifesim/play-v15'; exit 1; }
+          git add lifesim/play-v16
+          test -z "$(git diff --name-only -- . ':!lifesim/play-v16')" || { echo 'Unexpected modifications outside lifesim/play-v16'; exit 1; }
           if git diff --cached --quiet; then
             echo "Unchanged web files: no update needed"
           else
-            git commit -m "deploy(lifesim): publish isolated V0.15 urban landscape Web build"
+            git commit -m "deploy(lifesim): publish isolated V0.16 urban landscape Web build"
             git push origin HEAD:main
           fi
       - name: Read GitHub Pages site status without altering it

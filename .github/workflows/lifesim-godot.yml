@@ -67,6 +67,8 @@ jobs:
           python3 "$PROJECT_DIR/tests/check_art_v13.py"
           python3 "$PROJECT_DIR/tools/build_interiors_v12.py"
           python3 "$PROJECT_DIR/tests/check_compact_interiors_v12.py"
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/build_mart_v16.py"
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tests/check_mart_visual_v16.py"
       - name: Static checks
         shell: bash
         run: |
@@ -89,6 +91,7 @@ jobs:
           if grep -E 'QA FAIL|SCRIPT ERROR|Parse Error' godot-qa.log; then exit 1; fi
           grep -F 'QA PASS:' godot-qa.log
           grep -F 'V15 QA PASS:' godot-qa.log
+          grep -F 'V16 QA PASS:' godot-qa.log
       - name: Install virtual display and Mesa for viewport proof
         shell: bash
         run: |
@@ -168,11 +171,25 @@ jobs:
           test -s "$PROJECT_DIR/tests/v15_mart_checkout.png"
           test -s "$PROJECT_DIR/tests/v15_mart_aisles.png"
           test -s "$PROJECT_DIR/tests/v15_mart_to_street.png"
+      - name: Capture V0.16 real retail shelf heights, small SKU packs and fridges
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v16.gd 2>&1 | tee godot-v16-visual.log
+          grep -F 'V16 CAPTURE PASS:' godot-v16-visual.log
+          test -s "$PROJECT_DIR/tests/v16_shop_aisles.png"
+          test -s "$PROJECT_DIR/tests/v16_stock_closeup.png"
+          test -s "$PROJECT_DIR/tests/v16_refrigeration.png"
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v015-godot-source-verified
+          name: lifesim-v016-godot-source-verified
           path: |
             lifesim/godot/
             !lifesim/godot/.godot/**
@@ -185,6 +202,8 @@ jobs:
         with:
           name: lifesim-godot-logs
           path: |
+            godot-v16-visual.log
+            lifesim/godot/tests/v16_*.png
             godot-import.log
             godot-qa.log
             godot-visual.log
