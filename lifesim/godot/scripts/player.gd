@@ -127,8 +127,10 @@ func _physics_process(delta: float) -> void:
     _pose("RightThigh", -s * power)
     _pose("LeftShin", maxf(0.0, -s) * .76 * anim_weight)
     _pose("RightShin", maxf(0.0, s) * .76 * anim_weight)
-    _pose("LeftUpperArm", -s * power * .55, -.12)
-    _pose("RightUpperArm", s * power * .55, .12)
+    # Modular CC0 characters ship in T-pose. Rest the arms at the torso;
+    # animate small opposite swings around that authored idle offset.
+    _pose("LeftUpperArm", -1.13 - s * power * .28, -.08)
+    _pose("RightUpperArm", -1.13 + s * power * .28, .08)
     _pose("LeftForeArm", -.16 - maxf(0.0,s) * .16 * anim_weight)
     _pose("RightForeArm", -.16 - maxf(0.0,-s) * .16 * anim_weight)
     _pose("Spine", 0.085 if running else 0.015, -s * .03 * anim_weight)

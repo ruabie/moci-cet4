@@ -395,8 +395,8 @@ func update_ambience(daylight: float, elapsed: float) -> void:
         _resident_pose(rig, "RightThigh", -stride)
         _resident_pose(rig, "LeftShin", maxf(0.0, -stride) * .7)
         _resident_pose(rig, "RightShin", maxf(0.0, stride) * .7)
-        _resident_pose(rig, "LeftUpperArm", -stride * .68)
-        _resident_pose(rig, "RightUpperArm", stride * .68)
+        _resident_pose(rig, "LeftUpperArm", -1.13 - stride * .22)
+        _resident_pose(rig, "RightUpperArm", -1.13 + stride * .22)
 
 func _round_post(parent: Node3D, where: Vector3, height: float, radius: float, color: String) -> void:
     var mesh := CylinderMesh.new()

@@ -55,7 +55,16 @@ static func pose(rig: Skeleton3D, semantic: String, pitch: float, yaw: float = 0
     if not rig.has_meta(cache_key):
         rig.set_meta(cache_key, rig.get_bone_pose_rotation(bone_idx))
     var imported_bind: Quaternion = rig.get_meta(cache_key)
-    var motion: Quaternion = Quaternion(Vector3.UP, yaw) * Quaternion(Vector3.RIGHT, pitch)
+    # Quaternius' leg bones use opposite local Z axes for forward/backward
+    # locomotion. Using old character local X swings knees sideways.
+    var motion_axis: Vector3 = Vector3.RIGHT
+    var amount: float = pitch
+    if name == "UpperLeg.L":
+        motion_axis = Vector3.FORWARD
+    elif name == "UpperLeg.R":
+        motion_axis = Vector3.FORWARD
+        amount = -pitch
+    var motion: Quaternion = Quaternion(Vector3.UP, yaw) * Quaternion(motion_axis, amount)
     rig.set_bone_pose_rotation(bone_idx, imported_bind * motion)
 
 static func _measure(node: Node, root_model: Node3D, bounds: Dictionary) -> void:
