@@ -206,7 +206,7 @@ func run_contracts() -> void:
     if authored_trees < 12:
         fail("V0.10 vegetation count too low: %d" % authored_trees)
         return
-    if district.get_node_or_null("Authored_KAWA_COFFEE/V09CuratedCafeAndInterior") == null:
+    if district.get_node_or_null("Authored_KAWA_COFFEE/V14UpperStoreys") == null:
         fail("V0.9 curated cafe mesh missing from live 3D world")
         return
     for address in ["Authored_SLOW_LIVING", "Authored_青川公寓"]:
@@ -257,8 +257,8 @@ func run_contracts() -> void:
     for candidate in [v12_cafe, v12_mart, v12_home]:
         var room: CuratedInteriorsV12 = candidate as CuratedInteriorsV12
         var front_offset: float = room.room_dimensions.y*.5-.65
-        var a: Vector3 = room.global_position + Vector3(0, 1.08, front_offset)
-        var b: Vector3 = room.global_position + Vector3(0, 1.08, 1.1)
+        var a: Vector3 = room.to_global(Vector3(0, 1.08, front_offset))
+        var b: Vector3 = room.to_global(Vector3(0, 1.08, 1.1))
         var ray := PhysicsRayQueryParameters3D.create(a, b)
         ray.collision_mask = 1
         var hit: Dictionary = room.get_world_3d().direct_space_state.intersect_ray(ray)
@@ -286,6 +286,50 @@ func run_contracts() -> void:
     if v13_cafe.clear_aisle_width < 2.0 or v13_cafe.room_dimensions.x * v13_cafe.room_dimensions.y > 90.0:
         fail("V0.13 cramped aisle or oversized cafe")
         return
+    # V0.14: door, street and bar must occupy the SAME physics world.
+    var seamless: WalkableCafeV14 = instance.get_node_or_null("CafeInterior") as WalkableCafeV14
+    if seamless == null or seamless.position.distance_to(Vector3(22.5,0,-14)) > .01:
+        fail("V14 cafe still isolated from real street")
+        return
+    var approach: Vector3 = seamless.street_door_world()
+    var inside: Vector3 = seamless.interior_probe_world()
+    if seamless.is_inside_world(approach) or not seamless.is_inside_world(inside):
+        fail("V14 entrance spatial boundary invalid")
+        return
+    var q := PhysicsRayQueryParameters3D.create(
+        seamless.to_global(Vector3(0,1.1,6.15)),
+        seamless.to_global(Vector3(0,1.1,2.9)), 1)
+    var blockage: Dictionary = avatar.get_world_3d().direct_space_state.intersect_ray(q)
+    if not blockage.is_empty():
+        fail("V14 physically blocked cafe threshold: "+str(blockage.get("collider")))
+        return
+    avatar.global_position = approach
+    avatar.camera_yaw = -PI * .5
+    avatar.velocity = Vector3.ZERO
+    instance.indoor_place = ""
+    Input.action_press("move_forward")
+    for ticks in range(46):
+        await physics_frame
+        await process_frame
+    Input.action_release("move_forward")
+    if not seamless.is_inside_world(avatar.global_position):
+        fail("V14 WASD cannot actually cross threshold")
+        return
+    if instance.indoor_place != "咖啡馆":
+        fail("V14 did not set cafe indoor context upon physical entry")
+        return
+    if avatar.global_position.distance_to(approach) > 6.0:
+        fail("V14 entering used teleport rather than physical movement")
+        return
+    Input.action_press("move_back")
+    for ticks in range(55):
+        await physics_frame
+        await process_frame
+    Input.action_release("move_back")
+    if seamless.is_inside_world(avatar.global_position) or instance.indoor_place != "":
+        fail("V14 could not physically leave cafe")
+        return
+    print("V14 QA PASS: genuine contiguous street/interior, threshold ray, actual physical entry and exit")
     print("QA PASS: V0.8 integrated facade and clock, old-save migration, daily quest idempotence, real-work payout, delivery, residents, photography, interiors, rigged characters, save and scene")
     instance.queue_free()
     ProjectSettings.set_setting("application/config/qa_mode", false)
