@@ -18,6 +18,9 @@ var sun: DirectionalLight3D
 var ambient_env: WorldEnvironment
 var sky_material: ProceduralSkyMaterial
 var localized_font: Font
+var hud_layer: CanvasLayer
+var hud_visible: bool = true
+var outdoor_camera_distance: float = 4.6
 var ui_clock: Label
 var ui_balance: Label
 var ui_hint: Label
@@ -107,6 +110,7 @@ func _emit_web_qa() -> void:
         "indoor": indoor_place,
         "at_home": in_home,
         "input_interact_attempts": input_interact_attempts,
+        "hud_visible": hud_visible,
         "notice": (ui_notice.text if ui_notice != null else "")
     }
     # Only serialized numbers and strings are passed to the browser.
@@ -119,7 +123,7 @@ func _configure_input() -> void:
         "move_left": [KEY_A, KEY_LEFT], "move_right": [KEY_D, KEY_RIGHT],
         "run": [KEY_SHIFT], "interact": [KEY_E], "job": [KEY_J],
         "buy": [KEY_B], "exit_interior": [KEY_Q],
-        "parcel": [KEY_K], "photo": [KEY_P], "journal": [KEY_T], "rest": [KEY_R]
+        "parcel": [KEY_K], "photo": [KEY_P], "journal": [KEY_T], "rest": [KEY_R], "toggle_hud": [KEY_H]
     }
     for action_name in keys:
         if not InputMap.has_action(action_name):
@@ -214,7 +218,7 @@ func _create_player() -> void:
 
 func _hud_card(panel: PanelContainer) -> void:
     var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.07, 0.11, 0.14, 0.78)
+    style.bg_color = Color(0.07, 0.11, 0.14, 0.67)
     style.border_color = Color(0.65, 0.74, 0.77, 0.16)
     style.border_width_left = 1
     style.border_width_right = 1
@@ -247,6 +251,7 @@ func _create_ui() -> void:
         localized_font = system_font
     var layer := CanvasLayer.new()
     layer.name = "HUD"
+    hud_layer = layer
     add_child(layer)
     var root := Control.new()
     root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -320,6 +325,11 @@ func _create_ui() -> void:
     root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _input(event: InputEvent) -> void:
+    if event.is_action_pressed("toggle_hud"):
+        hud_visible = not hud_visible
+        if hud_layer != null:
+            hud_layer.visible = hud_visible
+        return
     if event is InputEventKey and event.pressed and not event.echo:
         if shop_open and event.physical_keycode >= KEY_1 and event.physical_keycode <= KEY_5:
             _purchase_furniture(int(event.physical_keycode) - int(KEY_1))
@@ -401,6 +411,8 @@ func _enter_business(place: String) -> void:
     if not _save_progress():
         return
     indoor_place = place
+    outdoor_camera_distance = player.camera_distance
+    player.camera_distance = 3.05
     player.velocity = Vector3.ZERO
     player.position = Vector3(0, 0.2, 192.5 if place == "便利店" else 224.5)
     _notify("已进入%s。按 J 体验工作，Q 或 E 离开。" % place, 6.0)
@@ -408,6 +420,7 @@ func _enter_business(place: String) -> void:
 func _leave_business() -> void:
     var place: String = indoor_place
     indoor_place = ""
+    player.camera_distance = outdoor_camera_distance
     player.velocity = Vector3.ZERO
     player.position = Vector3(-11.4, 0.2, -14) if place == "便利店" else Vector3(11.4, 0.2, -14)
     _save_progress()
@@ -634,7 +647,7 @@ func _process(delta: float) -> void:
         ui_hint.text = "E 互动 · J 工作 · K 配送 · B 购买 · P 拍照 · R 休息 · T 日志"
     else:
         ui_place.text = "青川町 · 一起过普通的每一天"
-        ui_hint.text = "WASD 移动  ·  Shift 跑步  ·  E 互动  ·  T 今日目标  ·  P 摄影"
+        ui_hint.text = "WASD 移动  ·  Shift 跑步  ·  E 互动  ·  T 今日目标  ·  P 摄影  ·  H 隐藏界面"
     if job_mode != "":
         job_seconds -= delta
         if job_seconds <= 0.0:
