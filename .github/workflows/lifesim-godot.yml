@@ -125,6 +125,7 @@ jobs:
           test -s "$PROJECT_DIR/tests/v13_cafe_same_camera.png"
           test -s "$PROJECT_DIR/tests/v13_cafe_service.png"
           test -s "$PROJECT_DIR/tests/v13_cafe_window.png"
+          test -s "$PROJECT_DIR/tests/v13_cafe_clean.png"
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
