@@ -1,6 +1,6 @@
 {
   "version": "0.18",
   "source_branch": "lifesim-v018-humanoid-art-pass",
-  "commit": "95138c60e8b001b2fa69943464a4691c889f27a4",
+  "commit": "c288af7b7cd75fd8baa9d3369610d9f8b178b0dc",
   "build_system": "Godot 4.7.2 Web single thread"
 }
