@@ -52,6 +52,7 @@ jobs:
           python3 "$PROJECT_DIR/tools/build_street_v07.py"
           python3 "$PROJECT_DIR/tools/build_street_v08.py"
           python3 "$PROJECT_DIR/tests/check_authored_assets.py"
+          python3 "$PROJECT_DIR/tests/check_characters_v18.py"
           python3 "$PROJECT_DIR/tests/check_integrated_street.py"
           python3 "$PROJECT_DIR/tests/check_pbr_street.py"
           python3 "$PROJECT_DIR/tools/build_coffee_v09.py"
@@ -92,6 +93,7 @@ jobs:
           "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"             --headless --path "$PROJECT_DIR" --script res://tests/qa_headless.gd 2>&1 | tee godot-qa.log
           if grep -E 'QA FAIL|SCRIPT ERROR|Parse Error' godot-qa.log; then exit 1; fi
           grep -F 'QA PASS:' godot-qa.log
+          grep -F 'V18 QA PASS:' godot-qa.log
           grep -F 'V15 QA PASS:' godot-qa.log
           grep -F 'V16 QA PASS:' godot-qa.log
           grep -F 'V17 QA PASS:' godot-qa.log
@@ -131,11 +133,25 @@ jobs:
           for view in shop_aisles refrigerator_cavity cold_stock_detail storefront; do
             test -s "$PROJECT_DIR/tests/v17_${view}.png"
           done
+      - name: V0.18 render actual skinned civilians and six distinct outfits
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v18.gd 2>&1 | tee godot-v18-visual.log
+          grep -F 'V18 CAPTURE PASS:' godot-v18-visual.log
+          test -s "$PROJECT_DIR/tests/v18_player_in_city.png"
+          test -s "$PROJECT_DIR/tests/v18_player_closeup.png"
+          test -s "$PROJECT_DIR/tests/v18_six_residents.png"
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v017-godot-source-verified
+          name: lifesim-v018-godot-source-verified
           path: |
             lifesim/godot/
             !lifesim/godot/.godot/**
@@ -154,6 +170,8 @@ jobs:
             lifesim/godot/tests/v16_*.png
             godot-import.log
             godot-qa.log
+            godot-v18-visual.log
+            lifesim/godot/tests/v18_*.png
             godot-visual.log
             godot-v08-visual.log
             godot-v09-visual.log
