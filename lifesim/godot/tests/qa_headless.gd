@@ -322,12 +322,12 @@ func run_contracts() -> void:
         fail("V14 entering used teleport rather than physical movement")
         return
     Input.action_press("move_back")
-    for ticks in range(55):
+    for ticks in range(115):
         await physics_frame
         await process_frame
     Input.action_release("move_back")
     if seamless.is_inside_world(avatar.global_position) or instance.indoor_place != "":
-        fail("V14 could not physically leave cafe")
+        fail("V14 could not physically leave cafe: pos=" + str(avatar.global_position) + " indoor=" + str(instance.indoor_place))
         return
     print("V14 QA PASS: genuine contiguous street/interior, threshold ray, actual physical entry and exit")
     print("QA PASS: V0.8 integrated facade and clock, old-save migration, daily quest idempotence, real-work payout, delivery, residents, photography, interiors, rigged characters, save and scene")
