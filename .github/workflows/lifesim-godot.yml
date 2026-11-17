@@ -290,6 +290,24 @@ jobs:
           print('V24 REAL CC0 CHARACTER IK SIGNAL EVIDENCE VERIFIED',m)
           PY
 
+      - name: V0.25 actual skinned avatar IK render pairs and pixel-difference gate
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v25_ik_render.gd 2>&1 | tee godot-v25-ik-render.log
+          grep -F 'V25 IK RENDER PASS:' godot-v25-ik-render.log
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/analyze_v25_ik_render.py"
+          for motion in walk run; do
+            test -s "$PROJECT_DIR/tests/v25_${motion}_real_render_pairs.jpg"
+          done
+          test -s "$PROJECT_DIR/tests/v25_ik_render_metrics.json"
+          test -s "$PROJECT_DIR/tests/v25_ik_render_comparison.json"
+
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
@@ -321,6 +339,10 @@ jobs:
             godot-v22-sequence.log
             godot-v23-native-ik.log
             godot-v24-city-ik.log
+            godot-v25-ik-render.log
+            lifesim/godot/tests/v25_*.png
+            lifesim/godot/tests/v25_*.jpg
+            lifesim/godot/tests/v25_*.json
             lifesim/godot/tests/v24_city_ik_metrics.json
             lifesim/godot/tests/v23_*.png
             lifesim/godot/tests/v23_*.jpg
