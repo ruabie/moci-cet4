@@ -30,7 +30,11 @@ func _align_once(character: Node3D, rig: Skeleton3D) -> bool:
     return true
 
 func _capture(name: String) -> bool:
-    await RenderingServer.frame_post_draw
+    # Three offscreen imported models with no main scene can fail to emit a
+    # frame_post_draw signal in the isolated Godot CI test. Force the actual
+    # rendering server to draw the current pose, never fake or reuse images.
+    await process_frame
+    RenderingServer.force_draw(false)
     var im:Image=root.get_viewport().get_texture().get_image()
     if im==null or im.get_width()<720 or im.get_height()<400:
         return false
