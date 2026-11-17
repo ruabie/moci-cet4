@@ -44,6 +44,14 @@ static func install(source_scene: Node, dest_scene: Node3D) -> Dictionary:
         rebuilt.length=clip.length
         rebuilt.loop_mode=Animation.LOOP_LINEAR
         var counts:Dictionary={"rotation":0,"pelvis_translation":0}
+        var critical_bones:Dictionary={}
+        var critical_required:Array[String]=[
+            "pelvis","spine_01","spine_03",
+            "clavicle_l","upperarm_l","lowerarm_l",
+            "clavicle_r","upperarm_r","lowerarm_r",
+            "thigh_l","calf_l","foot_l",
+            "thigh_r","calf_r","foot_r"
+        ]
         for n in range(clip.get_track_count()):
             var type:int=clip.track_get_type(n)
             if type!=Animation.TYPE_ROTATION_3D and type!=Animation.TYPE_POSITION_3D:
@@ -73,6 +81,8 @@ static func install(source_scene: Node, dest_scene: Node3D) -> Dictionary:
                     var adapted:Quaternion=(dr*frame*local_delta*frame.inverse()).normalized()
                     rebuilt.track_insert_key(index,clip.track_get_key_time(n,k),adapted)
                 counts["rotation"]=int(counts["rotation"])+1
+                if critical_required.has(bone):
+                    critical_bones[bone]=true
             else:
                 var src_origin:Vector3=source_rig.get_bone_rest(si).origin
                 var dst_origin:Vector3=target_rig.get_bone_rest(ti).origin
@@ -83,9 +93,16 @@ static func install(source_scene: Node, dest_scene: Node3D) -> Dictionary:
                     var shifted:Vector3=dst_origin+(authored-src_origin)
                     rebuilt.track_insert_key(index,clip.track_get_key_time(n,k),shifted)
                 counts["pelvis_translation"]=int(counts["pelvis_translation"])+1
-        if int(counts["rotation"])<60 or int(counts["pelvis_translation"])!=1:
-            return {"ok":false,"reason":"full-body motion lost tracks: "+key,
-                "counts":counts}
+        var missing_critical:Array[String]=[]
+        for required in critical_required:
+            if not critical_bones.has(required):
+                missing_critical.append(required)
+        # Godot's actual imported source Idle has 55 rotation tracks; do not
+        # demand 60 animated leaf bones when they are absent from SOURCE.
+        # Enforce all important bilateral torso/arm/leg joint tracks instead.
+        if int(counts["rotation"])<50 or int(counts["pelvis_translation"])!=1                 or missing_critical.size()>0:
+            return {"ok":false,"reason":"real source lost important full-body tracks: "+key,
+                "counts":counts,"missing_critical":missing_critical}
         lib.add_animation(key,rebuilt)
         clip_tracks[key]=counts
     var driver:=AnimationPlayer.new()
