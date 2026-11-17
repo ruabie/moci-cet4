@@ -1,10 +1,25 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
 > **交接快照：2026-11-17（Asia/Singapore）**  
-> **最新开发候选：V0.21 草稿 PR #35（独立 CC0 动作接入/骨骼重定向试验；未合并、未发布）。同 SHA 引擎 CI 通过，但实际画面中人物悬空、姿态不自然，严禁当作美术验收成功。**  
+> **最新开发候选：V0.22 草稿 PR #36（跨骨架静止姿态转换及鞋底接地代理；未合并、未发布）。同 SHA Godot QA 通过且脚部悬空明显改善，但跑步/手臂异常与根节点上下跳动仍阻断美术验收。**  
 > 这是一次有证据的历史快照，不是实时仪表板。每次接班仍需独立查最新 GitHub PR/SHA/CI/Issue。
 
-## 最新一轮：V0.21 有版权证据的真实动画库接入与失败可复现（2026-11-17）
+## 最新一轮：V0.22 静止姿态旋转轴及鞋底接地（2026-11-17）
+
+**候选：** [V0.22 草稿 PR #36](https://github.com/ruabie/moci-cet4/pull/36)，head `dd1203044e911707f3f91581dac023c3bf9dd68c`，base V0.21 分支，**open / draft / merged=false**；零新增费用、无自动合并、无公开发布、未修改游戏正式玩家动作。
+
+- 按 [Godot 4 官方骨架重定向说明](https://docs.godotengine.org/en/stable/tutorials/assets_pipeline/retargeting_3d_skeletons.html)，Bone Pose 包括 Bone Rest，不可因骨骼名称一致就直接复用旋转。因此新增 `animation_retarget_v22.gd`：从源骨骼静止旋转提取动作增量，再通过源/目标**全局骨骼静止轴**变换动作增量，最后应用到目标骨骼静止姿态；与 V0.21 源脚本分离，不影响现有游戏。
+- 新增 `foot_contact_v22.gd`：读取实际玩家模型鞋部网格**静止状态包围盒**和 Foot.L/Foot.R 脚踝位置，射线碰撞实际街道路面，**仅在 QA 预览**调整渲染角色根高度。此法每个采样只保证最低脚踝对应的鞋底代理落地，**不等于真实鞋面蒙皮接触检测或独立两脚 IK**。
+- 第一轮提交 `5624c2f6611297ae769954aa5b14863bacc11401` 完成六张真实 Godot 渲染 PNG 和地面代理指标：脚踝与鞋底静止偏移约 0.0234m；根节点需下降约 0.21–0.51m。**人工画质复核：** V0.21 明显悬空已得到视觉改善，但手臂和跑步姿态不自然，不能交付。
+- 第二次有界修正提交 `dd1203044e911707f3f91581dac023c3bf9dd68c`：在拍照前冻结动画采样姿态，新增 `visual_v22_sequence.gd`，分别对真实 CC0 Walk 与 Jog 动作片段生成 18 帧采样 PNG、GIF、逐帧对照和精确 JSON。动作片段采样不等于真实设备中连续输入或 60FPS 游戏录屏。
+- **实际相位高度指标：** Walk 片段长 1.333s，18 帧根节点高度修正范围 **0.067m**、相邻采样最大跳变 **0.031m**；Jog 片段长 0.933s，18 帧范围 **0.122m**、相邻采样最大跳变 **0.095m**。走跑切换预期还存在约 0.25m 的根节点高度差。这些数字暴露出新的严重动画质量风险，不能只凭鞋底代理高度归零来声称已消除脚滑。
+- 对**准确 SHA**的 [PR Godot CI #44083259830](https://github.com/ruabie/moci-cet4/actions/runs/44083259830)、[Push CI #44083250185](https://github.com/ruabie/moci-cet4/actions/runs/44083250185) 和 [监工 CI #44083259710](https://github.com/ruabie/moci-cet4/actions/runs/44083259710) 均为 `completed/success`；已下载并查看 [36 帧真实动作/指标工件 #14327039681](https://github.com/ruabie/moci-cet4/actions/runs/44083250185/artifacts/14327039681)。
+- **判定：技术 QA 通过；视觉/足部 IK/实际游玩验收失败。** 双脚尚未独立锁定地面、跑步手臂像出拳、身体上下跳动过大；禁止进入正式玩家控制。两次有界尝试已经结束，下一独立工作包应使用 Godot `SkeletonProfileHumanoid` / BoneMap 正规骨骼静止轴映射、真正的足部 IK、平滑 root motion、连续真实输入视频和 Windows RTX3060 实机测评。
+- **保持原有风险边界：** V0.18 旧分支仍有 push-to-main 自动发布工作流，禁止对旧分支直接 push；当前高版本草稿无自动发布；main 的 `lifesim/index.html` 仍不存在，HTML S0–S5 `pending`，Chrome 浏览器试玩与 Windows FPS 均未验收，#15/#18 仍开放。
+
+---
+
+## 历史里程碑：V0.21 有版权证据的真实动画库接入与失败可复现（2026-11-17）
 
 - [草稿 PR #35](https://github.com/ruabie/moci-cet4/pull/35)，head `753f2dd577c161df486960d7a892c332b4184d15`，base `lifesim-v020-grounded-gait-review`。**open / draft / merged=false，原 V0.20 正式操控与经济/存档实现没有替换。**
 - 真实接入 Quaternius 的 **Universal Animation Library 1**，许可 CC0-1.0（[原作者官方下载页](https://quaternius.itch.io/universal-animation-library)）。使用只读、固定 Git commit 的可再分发镜像 `Barbatos6669/elderforge@bb2ce469f0ab2ccfc487faef55550ba07fae2483`：`UAL1_Standard.glb`，Git blob SHA `473e59080288428d0b6da826ba19324d07b191f0`，SHA256 `69591853d817488edaa8fd9bf8fc1d821eaeaf789f8627b3cd23b41c4ed67997`，7,618,436 字节，43 个动作片段。
@@ -65,14 +80,14 @@ GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/m
 
 ## 4. 下一步最优先任务
 
-1. **先解决 PR #35 六张真实截图中人物明显悬空及不自然摆臂**：已引入 CC0 动作库并可重定向 49 根语义骨骼，故下一步必须做 source/target rest/根高度/鞋底接触映射和连续视频测试（独立 V0.22），不可再把‘轨道正常’等于‘动画质量合格’。
+1. **按 V0.22 的 36 帧实际证据启动下一独立美术里程碑：** 人物整体悬空已有改善，但跑步手臂异常；Walk 根高度波动 6.7cm、Jog 12.2cm 且单帧最大 9.5cm，必须改用 Godot 骨骼配置标准化（SkeletonProfileHumanoid/BoneMap）、真正独立双脚 IK 与根高度平滑；不得把鞋底代理接地当成自然动作合格。
 2. 确保所有后续开发分支均禁止未审核自动发布；尤其不要直接向 V0.18 旧分支 push 而触发旧发布任务。
 3. 保持 `lifesim/index.html` 的浏览器 S0–S5 契约独立；核实现有隔离 Web 构建在真实 Chrome 的 WebGL/指针锁/输入/保存和加载表现。
 4. 用 Windows RTX 3060 真机测 1080p 帧率、输入延迟、碰撞/相机、进出商店；达不到可用性与画质标准则继续阻断最终交付。
 
 ## 5. 下次新聊天直接复制
 
-> 继续《游戏计划书／同频之城》开发。用 GitHub 连接器读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新核实最新 PR/SHA/Issue/CI 和主分支 HTML S0–S5（不将交接快照误当实时）。最新草稿 PR #35（V0.21，head 753f2dd577c1），已用固定许可 CC0 动作库重定向 49 根语义骨骼并通过同 SHA Godot CI，但真实截图中人物悬空/摆臂畸形，美术 FAIL。下一轮按 V0.22 独立里程碑先修 source/target BoneRest、脚底地面位置和真正连续动作证据；不直接改游戏正式操控。严格禁止自动合并/自动发布/新增付费/修改其他项目；结束时同步两份交接记录与提交 SHA。
+> 继续《游戏计划书／同频之城》开发。用 GitHub 连接器读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新核实最新 PR/SHA/Issue/CI 和主分支 HTML S0–S5（不将交接快照误当实时）。最新草稿 PR #36（V0.22，head dd1203044e91），已加入源/目标 BoneRest 跨轴转换及道路-鞋底代理接地；同 SHA Godot CI 和 36 帧真实动作片段采样通过，但跑步高度波动 12.2cm、相邻帧最大 9.5cm，手臂异常，画质/IK 仍 FAIL。下一轮独立里程碑需要原生 SkeletonProfileHumanoid/BoneMap 和双脚 IK、根高度平滑，并取得实际设备录像。不要替换正式玩家控制。严格禁止自动合并/自动发布/新增付费/修改其他项目；结束时同步两份交接记录与提交 SHA。
 
 ## 6. 交接文件和监工
 
