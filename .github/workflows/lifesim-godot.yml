@@ -208,6 +208,22 @@ jobs:
             test -s "$PROJECT_DIR/tests/v21_${state}.png"
           done
           test -s "$PROJECT_DIR/tests/v21_retarget_metrics.json"
+      - name: V0.22 rest-axis and actual road-ground contact diagnostic render
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v22_contact.gd 2>&1 | tee godot-v22-contact.log
+          grep -F 'V22 CONTACT PASS:' godot-v22-contact.log
+          for state in idle_a idle_b walk_a walk_b run_a run_b; do
+            test -s "$PROJECT_DIR/tests/v22_${state}.png"
+          done
+          test -s "$PROJECT_DIR/tests/v22_contact_metrics.json"
+
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
@@ -235,6 +251,9 @@ jobs:
             godot-v19-motion.log
             godot-v20-gait.log
             godot-v21-retarget.log
+            godot-v22-contact.log
+            lifesim/godot/tests/v22_*.png
+            lifesim/godot/tests/v22_*.json
             lifesim/godot/tests/v21_*.png
             lifesim/godot/tests/v21_*.json
             lifesim/godot/tests/v20_*.png
