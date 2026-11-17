@@ -1,10 +1,23 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
 > **交接快照：2026-11-17（Asia/Singapore）**  
-> **最新开发候选：V0.26 草稿 PR #40（Quaternius CC0 65 骨骼通用人物兼容性审核；未合并、未发布）。固定来源模型 65/65 骨骼及层级均匹配、独立审核 CI PASS，但两轮 Godot 三方渲染前置测试失败，未产生新角色对比截图。**  
+> **最新开发候选：V0.29 草稿 PR #43（CC0 原生配套骨架完整动作和真实三方渲染对照；未合并、未发布）。同提交 Godot 全量/快速/监工 CI 均通过，真实 15 张人物对照显示全身步态较旧市民自然，但缺少合格生活服装与实机连续操作，最终美术仍 BLOCKED。**  
 > 这是一次有证据的历史快照，不是实时仪表板。每次接班仍需独立查最新 GitHub PR/SHA/CI/Issue。
 
-## 最新一轮：V0.26 CC0 原生兼容骨架与未完成的实际渲染（2026-11-17）
+## 最新一轮：V0.27–V0.29 导入修复、15 张真实同相位人物截图（2026-11-17）
+
+- **最新候选：** [V0.29 草稿 PR #43](https://github.com/ruabie/moci-cet4/pull/43)，最终 head `d82fb76e649dbcf3d9c0c6787be755d3d75acfcc`，base `lifesim-v028-import-name-rest-proof`；**open / draft / merged=false**。当前只是验证美术方向，不合并、不自动发布、不替换生产 `CityPlayer`。
+- V0.27 **独立诊断**发现问题并非源素材缺少脊柱动画：原始 Quaternius UAL1 GLB 的 `spine_01` 在 `Idle_Loop`、`Walk_Loop`、`Jog_Fwd_Loop` 整条轨道的旋转变化均约 **0°** 且完全等于源骨骼 rest；反面证据是同一 Walk 的 `upperarm_l` 振幅 **32.57°**、Jog **26.51°**，不允许丢弃这些真正运动的关节。真实 Godot 4.7.2 导入把 `Idle_Loop/Walk_Loop/Jog_Fwd_Loop` 分别改名 `Idle/Walk/Jog_Fwd`，并优化掉静止的 `spine_01`，保留每个动作 **55 条旋转+1 条 pelvis 平移**。新代码只允许带 pinned GLB Git blob 证据的缺失恒定轨道回退到目标 rest，其他动态关键骨骼仍为阻断项。
+- 两个受限排错小版本保留真实失败证据：**PR #41 / V0.27** 最终 `d92f8e7238f723d3db303dedc499e436e8ff39ac`，先误用原始动作名、后在 source-rest JSON 中误用导入名，未出图；**PR #42 / V0.28** 最终 `782c7be2774c6f251570297e5bc5060139bd4b2b` 修复动作名映射，跳过之前的关键轨道阻断，但预览 GDScript `Array[float]` 条件赋值失败，仍未出图。历史失败不掩盖，也不对两者无限补丁。
+- V0.29 第一轮 `b7777ee7559ba777a26e6f24a94c3a22f89eb4b5` 修复真正的 typed-array 脚本问题，已有**15 张真实 Godot OpenGL3 同相位截图**（待机一组；步行、慢跑各两组）；第二轮最终 `d82fb76e649dbcf3d9c0c6787be755d3d75acfcc` 仅改测试拍照时隐藏另外两个角色，防止同画面模型重叠。实际图片来自原始 UAL 黄色人偶、65 骨骼 CC0 Universal Base Character 和 49 骨骼旧市民，不是 AI 概念图。
+- **四项同 head SHA CI 均 `completed/success`**：[专注源文件/轨道/实际三方渲染 #44106195024](https://github.com/ruabie/moci-cet4/actions/runs/44106195024)、[完整 Godot PR CI #44106195075](https://github.com/ruabie/moci-cet4/actions/runs/44106195075)、[完整 Godot Push CI #44106180691](https://github.com/ruabie/moci-cet4/actions/runs/44106180691)、[监工 CI #44106195051](https://github.com/ruabie/moci-cet4/actions/runs/44106195051)。已下载、人工打开并核对 [原始证据工件 #14338513188](https://github.com/ruabie/moci-cet4/actions/runs/44106195024/artifacts/14338513188)，含 **15 张 1280×720 PNG**、真实轨道清单、来源及动作指标、只含单一人物的 5×3 JPG 对照图。
+- **实际画面判断：** 官方 UAL 原生动画人偶与 Quaternius 65 骨骼兼容基础人物的全身步行/跑步比旧 49 骨骼有衣市民更协调，旧人物手臂异常抬高、类似出拳。新人物的臂腿运动接近原始动作库，这是**比较意义上的实质改善**；但新人物目前只是未换装的基础人体，并非真实城市生活服装，不能作为正式玩家；实际游戏街道、鞋底接触、脚滑、膝盖/脚尖滚动、从跑到停/转身的输入驱动连贯性均未证明。
+- **数值边界：** 最新静止/步行/跑步帧最低踝骨 Y（米）原始/兼容/旧市民分别为待机 `0.069/0.069/0.156`；步行两相位 `0.069–0.075 / 0.072–0.078 / 0.102–0.147`；跑步两相位 `0.108–0.186 / 0.141–0.219 / 0.330–0.372`。这是骨骼高度代理，**不是鞋底物理离地距离或扎实落地证据**。
+- **下一独立里程碑 V0.30：** 为兼容的 65 骨骼基础人物寻找/制作**许可证允许、与现代城市相符的衣服、鞋、头发**，保持现已验证的全身骨骼层级与 `pelvis` 平移；实际 Godot 蒙皮外观达到普通年轻人可接受的标准后，再将其接入封闭的玩家漫游试点，提供连续真实输入证据和 Windows/Chrome 测试。旧 V0.18 分支仍含危险的 push-to-main 自动发布，不推送它；Issues #10/#12/#15/#18 未关闭，main `lifesim/index.html` 缺失，HTML S0–S5 仍待验收。
+
+---
+
+## 历史里程碑：V0.26 CC0 原生兼容骨架与未完成的实际渲染（2026-11-17）
 
 - **候选：** [草稿 PR #40](https://github.com/ruabie/moci-cet4/pull/40)，base V0.25，最终 head `87a5399cc7c4be920ca2d35e8b0ec5fd54403ff4`，**open / draft / merged=false**。没有自动合并、发布、收费，也没有替换正式 `CityPlayer`。
 - 重新核实 Quaternius 官方 [Universal Base Characters](https://quaternius.itch.io/universal-base-characters) 和 [Universal Animation Library](https://quaternius.itch.io/universal-animation-library)，二者均为 **CC0 1.0**，官方明确提及互相兼容。新增 `tools/acquire_base_v26.py` 从只读固定镜像 `Barbatos6669/elderforge@bb2ce469f0ab2ccfc487faef55550ba07fae2483` 于 **CI 构建时**取得 `BaseCharacter.glb`；验证 Git blob `59c4044d5146146170f1c6d5e765985a73bc7875`、SHA256 `2d6792e77f337cf6fac3a81e1caf92798b898401140485b55307c9f14785ec25`、大小 1,085,752B、真实蒙皮与骨骼。裸 git checkout **不内含该二进制**，不能声称完全离线直接启动；运行时游戏也不请求网络。
@@ -135,14 +148,14 @@ GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/m
 
 ## 4. 下一步最优先任务
 
-1. **V0.27 先修导入语义，不再第三次盲改 V0.26**：原生 UAL GLB 包含 `spine_01` 轨道，Godot 已导入动作在 V0.26 却没有该旋转轨道。必须逐项核对动画导入后的 `NodePath`、`TrackType` 和常量/动态轨道，给真正静止的骨骼 rest-pose 合理回退；对 pelvis 平移及双腿/双臂动态轨道保持严格验收。
-2. 在功能兼容性真正通过后，出 **真实 Godot 三方截图**：原生 UAL 人偶、CC0 65 骨骼基础人物、49 骨骼旧市民同相位对照，人工审查膝盖、鞋底、上半身、走跑自然度。配套基础角色只是技术试验，不是生活市民最终外观。
-3. 未经过人眼和实机验证，不改正式 CityPlayer、不合并/发布。禁止向带危险自动部署工作的旧 V0.18 分支推送。继续守住零新增付费、#15/#18 阻断。
-4. 主分支 HTML S0–S5、Chrome WebGL 真实浏览器试玩、Windows RTX3060 1080p FPS/输入仍待独立验收。
+1. **V0.30 先补真实市民美术而非再调脊柱或脚踝：** V0.29 已证明 65 骨骼 Quaternius Universal Base Character 与 UAL1 动作高度适配，15 张真实画面中走跑比旧市民协调。下一独立工作包先检查可用 CC0 都市衣着、鞋靴和头发，或制作简洁有真实比例的蒙皮服装；保持兼容 65 关节、source rest / `pelvis` 平移，取得着装角色的实际 Godot 截图并验收。
+2. 保留此技术基线，待穿衣角色视觉通过后再做实际 LifeSim 街景输入驱动的连续走/停/转/跑、独立鞋底接地/脚滑指标、镜头、防穿模与碰撞。未经验证禁止修改正式 CityPlayer。
+3. 旧 V0.18 分支含自动 push 发布到 main 的危险工作流，不得直接推送；V0.29 PR #43 保持草稿、原美术/交付 Issues 不关闭、不自动合并或公开发布、不启用新增付费服务。
+4. 独立跟进 main HTML S0–S5/Chrome WebGL 浏览器实际试玩、存档/真实时钟，以及 Windows RTX3060 1080p FPS、输入延迟与最终人眼美术验收。
 
 ## 5. 下次新聊天直接复制
 
-> 继续《游戏计划书／同频之城》开发。先用 GitHub 读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新核实 PR/head SHA/CI/Issue/main HTML。最新 V0.26 草稿 PR #40，head `87a5399cc7c4be920ca2d35e8b0ec5fd54403ff4`，确切 CC0 Universal Base Character 与 UAL 65/65 共享骨骼与层级，静止旋转差异中位数 2.16°，旧 49 骨骼市民仅 1 个同名骨骼；快审核 CI 通过。注意 V0.26 两次完整 Godot CI 均在三方渲染前失败：原始导入有 55 条旋转+1 条 pelvis 平移，而第二轮关键轨道检查发现 `spine_01` 缺失。**没有 V0.26 新截图，不要谎称画质改善。** 下一独立 V0.27 先调查 Godot 动画轨道导入/常量轨道过滤，再用严格 rest-pose 回退保持动态髋部/双腿动作，之后取得真实同相位三方截图。不能第三次盲改旧 PR、不自动合并或发布、不付费、不推送危险 V0.18 旧分支、不修改其他项目，结束时再核实并更新两份交接及 SHA。
+> 继续《游戏计划书／同频之城》。先用 GitHub 读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，独立查 PR/head SHA/CI/Issue/main HTML。最新 V0.29 草稿 [PR #43](https://github.com/ruabie/moci-cet4/pull/43)，head `d82fb76e649dbcf3d9c0c6787be755d3d75acfcc`；同 SHA 快速 15 张原始 Godot 三方截图 CI #44106195024、完整 PR Godot #44106195075、完整 Push #44106180691、监工 #44106195051 全部 PASS。原生 UAL 65 骨骼与 Universal Base Character 65 根关节/父子层级完全一致，Godot 原始名变化已核实；原始 `spine_01` 三个动作都恒定等于 rest，允许 SHA pin 的静止轨道回退；各动作真实动画传递 55 条旋转+1 条 pelvis 平移。已人工复查干净的 5×3 角色对照图：新基础人物全身动作较旧市民自然，但还没有合格的都市服装、鞋底物理/连续输入实测，因此不得宣称游戏已经有可交付的新市民。下一独立 V0.30 优先挑选/制作许可合规的现代日常衣服/鞋/头发并匹配 65 骨骼后出真正游戏内蒙皮图，不合格不合并发布。保持零新增费用，绝不触碰 V0.18 危险自动发布分支和其他项目，完成后更新两份交接文件及 SHA。
 
 ## 6. 交接文件和监工
 
