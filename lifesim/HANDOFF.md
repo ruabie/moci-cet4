@@ -1,10 +1,23 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
 > **交接快照：2026-11-17（Asia/Singapore）**  
-> **最新开发候选：V0.20 草稿 PR #34（第二轮有界步态修正；未合并、未交付）。V0.19 PR #33 是技术基线，不能以旧版 CI 代替最新候选验收。**  
+> **最新开发候选：V0.21 草稿 PR #35（独立 CC0 动作接入/骨骼重定向试验；未合并、未发布）。同 SHA 引擎 CI 通过，但实际画面中人物悬空、姿态不自然，严禁当作美术验收成功。**  
 > 这是一次有证据的历史快照，不是实时仪表板。每次接班仍需独立查最新 GitHub PR/SHA/CI/Issue。
 
-## 最新一轮：V0.20 动态步态与脚部贴地（2026-11-17）
+## 最新一轮：V0.21 有版权证据的真实动画库接入与失败可复现（2026-11-17）
+
+- [草稿 PR #35](https://github.com/ruabie/moci-cet4/pull/35)，head `753f2dd577c161df486960d7a892c332b4184d15`，base `lifesim-v020-grounded-gait-review`。**open / draft / merged=false，原 V0.20 正式操控与经济/存档实现没有替换。**
+- 真实接入 Quaternius 的 **Universal Animation Library 1**，许可 CC0-1.0（[原作者官方下载页](https://quaternius.itch.io/universal-animation-library)）。使用只读、固定 Git commit 的可再分发镜像 `Barbatos6669/elderforge@bb2ce469f0ab2ccfc487faef55550ba07fae2483`：`UAL1_Standard.glb`，Git blob SHA `473e59080288428d0b6da826ba19324d07b191f0`，SHA256 `69591853d817488edaa8fd9bf8fc1d821eaeaf789f8627b3cd23b41c4ed67997`，7,618,436 字节，43 个动作片段。
+- 已提交 `tools/acquire_ual_v21.py`（构建时获取，验证文件 SHA/尺寸/真实动画/骨骼并生成 manifest）、`scripts/animation_retarget_v21.gd`（骨骼语义映射和 BoneRest 增量旋转）、`tests/visual_v21_retarget.gd`（在现有玩家模型上真实渲染待机/走/跑六帧）与 CI 工作流及来源证据。**运行时不请求网络**；但纯 git checkout 仍需先执行构建时下载脚本才能导入此资源，不能称已离线自带资源。
+- **第一轮失败证据：** 初版 `801e3f9f...` [CI #44078406302](https://github.com/ruabie/moci-cet4/actions/runs/44078406302) 失败于骨骼匹配仅 1 根，因动作库采用 `pelvis / spine_01 / thigh_l` 命名，现有人物是 `Hips / Abdomen / UpperLeg.L`。不是引擎/经济测试故障。
+- **第二轮真实结果：** 添加明确语义映射；[PR Godot CI #44079086818](https://github.com/ruabie/moci-cet4/actions/runs/44079086818) 和 [Push Godot CI #44079074579](https://github.com/ruabie/moci-cet4/actions/runs/44079074579) 在同一 SHA 全部 **success**。读取 [真实运行图/日志工件 #14326357015](https://github.com/ruabie/moci-cet4/actions/runs/44079074579/artifacts/14326357015)：语义骨骼匹配 49 根；`Idle / Walk / Jog_Fwd` 每项映射 47 条旋转轨道，玩家左大腿姿态变化依次为 0.044 / 0.407 / 0.759 rad。
+- **独立视觉判定：FAILED。** 六张实际截图均显示人物脚底远离地面/悬空，手臂姿态不自然，跑动像在空中跳跃。轨道驱动成功**不等于动作、脚部贴地、角色方向、真实操作手感合格**。两次有界尝试结束，QA 试验脚本不能并入正式操控。Issues #15/#18 保持开放。
+- **下一步单一最优先任务：** 独立 V0.22 项目重校准 source/target BoneRest、人物 root height 与鞋底地面位置，使用 Godot 官方 `SkeletonProfileHumanoid`、BoneMap / 适当足部 IK 或可量化接触约束；先消除 V0.21 悬空/畸形，再以完整实际录屏复验。**禁止第三轮只调摆臂数值的无界返工**。
+- 主分支 `lifesim/index.html` 仍 404、S0–S5 均 `pending`；Windows RTX3060 FPS、Chrome WebGL 真实输入和发布验收仍未完成。V0.18 上游工作流仍可能在推送时向 main 自动发布；**不要向旧分支 push**，在其独立禁用自动发布后才考虑继续。
+
+---
+
+## 历史里程碑：V0.20 动态步态与脚部贴地（2026-11-17）
 
 - 新建 [V0.20 草稿 PR #34](https://github.com/ruabie/moci-cet4/pull/34)，base 为 V0.19 PR #33；最新提交 `93fb2112d3a8a1c47014789f632dbf83893848db`。**未合并、未发布**。
 - 更新 `scripts/player.gd`：以实际位移推进 2.30m/步态周期（旧版约 4.25m），改进交替膝盖屈伸和手臂摆动，增加小幅受限的角色视觉根节点高度补偿（不会修改玩家物理碰撞体）。
@@ -52,14 +65,14 @@ GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/m
 
 ## 4. 下一步最优先任务
 
-1. **启动下一独立视觉里程碑（非 V0.20 第三轮盲改）**：寻找并核实可用于当前 Quaternius 人物骨骼的 CC0 或明确可再分发专业行走/跑步/转身动画，做重定向与足部接触约束，提交前后完整录屏和走/停/转实机证据。V0.20 当前仅技术 QA 通过。
+1. **先解决 PR #35 六张真实截图中人物明显悬空及不自然摆臂**：已引入 CC0 动作库并可重定向 49 根语义骨骼，故下一步必须做 source/target rest/根高度/鞋底接触映射和连续视频测试（独立 V0.22），不可再把‘轨道正常’等于‘动画质量合格’。
 2. 确保所有后续开发分支均禁止未审核自动发布；尤其不要直接向 V0.18 旧分支 push 而触发旧发布任务。
 3. 保持 `lifesim/index.html` 的浏览器 S0–S5 契约独立；核实现有隔离 Web 构建在真实 Chrome 的 WebGL/指针锁/输入/保存和加载表现。
 4. 用 Windows RTX 3060 真机测 1080p 帧率、输入延迟、碰撞/相机、进出商店；达不到可用性与画质标准则继续阻断最终交付。
 
 ## 5. 下次新聊天直接复制
 
-> 继续《游戏计划书／同频之城》开发。用 GitHub 连接器读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新核实最新 PR/SHA/Issue/CI 和主分支 HTML S0–S5（不将交接快照误当实时）。当前最新草稿 PR #34（V0.20，head 93fb2112）已有同 SHA Godot CI 技术通过，但两轮受限修复后美术和步态仍未验收；继续下一独立动作资源重定向/足部 IK 里程碑，并取得视频和 Windows 实机证据。严格禁止自动合并/自动发布/新增付费/修改其他项目；结束时同步两份交接记录与提交 SHA。
+> 继续《游戏计划书／同频之城》开发。用 GitHub 连接器读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新核实最新 PR/SHA/Issue/CI 和主分支 HTML S0–S5（不将交接快照误当实时）。最新草稿 PR #35（V0.21，head 753f2dd577c1），已用固定许可 CC0 动作库重定向 49 根语义骨骼并通过同 SHA Godot CI，但真实截图中人物悬空/摆臂畸形，美术 FAIL。下一轮按 V0.22 独立里程碑先修 source/target BoneRest、脚底地面位置和真正连续动作证据；不直接改游戏正式操控。严格禁止自动合并/自动发布/新增付费/修改其他项目；结束时同步两份交接记录与提交 SHA。
 
 ## 6. 交接文件和监工
 
