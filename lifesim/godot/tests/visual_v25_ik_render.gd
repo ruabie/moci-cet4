@@ -160,12 +160,19 @@ func _run() -> void:
             signal_info["positions"]={}
             signal_info["errors"]={}
             ik.active=true
+            # A prior OFF-state render also advanced this skeleton. Wait for
+            # the *next engine frame* before running manual modifier advance;
+            # the V0.24 passing test performed just one advance each frame.
+            await process_frame
             rig.advance(1.0/60.0)
             signal_info["enabled"]=false
             var count:int=int(signal_info["count"])
             if count<1:
                 _fail("native modifier did not fire in actual city player",{
-                    "motion":motion,"phase":i
+                    "motion":motion,"phase":i,
+                    "ik_active":ik.active,"solver_in_tree":ik.is_inside_tree(),
+                    "setting_count":ik.setting_count,
+                    "modifier_mode":rig.modifier_callback_mode_process
                 })
                 return
             callback_samples+=1
