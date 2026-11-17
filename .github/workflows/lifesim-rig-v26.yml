@@ -1,0 +1,50 @@
+name: LifeSim V0.26 pinned CC0 full-body rig audit
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/lifesim-rig-v26.yml'
+      - 'lifesim/godot/tools/acquire_base_v26.py'
+      - 'lifesim/godot/tools/audit_rigs_v26.py'
+      - 'lifesim/godot/art/characters/v26/PROVENANCE.md'
+  pull_request:
+    paths:
+      - '.github/workflows/lifesim-rig-v26.yml'
+      - 'lifesim/godot/tools/acquire_base_v26.py'
+      - 'lifesim/godot/tools/audit_rigs_v26.py'
+      - 'lifesim/godot/art/characters/v26/PROVENANCE.md'
+
+permissions:
+  contents: read
+
+jobs:
+  source-and-legacy-compatibility:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch pinned, unmodified CC0 GLBs and verify Git blob digests
+        run: |
+          set -euo pipefail
+          python3 lifesim/godot/tools/acquire_ual_v21.py
+          python3 lifesim/godot/tools/acquire_base_v26.py
+      - name: Audit actual rig parent hierarchy, rest frames and source pelvis motion
+        run: |
+          set -euo pipefail
+          python3 lifesim/godot/tools/audit_rigs_v26.py | tee v26-rig-audit.log
+          grep -F 'V26 REAL RIG AUDIT PASS:' v26-rig-audit.log
+          test -s lifesim/godot/tests/v26_rig_audit.json
+          test -s lifesim/godot/tests/v26_base_provenance.json
+      - name: Archive actual report even on failure (no publish)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v026-rig-audit
+          path: |
+            v26-rig-audit.log
+            lifesim/godot/tests/v26_rig_audit.json
+            lifesim/godot/tests/v26_base_provenance.json
+            lifesim/godot/art/characters/v26/PROVENANCE.md
+          if-no-files-found: warn
+          retention-days: 14
