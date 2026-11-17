@@ -1,18 +1,31 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
 > **交接快照：2026-11-17（Asia/Singapore）**  
-> **最新开发候选：V0.23 草稿 PR #37（Godot 原生 TwoBoneIK3D 双腿测试；未合并、未发布）。最后提交的原生 IK 验收未通过，脚踝目标误差改善次数 0/12；不能因旧版 QA 通过而宣称本版通过。**  
+> **最新开发候选：V0.24 草稿 PR #38（骨骼修改器读取时机诊断；未合并、未发布）。Godot 4.7.2 同 SHA 技术测试已证实真实玩家 IK 在 modification_processed 信号内求解成功；人物自然度、实机及 Web 验收仍阻断。**  
 > 这是一次有证据的历史快照，不是实时仪表板。每次接班仍需独立查最新 GitHub PR/SHA/CI/Issue。
 
-## 最新一轮：V0.23 Godot 原生双腿 IK 的实际失败证据（2026-11-17）
+## 最新一轮：V0.24 澄清原生双腿 IK 测试误判（2026-11-17）
+
+- 已独立确认 [V0.24 草稿 PR #38](https://github.com/ruabie/moci-cet4/pull/38)：head `5ed2a6db7a96c757dc35c2176befa4c22efc259e`；base V0.23 分支；**open / draft / 未合并、未发布**。源代码修改仅限诊断测试与 Actions；**没有替换正式 `CityPlayer` 的 V0.20 动作**。
+- 依据 [Godot 4.7 SkeletonModifier3D 官方说明](https://docs.godotengine.org/en/4.7/classes/class_skeletonmodifier3d.html)，修改器实际骨骼姿态应在 `modification_processed` 信号**触发瞬间**读取。原 V0.23 错在等 `process_frame` 后用 `get_bone_global_pose()` 读取，错过求解后姿态。因此此前“原生 IK 根本无法修改真实人物骨骼”的推论被新证据**推翻**；但 V0.23 当时的 CI 失败记录仍然有效，不能删除历史。
+- 新增不依赖游戏资产的 `tests/diagnostic_v24_minimal_ik.gd`，以真实官方 Godot 4.7.2 建三根骨骼、1 套原生 TwoBoneIK3D，手动 `Skeleton3D.advance()` 并在 `modification_processed` 内测实际脚踝：修改器触发 **4 次**，原本误差 **0.44m**，信号内 **0m**，信号外恢复 **0.44m**。短流程 [CI #44089439638](https://github.com/ruabie/moci-cet4/actions/runs/44089439638) **success**。
+- 又新增 `tests/diagnostic_v24_city_ik.gd`：**真实 LifeSim 原有 CC0 玩家模型**，沿用 V0.23 `TwoBoneIK3D` 左右腿设置及 UAL1 Walk/Jog 片段，在同一个场景里同时比较修改器前、信号内部与信号外三种读数。实际 **10 次修改器信号**；10 组 Walk/Jog 采样，7 个支撑脚样本，其中 **5 个显著改善**；支撑脚目标平均误差从 **0.248m**（动作原始姿态）降为信号内 **0m**，但后续读取仍为 **0.248m**。
+- 与 V0.24 同 SHA 的 [完整 PR Godot CI #44089439985](https://github.com/ruabie/moci-cet4/actions/runs/44089439985)、[完整 Push Godot CI #44089426494](https://github.com/ruabie/moci-cet4/actions/runs/44089426494)、[独立最小 IK CI #44089439638](https://github.com/ruabie/moci-cet4/actions/runs/44089439638) 及 [监督 CI #44089439690](https://github.com/ruabie/moci-cet4/actions/runs/44089439690) **均 completed/success**。已下载并独立读取 [同 SHA 的 GitHub 原始运行工件 #14331276265](https://github.com/ruabie/moci-cet4/actions/runs/44089439985/artifacts/14331276265)，确认 `v24_city_ik_metrics.json` 对应上述实测数字。
+- 在 V0.24 的完整 CI 中，**保留执行原 V0.23 失败脚本作为明确预期失败的反例对照**，并验证是已知“读取过晚”的失败原因；随后 V0.24 必须通过信号内测量的新独立门槛。没有隐藏旧错误或把反例当作功能成功。
+- **已通过的范围：** 官方 Godot 4.7.2 的原生求解器确实在**实际游戏人物骨架**上改变了脚踝位置，确认此前 V0.23 诊断误判。**未通过：** 蒙皮鞋底真实落地、膝盖/摆臂美观、连续实际输入、脚滑、走跑切换、Chrome WebGL、Windows RTX3060 和正式发布；不应从 `0m` 信号内误差推导美术和游戏体验合格。
+- 下一独立 V0.25 的首要工作：**在骨骼修改器已经生效的时刻捕获实际蒙皮角色渲染证据**，检验膝盖是否反折、鞋底是否穿地、手臂和重心是否自然，再判断是否值得研究接入正式控制。严格零新增费用，不合并、不发布、不推送仍有自动发布风险的 V0.18 旧分支。
+
+---
+
+## 历史里程碑：V0.23 Godot 原生双腿 IK 的实际失败证据（2026-11-17）
 
 - 新建 [V0.23 草稿 PR #37](https://github.com/ruabie/moci-cet4/pull/37)，base `lifesim-v022-rest-foot-contact-pilot`，最终 head SHA `7dc7d47add4ad62c95d610504725c70523bbbd9b`，**open / draft / merged=false；未发布、未替换正式玩家动作**。
 - 根据 [Godot 4.7 的 TwoBoneIK3D 原生接口](https://docs.godotengine.org/en/4.7/classes/class_twoboneik3d.html) 提交 `scripts/native_foot_ik_v23.gd`：显式 `SkeletonProfileHumanoid`/`BoneMap` 人形语义映射，左右腿各一套 `UpperLeg → LowerLeg → Foot`、世界地面射线目标与膝盖 pole；独立测试中根节点固定在 idle 校准值。还提交 `tests/visual_v23_native_ik.gd`、`tools/assemble_v23_native_ik.py` 及 CI 验收步骤。
 - **首次失败：** SHA `f55fc47adb9fb86ed14372ab8a855c71bb347637`、[PR CI #44085960249](https://github.com/ruabie/moci-cet4/actions/runs/44085960249)，错误调用了不存在的 `SkeletonProfileHumanoid.get_bone_count()`，应使用官方 `get_bone_size()`；已经修复但没有放宽后续测试门槛。
 - **第二轮实证仍失败：** SHA `7dc7d47add4ad62c95d610504725c70523bbbd9b`；[PR CI #44086627399](https://github.com/ruabie/moci-cet4/actions/runs/44086627399)、[Push CI #44086618495](https://github.com/ruabie/moci-cet4/actions/runs/44086618495) **均 completed/failure，失败于新原生 IK 验收**。此前 Godot 导入、经济/存档、V0.19–V0.22 动作截图测试均通过，不能以这些旧项通过代替新项。
-- 实际下载并审查 [该 SHA 失败工件 #14329447830](https://github.com/ruabie/moci-cet4/actions/runs/44086627399/artifacts/14329447830)：`v23_native_ik_metrics.json`、真实 Godot **Walk/Jog 各 8 张 PNG**、完整运行日志。成功创建了标准人形映射 **20 根骨骼**和两套 IK 目标；真实脚踝目标误差的 **12 次支撑脚采样中改善 0 次**，平均误差 **求解前 0.249m、求解后仍 0.249m**。这证明当前程序**未使被测脚踝骨骼出现可观测的修正**。日志没有确定精确根因，不应凭猜测宣布“原生 IK 已生效”。
+- 实际下载并审查 [该 SHA 失败工件 #14329447830](https://github.com/ruabie/moci-cet4/actions/runs/44086627399/artifacts/14329447830)：`v23_native_ik_metrics.json`、真实 Godot **Walk/Jog 各 8 张 PNG**、完整运行日志。成功创建了标准人形映射 **20 根骨骼**和两套 IK 目标；真实脚踝目标误差的 **12 次支撑脚采样中改善 0 次**，平均误差 **求解前 0.249m、求解后仍 0.249m**。**这是信号外的错误测量时机造成的假阴性**，不能证明 IK 求解器本身没有工作；V0.24 同一模型的新测试已证明信号内真实脚踝被求解到目标。保留旧 CI 测试失败这一事实，但废弃当时的错误归因。
 - 固定预览角色根节点 `-0.276m`，记录的根节点波动为 0 是**预览脚本设定**，并不证明实际游玩中身体自然平稳。截图仍显示手臂不自然、跑步腾空、街道重复低精度；真实鞋底蒙皮接触、连续操作视频、Chrome 和 RTX3060 性能均未验收。
-- **最终判定：V0.23 原生 IK 技术门槛 FAIL，人物视觉门槛 FAIL。** 本轮最多两次有界修复已用完；保留草稿 PR 和失败证据，**不合并、不发布、不把测试模块接入 CityPlayer**。
+- **历史判定：V0.23 原始测量门槛 FAIL，人物视觉门槛 FAIL；V0.24 已纠正原始门槛的测量方法，并确认 IK 求解生效。** 本轮最多两次有界修复已用完；保留草稿 PR 和失败证据，**不合并、不发布、不把测试模块接入 CityPlayer**。
 - **下一独立 V0.24 应先做根因诊断**，用最小 Godot Skeleton3D 测试 `SkeletonModifier3D.modification_processed` 是否触发，检查两条 `TwoBoneIK3D` 的 target/pole NodePath、`active`、动画更新时序以及 `Skeleton3D.advance()`，以实际脚踝骨骼前后坐标验证求解器是否运行；没有实证前禁止声称 IK 已落地。后续才是足部踩地、膝盖形态、动作混合与真实设备连续录屏。
 - **安全与交付边界不变：** V0.18 旧分支 push-to-main 的自动发布风险未解除，禁止直接推送该旧分支；主分支 HTML S0–S5 仍待验收，Chrome 实际试玩和 Windows RTX3060 FPS 未通过，#15/#18 继续开放。零新增付费服务。
 
@@ -94,14 +107,14 @@ GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/m
 
 ## 4. 下一步最优先任务
 
-1. **独立 V0.24：证明原生 IK 求解器确实被执行**。通过 `SkeletonModifier3D.modification_processed` 信号、`Skeleton3D.advance()`、target/pole 路径与更新时序测试，逐项比较真实脚踝世界坐标。V0.23 的 12 次支撑脚采样中误差均未改善，必须先找出该原因，不允许第三轮盲改 V0.23。
-2. 当原生 IK 能改变骨骼且目标误差确实下降后，再审查膝盖方向、双脚独立接触、步态混合和玩家输入连续录像；仅固定根节点高度不够。
-3. 不向 V0.18 旧分支直接 push；它仍含自动发布到 main 的旧工作流，需要独立安全修复。
-4. 继续独立验证主分支 HTML S0–S5、Chrome WebGL/指针锁/室内互动/存档、Windows RTX3060 的 1080p FPS 和输入延迟。
+1. **V0.25 真实蒙皮视觉审核**：V0.24 已在实际 CC0 模型上证明 TwoBoneIK3D 信号内脚踝误差从 24.8cm 降为 0；下一独立小版本必须捕获求解后真正用于绘制的蒙皮网格，逐帧审查足部接地、膝盖形态、手臂、角色重心，不能凭骨骼目标为 0 就宣布美术合格。
+2. 只有视觉通过后才进行实际输入驱动的连续走跑停/转身、双脚锁定地面、渲染时序和真实 Windows 录屏；禁止直接覆盖生产 CityPlayer。
+3. 不向 V0.18 旧分支直接 push，它仍含自动发布到 main 的工作流。高版本草稿只交付构建工件，不发布。
+4. 保持主分支 HTML S0–S5 独立验收，并实测 Chrome WebGL/指针锁/商店与存档、Windows RTX3060 的 1080p FPS 和输入延迟。
 
 ## 5. 下次新聊天直接复制
 
-> 继续《游戏计划书／同频之城》项目。先读取 GitHub 私人仓库 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，独立核实最新 PR/SHA/CI/Issue 和 main HTML S0–S5。最新草稿 PR #37 是 V0.23（head `7dc7d47add4ad62c95d610504725c70523bbbd9b`），两轮有界尝试均失败：首次用了错误 Godot SkeletonProfile API；第二轮实际 12 次足部支撑误差改善 0 次，平均误差 0.249m 前后相同，16 帧截图也未达到自然动画标准。不要第三次盲改 V0.23；下一独立 V0.24 先证明 Godot `SkeletonModifier3D`/原生 `TwoBoneIK3D` 实际更新了骨骼，排查 target/pole 路径、active 时序及 advance/信号，并保留成功或失败证据。坚持零新增费用、不合并/发布、不触碰旧 V0.18 高风险发布分支、不更改其他项目。结束时同步两份交接文件与真实 SHA。
+> 继续《游戏计划书／同频之城》项目。先读取 GitHub `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md` 并独立核实最新 PR/SHA/CI/Issue。当前最新 V0.24 草稿 PR #38，head `5ed2a6db7a96c757dc35c2176befa4c22efc259e`，引擎 CI 与独立最小 IK 测试成功；**更正 V0.23 的错误归因**：真实游戏人物的原生 IK 在 `modification_processed` 信号内将支撑脚平均目标误差从 24.8cm 降至 0，旧脚本信号外读数仍为 24.8cm。历史失败对照已保留，不要误称旧版测试通过。下一独立 V0.25 先获取原生 IK 生效后的蒙皮截图/连续证据，人工核查脚底与膝盖、手臂/跑步自然度；在美术/真实设备验收通过前绝不接入正式操控或发布。保持零费用、不自动合并或发布、不推送旧 V0.18 危险分支。结束时更新两份交接文件及真实提交 SHA。
 
 ## 6. 交接文件和监工
 
