@@ -1,10 +1,23 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
 > **交接快照：2026-11-17（Asia/Singapore）**  
-> **最新开发候选：V0.24 草稿 PR #38（骨骼修改器读取时机诊断；未合并、未发布）。Godot 4.7.2 同 SHA 技术测试已证实真实玩家 IK 在 modification_processed 信号内求解成功；人物自然度、实机及 Web 验收仍阻断。**  
+> **最新开发候选：V0.25 草稿 PR #39（原生 IK 开关真实蒙皮渲染对照；未合并、未发布）。同 SHA Godot CI 通过，8/8 组真实渲染画面发生明显变化，但人工复核膝盖、摆臂与跑步姿态仍不自然，美术验收 FAIL。**  
 > 这是一次有证据的历史快照，不是实时仪表板。每次接班仍需独立查最新 GitHub PR/SHA/CI/Issue。
 
-## 最新一轮：V0.24 澄清原生双腿 IK 测试误判（2026-11-17）
+## 最新一轮：V0.25 真实蒙皮 IK 对照图与美术阻断（2026-11-17）
+
+- **当前候选**：[草稿 PR #39](https://github.com/ruabie/moci-cet4/pull/39)，base `lifesim-v024-ik-signal-diagnostics`，最终 head `fbfc0a184f46de88a1aec9e080d9cee36d2baf7d`；**open / draft / merged=false**。零新增费用，未自动合并/发布，正式 `CityPlayer` 动作未替换。
+- 在 V0.24 已证明 IK 修改器信号内真能改变玩家脚踝后，本轮新增 `lifesim/godot/tests/visual_v25_ik_render.gd` 和 `tools/analyze_v25_ik_render.py`：对实际 CC0 LifeSim 玩家、真实 Quaternius UAL1 Walk/Jog 两个动作、四个相位各拍摄 **IK OFF vs IK ON 的成对 Godot OpenGL3 原始 PNG**。每对同一相位、同一镜头、同一游戏场景，1280×720 共 16 张，不以代码想象或 AI 生图替代实际渲染。分析脚本读取 PNG 原图做 RGB 像素差分并生成并排 JPG。
+- **两轮有界测试：** 第一轮 `9efee4e75006ac976014adabbde52482cd01a6d4` 的新测试在同一引擎帧里连续做 OFF 截图、ON 手动 advance，未收到第二次 `modification_processed`，CI 失败。第二轮 `fbfc0a184f46de88a1aec9e080d9cee36d2baf7d` 把 ON 求解移至下一个引擎帧，保留原始严格像素门槛。
+- **可复核的技术结果：** [PR Godot CI #44092482728](https://github.com/ruabie/moci-cet4/actions/runs/44092482728)、[Push Godot CI #44092475366](https://github.com/ruabie/moci-cet4/actions/runs/44092475366)、[监工 CI #44092482766](https://github.com/ruabie/moci-cet4/actions/runs/44092482766) 针对同 SHA 均 `completed/success`。已下载 [实际渲染与日志工件 #14332003288](https://github.com/ruabie/moci-cet4/actions/runs/44092482728/artifacts/14332003288)，独立读取 `v25_ik_render_metrics.json`、`v25_ik_render_comparison.json`、两幅 4×2 对照图并人工检视。
+- **量化结果：** 8 组真实 IK OFF/ON 图中 **8/8 均有真实可见渲染差异**。RGB 最大通道变化阈值 >20 的像素数按相位为 **13,434 / 16,418 / 10,277 / 17,648（Walk）**，**12,497 / 10,373 / 12,311 / 14,509（Jog）**，大约每张 1.1%–1.9% 图像像素，且在真实人物腿部可见。因此**不只是修改器回调数值，Godot 实际蒙皮角色也受到 IK 影响**。
+- **独立美术复核：FAIL。** 实际渲染发现腿部支撑与膝盖仍不自然且部分姿态过直，跑步多帧仍显著腾空，手臂如出拳/格斗而非自然跑步；不能证明鞋底蒙皮触地、脚滑为零、转身/停走连续。街道仍是低精度重复建筑与宽阔马路。**像素差异≠美术通过**，禁止接入正式玩家动作。
+- **下一独立方向：V0.26 以整个角色的动作适配为目标**：重新核对 UAL 动作源与当前 Quaternius 人物的上半身、肩膀、髋部、脚踝与膝盖的静止骨架取向，判断是否应直接改用骨架天然兼容的 CC0 人物与运动动画，避免继续在不兼容的全身动作上反复调 IK 或根节点高度。先交付对比和真实漫游姿态后再决定融合；仍需 Chrome/WebGL 真机与 Windows RTX3060 实测。
+- 费用、安全和发布边界不变：高版本为独立草稿，V0.18 原始分支包含危险的 push-to-main Web 自动发布任务，不向它直接推送；#15/#18 未关闭；主分支 `lifesim/index.html` 仍不存在，HTML S0–S5 `pending`，用户实际游玩未验收。
+
+---
+
+## 历史里程碑：V0.24 澄清原生双腿 IK 测试误判（2026-11-17）
 
 - 已独立确认 [V0.24 草稿 PR #38](https://github.com/ruabie/moci-cet4/pull/38)：head `5ed2a6db7a96c757dc35c2176befa4c22efc259e`；base V0.23 分支；**open / draft / 未合并、未发布**。源代码修改仅限诊断测试与 Actions；**没有替换正式 `CityPlayer` 的 V0.20 动作**。
 - 依据 [Godot 4.7 SkeletonModifier3D 官方说明](https://docs.godotengine.org/en/4.7/classes/class_skeletonmodifier3d.html)，修改器实际骨骼姿态应在 `modification_processed` 信号**触发瞬间**读取。原 V0.23 错在等 `process_frame` 后用 `get_bone_global_pose()` 读取，错过求解后姿态。因此此前“原生 IK 根本无法修改真实人物骨骼”的推论被新证据**推翻**；但 V0.23 当时的 CI 失败记录仍然有效，不能删除历史。
@@ -107,14 +120,14 @@ GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/m
 
 ## 4. 下一步最优先任务
 
-1. **V0.25 真实蒙皮视觉审核**：V0.24 已在实际 CC0 模型上证明 TwoBoneIK3D 信号内脚踝误差从 24.8cm 降为 0；下一独立小版本必须捕获求解后真正用于绘制的蒙皮网格，逐帧审查足部接地、膝盖形态、手臂、角色重心，不能凭骨骼目标为 0 就宣布美术合格。
-2. 只有视觉通过后才进行实际输入驱动的连续走跑停/转身、双脚锁定地面、渲染时序和真实 Windows 录屏；禁止直接覆盖生产 CityPlayer。
-3. 不向 V0.18 旧分支直接 push，它仍含自动发布到 main 的工作流。高版本草稿只交付构建工件，不发布。
-4. 保持主分支 HTML S0–S5 独立验收，并实测 Chrome WebGL/指针锁/商店与存档、Windows RTX3060 的 1080p FPS 和输入延迟。
+1. **V0.26 独立美术里程碑：先质疑当前动作/人物骨骼重定向方案本身是否适用。** V0.25 已以 8/8 组 Godot 原始截图证明 IK 实际影响蒙皮，但人物膝盖过直、跑步腾空、手臂像出拳；应优先对比源动作骨架/目标静止肩膀髋部轴向，研究换用骨架天然兼容的 CC0 人物和动作，不能再无限调 IK 数字。
+2. 建立真实连续输入操作和足底蒙皮-地面接触测量，审查走/停/转/跑全身动作、膝盖、鞋底滑动、原始脚步相位。美术合格前不替换正式 CityPlayer。
+3. 不向 V0.18 旧分支 push：尚存在自动发布至 main 的危险工作流；只在独立草稿产出 CI 工件。
+4. 保持 HTML S0–S5 独立验收，核实隔离版 Chrome WebGL 真实试玩、指针锁、商店/存档及 Windows RTX3060 性能。
 
 ## 5. 下次新聊天直接复制
 
-> 继续《游戏计划书／同频之城》项目。先读取 GitHub `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md` 并独立核实最新 PR/SHA/CI/Issue。当前最新 V0.24 草稿 PR #38，head `5ed2a6db7a96c757dc35c2176befa4c22efc259e`，引擎 CI 与独立最小 IK 测试成功；**更正 V0.23 的错误归因**：真实游戏人物的原生 IK 在 `modification_processed` 信号内将支撑脚平均目标误差从 24.8cm 降至 0，旧脚本信号外读数仍为 24.8cm。历史失败对照已保留，不要误称旧版测试通过。下一独立 V0.25 先获取原生 IK 生效后的蒙皮截图/连续证据，人工核查脚底与膝盖、手臂/跑步自然度；在美术/真实设备验收通过前绝不接入正式操控或发布。保持零费用、不自动合并或发布、不推送旧 V0.18 危险分支。结束时更新两份交接文件及真实提交 SHA。
+> 继续《游戏计划书／同频之城》。先用 GitHub 读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新独立验证 PR/head SHA/CI/Issues 和 main HTML S0–S5。当前开发候选 V0.25 草稿 [PR #39](https://github.com/ruabie/moci-cet4/pull/39)，head `fbfc0a184f46de88a1aec9e080d9cee36d2baf7d`。同 SHA Godot CI 技术 PASS：8 组成对真实原始渲染图，8/8 组 IK 开/关均显示约 1.1%–1.9% 像素差；人工打开对照图发现膝盖、脚底和跑步悬空/摆臂仍 FAIL。下一独立 V0.26 优先对比 UAL 与 Quaternius 人物的全身骨骼静止取向和可替代 CC0 骨架匹配方案，不再只调 IK；须提供真实漫游/接地连续视频证据。不要自动合并、发布、花钱、改其他项目，禁止推送仍带危险自动发布任务的旧 V0.18 分支。结束时同步两份 main 交接文件并列出实际 SHA。
 
 ## 6. 交接文件和监工
 
