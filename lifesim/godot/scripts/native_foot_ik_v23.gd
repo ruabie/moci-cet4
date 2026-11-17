@@ -50,7 +50,7 @@ static func install(player: CityPlayer) -> Dictionary:
     var bone_map := BoneMap.new()
     bone_map.profile = profile
     var known: Dictionary = {}
-    for n in range(profile.get_bone_count()):
+    for n in range(profile.get_bone_size()):
         known[str(profile.get_bone_name(n))] = true
     var matched: int = 0
     for semantic in HUMANOID:
