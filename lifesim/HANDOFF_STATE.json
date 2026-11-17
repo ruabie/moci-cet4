@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "snapshotDate": "2026-11-17",
+  "project": {
+    "id": "lifesim",
+    "name": "同频之城｜游戏计划书",
+    "type": "Godot 4.7.2 单人 3D 现实时间人生模拟",
+    "repository": "ruabie/moci-cet4",
+    "canonicalDirectory": "lifesim/",
+    "mainBranch": "main"
+  },
+  "goals": [
+    "游戏时钟与设备真实本地时间同步（主分支 HTML 验收阈值 <=90 秒）",
+    "可探索的 3D 街区及可交互公寓/商店",
+    "可实际参与的工作、收入与消费",
+    "可靠的本地版本化存档",
+    "真实浏览器/Windows 实机操作与画质验收"
+  ],
+  "constraints": {
+    "additionalPaidCost": false,
+    "automaticMerge": false,
+    "automaticRelease": false,
+    "allowedRepairAttempts": 2,
+    "realPlayEvidenceRequired": true,
+    "doNotModifyOtherProjects": true
+  },
+  "verifiedRepositoryFacts": {
+    "mainBranch": {
+      "projectConfig": "lifesim/project.json",
+      "sourceState": "not_connected",
+      "milestones": "S0-S5 pending",
+      "htmlEntry": "lifesim/index.html",
+      "htmlEntryPresent": false,
+      "interpretation": "主分支的 HTML/WebGL 独立验收未接通；不得由 Godot 草稿分支的成功推断为已完成"
+    },
+    "developmentCandidate": {
+      "version": "V0.18",
+      "pr": 32,
+      "url": "https://github.com/ruabie/moci-cet4/pull/32",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v018-humanoid-art-pass",
+      "headSha": "c288af7b7cd75fd8baa9d3369610d9f8b178b0dc",
+      "baseBranch": "lifesim-v017-refrigeration-art",
+      "engineProject": "lifesim/godot/project.godot",
+      "engineConfigName": "同频之城 · 青川町 V0.18-civilian-art",
+      "reportedChange": "导入七个 CC0 人物资源并替换玩家和六位 NPC 角色外观；骨骼兼容性与渲染证据为候选内容",
+      "visualApproved": false,
+      "windowsPerformanceVerified": false,
+      "finalRelease": false
+    },
+    "issues": [
+      {
+        "number": 10,
+        "state": "open",
+        "role": "LifeSim HTML 首版和独立监工"
+      },
+      {
+        "number": 12,
+        "state": "open",
+        "role": "Godot G0 工程及实机验证"
+      },
+      {
+        "number": 18,
+        "state": "open",
+        "role": "美术/镜头/HUD/Windows 实机阻断"
+      }
+    ],
+    "evidenceRule": "历史 G0 / V0.4 引擎 QA 通过不能证明 V0.18 的所有实际互动、画质、浏览器和 Windows 性能均通过"
+  },
+  "gates": [
+    {
+      "id": "HTML-S0-S5",
+      "state": "pending",
+      "why": "主分支 HTML 入口缺失；各阶段未在 project.json 标记验收通过"
+    },
+    {
+      "id": "Godot-functional-QA",
+      "state": "requires_current_run_evidence",
+      "why": "应对候选分支对应 SHA 逐项检查 CI、引擎内经济/存档与场景"
+    },
+    {
+      "id": "WebGL-browser",
+      "state": "unverified",
+      "why": "需要当前候选分支实际浏览器启动、交互、截图与操作记录"
+    },
+    {
+      "id": "Art-and-animation",
+      "state": "blocked_pending_review",
+      "why": "人物动作、细部造型、建筑拼接感、室内生活感、镜头遮挡需实际渲染/录屏审查"
+    },
+    {
+      "id": "Windows-RTX3060",
+      "state": "unverified",
+      "why": "需要用户 Windows 设备实机帧率、输入延迟、镜头碰撞测试"
+    },
+    {
+      "id": "Release",
+      "state": "not_ready",
+      "why": "功能、画面与实机性能尚未全面验收"
+    }
+  ],
+  "nextActions": [
+    "读取 PR #32 最新 head/base SHA 和 CI/视觉证据，检查是否有更新候选版本",
+    "优先检查 Issue #18 和实际渲染：步行/转身骨骼形变、人物比例、相机遮挡及室内外一致性",
+    "核实 Godot 4.7.2 候选版本时钟、经济幂等、损坏存档恢复与场景互动的独立运行证据",
+    "检查网页试玩构建及真实浏览器操作；不得把 Godot 引擎 QA 代替 HTML-S0-S5",
+    "安排 Windows RTX 3060 的实际试玩/FPS 与输入延迟检查；未做标记 unverified",
+    "只有相应证据通过后才能更新验收状态；仍保持草稿 PR、零新增费用、不自动合并或发布"
+  ],
+  "handoff": {
+    "entry": "lifesim/HANDOFF.md",
+    "protocol": "lifesim/HANDOFF_PROTOCOL.md",
+    "state": "lifesim/HANDOFF_STATE.json",
+    "freshness": "快照仅代表 2026-11-17 已核实信息；每次新对话或重大变更必须重新核对 GitHub；不基于旧快照自称当前最新",
+    "monitorIntegration": "not_verified"
+  }
+}
