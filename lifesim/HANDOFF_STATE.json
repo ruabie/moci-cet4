@@ -31,21 +31,28 @@
       "milestones": "S0-S5 pending",
       "htmlEntry": "lifesim/index.html",
       "htmlEntryPresent": false,
-      "interpretation": "主分支的 HTML/WebGL 独立验收未接通；不得由 Godot 草稿分支的成功推断为已完成"
+      "interpretation": "主分支的 HTML/WebGL 独立验收未接通；不得由 Godot 草稿分支的成功推断为已完成",
+      "isolatedPreviewBuild": "lifesim/play-v18/index.html + build-info.json present on main",
+      "isolatedPreviewSourceSha": "c288af7b7cd75fd8baa9d3369610d9f8b178b0dc",
+      "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.18",
-      "pr": 32,
-      "url": "https://github.com/ruabie/moci-cet4/pull/32",
+      "version": "V0.19 motion proof + safe Web build (draft)",
+      "pr": 33,
+      "url": "https://github.com/ruabie/moci-cet4/pull/33",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v018-humanoid-art-pass",
-      "headSha": "c288af7b7cd75fd8baa9d3369610d9f8b178b0dc",
-      "baseBranch": "lifesim-v017-refrigeration-art",
+      "headBranch": "lifesim-v019-motion-proof-safe-web",
+      "headSha": "31ba2aafb97784ac25133fe8df4bac85fa2b3fea",
+      "baseBranch": "lifesim-v018-humanoid-art-pass",
+      "baseSha": "c288af7b7cd75fd8baa9d3369610d9f8b178b0dc",
       "engineProject": "lifesim/godot/project.godot",
-      "engineConfigName": "同频之城 · 青川町 V0.18-civilian-art",
-      "reportedChange": "导入七个 CC0 人物资源并替换玩家和六位 NPC 角色外观；骨骼兼容性与渲染证据为候选内容",
+      "reportedChange": "Actual input-driven walking phases / turning / stop CI screenshots and metrics; candidate Web workflow removes publish-isolated-path",
+      "engineCiRun": 44071855686,
+      "engineCiLastChecked": "in_progress",
+      "sourceCommitted": true,
+      "qaPassedForThisHead": false,
       "visualApproved": false,
       "windowsPerformanceVerified": false,
       "finalRelease": false
@@ -67,7 +74,48 @@
         "role": "美术/镜头/HUD/Windows 实机阻断"
       }
     ],
-    "evidenceRule": "历史 G0 / V0.4 引擎 QA 通过不能证明 V0.18 的所有实际互动、画质、浏览器和 Windows 性能均通过"
+    "evidenceRule": "历史 G0 / V0.4 引擎 QA 通过不能证明 V0.18 的所有实际互动、画质、浏览器和 Windows 性能均通过",
+    "previousCandidate": {
+      "version": "V0.18",
+      "pr": 32,
+      "url": "https://github.com/ruabie/moci-cet4/pull/32",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v018-humanoid-art-pass",
+      "headSha": "c288af7b7cd75fd8baa9d3369610d9f8b178b0dc",
+      "baseBranch": "lifesim-v017-refrigeration-art",
+      "engineProject": "lifesim/godot/project.godot",
+      "engineConfigName": "同频之城 · 青川町 V0.18-civilian-art",
+      "reportedChange": "导入七个 CC0 人物资源并替换玩家和六位 NPC 角色外观；骨骼兼容性与渲染证据为候选内容",
+      "visualApproved": false,
+      "windowsPerformanceVerified": false,
+      "finalRelease": false,
+      "engineCiRun": 43909344105,
+      "engineCiResult": "success",
+      "sourceArtifact": 14246952613,
+      "visualArtifact": 14246962551,
+      "visualInspection": "Three V0.18 PNGs independently inspected: low-poly civilian, repeated/simple skyline and road dominance; six-resident lineup too small to check joint quality"
+    },
+    "workflowPublicationSafety": {
+      "finding": "V0.18 source workflow contains a publish-isolated-path job which commits and pushes build to main on branch push. Existing main/play-v18 published files confirmed.",
+      "v019CandidateFix": "The job was removed on PR #33 only; V0.18 branch remains vulnerable to push-driven publication until separately disabled.",
+      "guardVerifiedBySourceInspection": true,
+      "effectiveAcrossAllBranches": false,
+      "approval": "never merge or publish without human review"
+    },
+    "motionTestEvidence": {
+      "source": "lifesim/godot/tests/visual_v19_motion.gd",
+      "screenshotsExpected": [
+        "v19_walking_early.png",
+        "v19_walking_late.png",
+        "v19_turning.png",
+        "v19_stopped.png"
+      ],
+      "metricsExpected": "v19_motion_metrics.json",
+      "currentStatus": "code committed; PR #33 engine CI #44071855686 in progress when last checked",
+      "visualQualityApproved": false
+    }
   },
   "gates": [
     {
@@ -77,18 +125,18 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "requires_current_run_evidence",
-      "why": "应对候选分支对应 SHA 逐项检查 CI、引擎内经济/存档与场景"
+      "state": "current_candidate_ci_in_progress",
+      "why": "V0.18 SHA c288af7 success on Godot run 43909344105. V0.19 SHA 31ba2aaf new engine test run 44071855686 was in progress at last observation."
     },
     {
       "id": "WebGL-browser",
       "state": "unverified",
-      "why": "需要当前候选分支实际浏览器启动、交互、截图与操作记录"
+      "why": "main contains isolated lifesim/play-v18 Web export/build-info but no independently verified Chrome interaction; canonical lifesim/index.html still 404."
     },
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "人物动作、细部造型、建筑拼接感、室内生活感、镜头遮挡需实际渲染/录屏审查"
+      "why": "V0.18 static images independently reviewed: simplified character, large empty road, repeated skyline; four real-motion screenshots proposed by PR #33 but not yet visually approved."
     },
     {
       "id": "Windows-RTX3060",
@@ -99,22 +147,27 @@
       "id": "Release",
       "state": "not_ready",
       "why": "功能、画面与实机性能尚未全面验收"
+    },
+    {
+      "id": "Workflow-no-automatic-publication",
+      "state": "candidate_fix_pending",
+      "why": "V0.19 PR #33 removes auto-publish job only from stacked draft; original V0.18 workflow still has push-to-main capability."
     }
   ],
   "nextActions": [
-    "读取 PR #32 最新 head/base SHA 和 CI/视觉证据，检查是否有更新候选版本",
-    "优先检查 Issue #18 和实际渲染：步行/转身骨骼形变、人物比例、相机遮挡及室内外一致性",
-    "核实 Godot 4.7.2 候选版本时钟、经济幂等、损坏存档恢复与场景互动的独立运行证据",
-    "检查网页试玩构建及真实浏览器操作；不得把 Godot 引擎 QA 代替 HTML-S0-S5",
-    "安排 Windows RTX 3060 的实际试玩/FPS 与输入延迟检查；未做标记 unverified",
-    "只有相应证据通过后才能更新验收状态；仍保持草稿 PR、零新增费用、不自动合并或发布"
+    "Recheck PR #33 head SHA and Godot workflow run #44071855686; fix failed tests at most twice, preserve logs",
+    "Inspect four V0.19 actual-motion screenshots + metrics for knees, arms, rotation, foot sliding and clipping; engine pass is not subjective art pass",
+    "Before any push to V0.18 original branch, remove/disable its legacy push-to-main publication job; never interpret PR #33 draft as applied production guard",
+    "Review actual Chrome WebGL interactions for existing lifesim/play-v18; keep canonical HTML S0-S5 independent and pending",
+    "Run Windows RTX3060 1080p real gameplay and FPS/input/collision proof; no release before evidence"
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "快照仅代表 2026-11-17 已核实信息；每次新对话或重大变更必须重新核对 GitHub；不基于旧快照自称当前最新",
+    "freshness": "2026-11-17 snapshot: verified GitHub PR #33, PR #32, original CI/artifacts and current main published files; workflow status is point-in-time only",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
-    "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files."
+    "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
+    "latestRound": "V0.19 motion/release safety candidate PR #33 (draft, not merged); main metadata-only handoff update requested by user"
   }
 }
