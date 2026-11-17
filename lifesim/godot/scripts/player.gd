@@ -8,6 +8,8 @@ const WALK_SPEED: float = 4.7
 const RUN_SPEED: float = 7.5
 const TURN_SPEED: float = 9.0
 const MOUSE_SENSITIVITY: float = 0.0024
+# V0.20: a full two-step gait cycle per travelled distance, not per frame.
+const GAIT_CYCLE_METRES: float = 2.30
 
 var camera_yaw: float = -1.23
 var camera_pitch: float = -0.12
@@ -23,6 +25,10 @@ var anim_clock: float = 0.0
 var anim_weight: float = 0.0
 var walk_speed_ratio: float = 1.0
 var animation_verified: bool = false
+var resting_foot_height: float = 0.0
+var gait_foot_lift: float = 0.0  # Signed visual-root height offset (negative lowers floating ankles).
+var physics_tick_counter: int = 0
+var gait_stride_phase: float = 0.0
 
 func _ready() -> void:
     name = "Player"
@@ -63,6 +69,7 @@ func _ready() -> void:
             push_error("glTF character is missing bone " + required_bone)
             return
     animation_verified = true
+    resting_foot_height = _lowest_foot_height_relative_to_body()
     camera = Camera3D.new()
     camera.name = "ThirdPersonCamera"
     camera.current = true
@@ -84,6 +91,25 @@ func _ready() -> void:
 func _pose(name: String, x: float, y: float = 0.0) -> void:
     CharacterArtV18.pose(rig, name, x, y)
 
+func _lowest_foot_height_relative_to_body() -> float:
+    # Foot *bones* are ankle references, not shoe sole collision samples.
+    # Recording them in the idle bind pose avoids assuming a fixed model origin.
+    if rig == null or character_visual == null:
+        return 0.0
+    var lowest: float = INF
+    for semantic in ["LeftFoot", "RightFoot"]:
+        var bone_name: String = CharacterArtV18.joint_name(rig, semantic)
+        if bone_name == "":
+            continue
+        var foot_index: int = rig.find_bone(bone_name)
+        var foot_world: Vector3 = rig.global_transform * rig.get_bone_global_pose(foot_index).origin
+        lowest = minf(lowest, foot_world.y - global_position.y - character_visual.position.y)
+    return lowest if lowest != INF else 0.0
+
+func foot_clearance_vs_idle() -> float:
+    # Negative means at least one ankle reference is below its idle reference.
+    return _lowest_foot_height_relative_to_body() + gait_foot_lift - resting_foot_height
+
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
         camera_yaw -= event.relative.x * MOUSE_SENSITIVITY
@@ -99,6 +125,7 @@ func _unhandled_input(event: InputEvent) -> void:
         Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 func _physics_process(delta: float) -> void:
+    physics_tick_counter += 1
     var axis: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
     var basis := Basis(Vector3.UP, camera_yaw)
     var desired: Vector3 = basis * Vector3(axis.x, 0, axis.y)
@@ -120,26 +147,42 @@ func _physics_process(delta: float) -> void:
     var horizontal_speed: float = Vector2(velocity.x, velocity.z).length()
     var stride_weight: float = clampf(horizontal_speed / WALK_SPEED, 0.0, 1.0) if is_on_floor() else 0.0
     anim_weight = move_toward(anim_weight, stride_weight, delta * 5.0)
-    # Stride frequency scales with *actual* movement, minimizing foot sliding.
-    if horizontal_speed > 0.08:
-        anim_clock += delta * horizontal_speed * 1.48
-    var s: float = sin(anim_clock)
-    var power: float = anim_weight * (0.68 if running else 0.46)
+    # V0.19 completed a full cycle over ~4.25m, despite a ~1.8m avatar.
+    # Shortening distance-per-cycle reduces unrealistic drifting shoes.
+    if horizontal_speed > 0.08 and is_on_floor():
+        anim_clock += delta * horizontal_speed * TAU / GAIT_CYCLE_METRES
+    gait_stride_phase = fposmod(anim_clock, TAU)
+    var s: float = sin(gait_stride_phase)
+    var swing_left: float = maxf(0.0, -s)
+    var swing_right: float = maxf(0.0, s)
+    var power: float = anim_weight * (0.77 if running else 0.58)
     _pose("LeftThigh", s * power)
     _pose("RightThigh", -s * power)
-    _pose("LeftShin", maxf(0.0, -s) * .76 * anim_weight)
-    _pose("RightShin", maxf(0.0, s) * .76 * anim_weight)
-    # Modular CC0 characters ship in T-pose. Rest the arms at the torso;
-    # animate small opposite swings around that authored idle offset.
-    _pose("LeftUpperArm", -1.13 - s * power * .28, -.08)
-    _pose("RightUpperArm", -1.13 + s * power * .28, .08)
-    _pose("LeftForeArm", -.16 - maxf(0.0,s) * .16 * anim_weight)
-    _pose("RightForeArm", -.16 - maxf(0.0,-s) * .16 * anim_weight)
-    _pose("Spine", 0.085 if running else 0.015, -s * .03 * anim_weight)
-    _pose("Head", 0.0, s * .025 * anim_weight)
-    _pose("LeftFoot", -s * power * .18)
-    _pose("RightFoot", s * power * .18)
-    character_visual.position.y = absf(s) * .025 * anim_weight
+    # Alternate knee flexion during swing; the stance leg stays comparatively
+    # straight. Keep knee bends nonnegative to avoid hyperextension.
+    _pose("LeftShin", swing_left * 0.91 * anim_weight)
+    _pose("RightShin", swing_right * 0.91 * anim_weight)
+    _pose("LeftUpperArm", -1.13 - s * power * 0.45, -.08)
+    _pose("RightUpperArm", -1.13 + s * power * 0.45, .08)
+    _pose("LeftForeArm", -.16 - swing_right * .24 * anim_weight)
+    _pose("RightForeArm", -.16 - swing_left * .24 * anim_weight)
+    _pose("Spine", 0.072 if running else 0.022, -s * .045 * anim_weight)
+    _pose("Head", 0.0, s * .028 * anim_weight)
+    _pose("LeftFoot", -s * power * .22 - swing_left * .12 * anim_weight)
+    _pose("RightFoot", s * power * .22 - swing_right * .12 * anim_weight)
+
+    # V0.20.1: a high ankle above the idle reference is ALSO an error
+    # (floating shoes). Allow at most 5.5cm visual-root descent while the
+    # collider remains fixed. This is a bounded, diagnostic two-foot floor
+    # approximation, NOT exact mesh-sole contact or proper IK.
+    var correction: float = clampf(
+        resting_foot_height - _lowest_foot_height_relative_to_body(), -0.055, 0.105
+    )
+    if correction > gait_foot_lift:
+        gait_foot_lift = correction  # Correct floor penetration immediately.
+    else:
+        gait_foot_lift = move_toward(gait_foot_lift, correction, delta * 2.4)
+    character_visual.position.y = gait_foot_lift
     _update_camera(delta)
 
 func _update_camera(delta: float) -> void:

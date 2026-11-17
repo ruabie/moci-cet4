@@ -170,6 +170,22 @@ jobs:
           assert obj["turn_angle_radians"] >= 0.45
           print("V19 MOTION METRICS PASS", obj)
           PY
+      - name: Capture V0.20 real gait sequence and measure ankle floor guard
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v20_gait.gd 2>&1 | tee godot-v20-gait.log
+          grep -F 'V20 GAIT PASS:' godot-v20-gait.log
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/assemble_gait_v20.py"
+          test -s "$PROJECT_DIR/tests/v20_gait_sequence.gif"
+          test -s "$PROJECT_DIR/tests/v20_gait_contact_sheet.png"
+          test -s "$PROJECT_DIR/tests/v20_gait_metrics.json"
+
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
@@ -195,6 +211,10 @@ jobs:
             godot-qa.log
             godot-v18-visual.log
             godot-v19-motion.log
+            godot-v20-gait.log
+            lifesim/godot/tests/v20_*.png
+            lifesim/godot/tests/v20_*.gif
+            lifesim/godot/tests/v20_*.json
             lifesim/godot/tests/v19_*.png
             lifesim/godot/tests/v19_motion_metrics.json
             lifesim/godot/tests/v18_*.png
