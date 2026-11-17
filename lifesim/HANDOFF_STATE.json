@@ -37,32 +37,35 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.26 CC0 full-body compatible rig audit PASS; actual three-way animation render BLOCKED",
-      "pr": 40,
-      "url": "https://github.com/ruabie/moci-cet4/pull/40",
+      "version": "V0.29 full-body CC0 source-compatible rest-backed animation real 3-rig render (technical PASS, final civilian art blocked)",
+      "pr": 43,
+      "url": "https://github.com/ruabie/moci-cet4/pull/43",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v026-native-rig-compatibility",
-      "headSha": "87a5399cc7c4be920ca2d35e8b0ec5fd54403ff4",
-      "baseBranch": "lifesim-v025-ik-skinned-render-gate",
-      "baseSha": "fbfc0a184f46de88a1aec9e080d9cee36d2baf7d",
-      "isolatedRigAuditCiRun": 44098933766,
-      "isolatedRigAuditStatus": "completed_success",
-      "originalGameAndEconomyRegressionPassed": true,
-      "fullGodotPrCiRun": 44098933886,
-      "fullGodotPushCiRun": 44098911548,
-      "fullGodotCiResult": "completed_failure_v26_new_render_guard",
-      "actualNewBaseRendered": false,
-      "sourceVsBaseVsLegacyScreenshots": false,
-      "cc0SourceValidated": true,
-      "compatibleRigHierarchyVerified": true,
-      "productionPlayerUpdated": false,
-      "visualApproved": false,
+      "headBranch": "lifesim-v029-three-rig-typed-frame-capture",
+      "headSha": "d82fb76e649dbcf3d9c0c6787be755d3d75acfcc",
+      "baseBranch": "lifesim-v028-import-name-rest-proof",
+      "baseSha": "782c7be2774c6f251570297e5bc5060139bd4b2b",
+      "allSameHeadCI": {
+        "focusedPr": 44106195024,
+        "fullGodotPr": 44106195075,
+        "fullGodotPush": 44106180691,
+        "supervisor": 44106195051,
+        "status": "completed_success"
+      },
+      "pinnedCC0SourceVerified": true,
+      "fullBody65BoneSourceCompatible": true,
+      "actualRendered3RigSourceBaseLegacyApprovedAsEvidence": true,
+      "actualThreeRigScreenshots": 15,
+      "humanoidBaseComparableMotionBetterThanLegacy": true,
+      "finalCivilianVisualApproved": false,
+      "footSoleContactApproved": false,
+      "continuityInputVideoPassed": false,
+      "productionCityPlayerModified": false,
       "chromeVerified": false,
       "windowsPerformanceVerified": false,
-      "finalRelease": false,
-      "noMergeRelease": true
+      "finalRelease": false
     },
     "issues": [
       {
@@ -575,6 +578,149 @@
       "legacyV025VisualStatus": "FAIL — arms, knees, airborne run",
       "repairsUsed": 2,
       "nextRootCause": "Inventory Godot import track names vs original raw GLB; determine whether spine_01 is a constant rest pose track filtered by importer or track path mismatch. Only then implement principled rest-pose fallback, preserve pelvis translation and get actual rendered reference imagery."
+    },
+    "previousCandidateV026": {
+      "version": "V0.26 CC0 full-body compatible rig audit PASS; actual three-way animation render BLOCKED",
+      "pr": 40,
+      "url": "https://github.com/ruabie/moci-cet4/pull/40",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v026-native-rig-compatibility",
+      "headSha": "87a5399cc7c4be920ca2d35e8b0ec5fd54403ff4",
+      "baseBranch": "lifesim-v025-ik-skinned-render-gate",
+      "baseSha": "fbfc0a184f46de88a1aec9e080d9cee36d2baf7d",
+      "isolatedRigAuditCiRun": 44098933766,
+      "isolatedRigAuditStatus": "completed_success",
+      "originalGameAndEconomyRegressionPassed": true,
+      "fullGodotPrCiRun": 44098933886,
+      "fullGodotPushCiRun": 44098911548,
+      "fullGodotCiResult": "completed_failure_v26_new_render_guard",
+      "actualNewBaseRendered": false,
+      "sourceVsBaseVsLegacyScreenshots": false,
+      "cc0SourceValidated": true,
+      "compatibleRigHierarchyVerified": true,
+      "productionPlayerUpdated": false,
+      "visualApproved": false,
+      "chromeVerified": false,
+      "windowsPerformanceVerified": false,
+      "finalRelease": false,
+      "noMergeRelease": true
+    },
+    "v027Review": {
+      "pr": 41,
+      "headSha": "d92f8e7238f723d3db303dedc499e436e8ff39ac",
+      "underlyingSourceEvidence": "Exact pinned UAL GLB idle/walk/jog spine_01 quaternion is 0° range and equals bind/rest; Godot imported 0 spine_01 rotation tracks and kept 1 pelvis position track per clip.",
+      "sourceNativeNames": [
+        "Idle_Loop",
+        "Walk_Loop",
+        "Jog_Fwd_Loop"
+      ],
+      "godotImportedNames": [
+        "Idle",
+        "Walk",
+        "Jog_Fwd"
+      ],
+      "importedMappedRotationTracks": 55,
+      "sourceRestAuditPassed": true,
+      "importTrackInspectionPassed": true,
+      "firstRunFailure": "V27 initial test used original imported animation names and could not find Idle_Loop in Godot",
+      "lastRunFailure": "V27 rest-proof lookup keyed imported Idle rather than pinned source Idle_Loop, denying verified static rest fallback",
+      "twoBoundedAttemptsUsed": 2,
+      "result": "diagnostic_partial_pass_render_blocked",
+      "unmerged": true
+    },
+    "v028Review": {
+      "pr": 42,
+      "headSha": "782c7be2774c6f251570297e5bc5060139bd4b2b",
+      "appliedExactImportedToPinnedNameMap": true,
+      "preserveDynamicBodyBonesAndPelvisPosition": true,
+      "failure": "Godot 4.7.2 Three-rig scene GDScript assigned untyped ternary Array to Array[float] after compat retarget passed; next retry initially hung frame_post_draw and forced redraw improved observability.",
+      "twoBoundedAttemptsUsed": 2,
+      "result": "source_and_import_pass_triple_render_blocked",
+      "unmerged": true
+    },
+    "v029Review": {
+      "pr": 43,
+      "exactHeadSha": "d82fb76e649dbcf3d9c0c6787be755d3d75acfcc",
+      "authenticFocusedCIArtifactId": 14338513188,
+      "artifactUrl": "https://github.com/ruabie/moci-cet4/actions/runs/44106195024/artifacts/14338513188",
+      "realGodotScreenshots": 15,
+      "screenshotResolution": [
+        1280,
+        720
+      ],
+      "reviewSheet": "v26_three_rig_same_phase_review.jpg",
+      "rendersInEachComparison": [
+        "original UAL mannequin",
+        "CC0 Universal Base Character 65-bone body",
+        "legacy civilian 49-bone"
+      ],
+      "poses": [
+        "Idle fraction .18",
+        "Walk fractions .19/.59",
+        "Jog fractions .19/.59"
+      ],
+      "singleActorVisiblePerFrame": true,
+      "sameSourceAnimationPhaseAndLocalCamera": true,
+      "physicalSourceMatches": {
+        "sourceBones": 65,
+        "candidateBones": 65,
+        "sourceCandidateMatchingNames": 65,
+        "sourceCandidateMatchingParents": 65,
+        "legacyBones": 49,
+        "legacyExactMatchingNames": 1
+      },
+      "rotationsPerClip": {
+        "Idle": 55,
+        "Walk": 55,
+        "Jog": 55
+      },
+      "pelvisTranslationTracksPerClip": 1,
+      "verifiedRestOnlyOmission": [
+        "spine_01"
+      ],
+      "sourceLicence": "Quaternius CC0-1.0 from pinned public repository Git blobs; build-time only",
+      "comparativeArtJudgment": "actual same-phase source and 65-bone compatible character are more natural in full-body walk/jog than old dressed civilian, whose raised arms look like boxing",
+      "finalArtJudgment": "NOT APPROVED: compatible neutral body has no appropriate civilian clothing/shoes; no real city walk/turn/stop input, actual foot sole contact or knee/skin polish",
+      "lowestAnkleBoneYMetresByPose": {
+        "idle": {
+          "source": 0.069,
+          "compatible": 0.069,
+          "legacy": 0.156
+        },
+        "walk_019": {
+          "source": 0.069,
+          "compatible": 0.072,
+          "legacy": 0.102
+        },
+        "walk_059": {
+          "source": 0.075,
+          "compatible": 0.078,
+          "legacy": 0.147
+        },
+        "jog_019": {
+          "source": 0.186,
+          "compatible": 0.219,
+          "legacy": 0.33
+        },
+        "jog_059": {
+          "source": 0.108,
+          "compatible": 0.141,
+          "legacy": 0.372
+        }
+      },
+      "lowestAnkleDisclaimer": "These are bone world Y positions after one-time rig grounding, not shoe sole mesh-to-floor distances or planted foot lock",
+      "firstAttemptSha": "b7777ee7559ba777a26e6f24a94c3a22f89eb4b5",
+      "secondAttemptSha": "d82fb76e649dbcf3d9c0c6787be755d3d75acfcc",
+      "firstFocusedCI": 44105552868,
+      "secondFocusedCi": 44106195024,
+      "fullPrCI": 44106195075,
+      "fullPushCI": 44106180691,
+      "supervisorCI": 44106195051,
+      "allExactHeadChecksCompletedSuccess": true,
+      "productionGameChanged": false,
+      "publicRelease": false
     }
   },
   "gates": [
@@ -585,8 +731,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "blocked_current_head",
-      "why": "V0.26 PR#40 final SHA 87a5399: isolated binary rig audit #44098933766 SUCCESS and prior economy/save/scenes passed, but full PR Godot CI #44098933886 and push #44098911548 FAILURE at new 3-way render prerequisite (imported Idle clip missing spine_01 track). No V26 visual artifacts; do not confuse source rig structural compatibility with game animation acceptance."
+      "state": "passed_current_sha_engine_and_three_rig_render_only",
+      "why": "V0.29 PR #43 exact head d82fb76: focused true CC0 source/base/legacy render #44106195024, full Godot PR #44106195075, full push #44106180691, supervisor #44106195051 all completed SUCCESS; original economy/save/game regressions intact. No production avatar integration or live input verification."
     },
     {
       "id": "WebGL-browser",
@@ -596,7 +742,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "V0.26 exact full-body rig asset audit passes (65/65 shared hierarchy) but candidate's actual 3-way Godot render never happened due imported Idle spine_01 mapping guard. V0.25 real visuals remain art FAIL; no basis to approve new character or full-body motion."
+      "why": "15 actual independent isolated real Godot screenshots show source-compatible 65-bone base full-body motions more natural than old 49-bone dressed civilian, but compatible base is unclothed/unfinished; shoe soles and continuous input transitions unmeasured. Comparative art improvement is not final civilian visual acceptance."
     },
     {
       "id": "Windows-RTX3060",
@@ -611,23 +757,23 @@
     {
       "id": "Workflow-no-automatic-publication",
       "state": "fixed_in_stacked_drafts_only",
-      "why": "V0.26 remains only draft stacked on safe V0.25; original V0.18 branch still has unsafe push-to-main Web auto publication. Do not push old branch; no merge/release."
+      "why": "V0.29 PR #43 remains unmerged draft on safe V0.19-descended branch. Old V0.18 branch still has unsafe push-to-main web deploy; do not push old branch."
     }
   ],
   "nextActions": [
-    "Independent next V0.27 diagnostic: inspect Godot imported AnimationPlayer track paths/types and source GLB raw per-bone TRS values. Determine why spine_01 is present in raw UAL animation yet missing from imported rotation clone; distinguish constant/rest tracks from genuine missing deformation before implementing a principled fallback. Do not do a third blind repair to PR #40.",
-    "Once source imports are reconciled, render real source UAL Mannequin vs compatible 65-bone BaseCharacter vs old 49-bone civilian at identical Walk/Jog phases and camera; human-review arms, knees, foot contact and source pelvis motion. New base superhero appearance is not accepted as a civilian model.",
-    "Keep PR #40 draft, issues #15/#18 open, zero cost/no merge/release; never push unsafe old V0.18 branch Web auto publisher.",
-    "Canonical main HTML S0-S5, isolated WebGL real input and browser interaction still missing/unverified; run Chrome actual gameplay when candidate is trustworthy.",
-    "Run Windows RTX3060 1080p FPS, camera/collision, avatar art and gameplay transitions before claiming delivery."
+    "Next independent V0.30 art milestone: identify or create legally licensed everyday civilian clothing, shoes and hair compatible with the verified 65-bone CC0 Universal Base Character and source UAL animation skeleton. Preserve 65-bone hierarchy and pelvis translation; inspect actual Godot skinned material and silhouette against user preference for realistic city art before integrating.",
+    "After clothing quality passes, run actual input-driven Walk/Stop/Turn/Jog in LifeSim streets with new dressed compatible rig, prove skinned shoe sole-ground contact, correct knee bending, foot-world drift, smooth animation blending and camera, not just static-phase comparison.",
+    "Keep V0.29 PR #43 draft, #10/#12/#15/#18 issues open, zero new paid services, no merge/release. Never push legacy V0.18 branch with unsafe auto-publish-to-main job.",
+    "Main canonical HTML S0-S5 remains sourceState not_connected and lifesim/index.html absent. Chrome actual WebGL playable controls, pointer lock, shops, save and local-clock correctness still independently unverified.",
+    "Windows RTX3060 1080p frame rate, input response, collisions and final visual signoff required prior to playable user delivery."
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-17 independently verified PR #40 exact SHA, isolated audit run #44098933766 success, full Godot CI #44098933886 failure and original #44097738717 failure, read actual logs and pinned GLB metrics; handoff updated accordingly.",
+    "freshness": "2026-11-17 independent exact-SHA PR #43 and 4 CI successes verified, GitHub artifact 14338513188 downloaded; 15 real PNGs and clean 5x3 comparison manually viewed, numeric per-pose ankle bone distances audited. Main handoff updated.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.26 PR #40 draft head 87a5399: pinned Universal Base CC0 structural audit PASS (65/65 bones, 65/65 parents, 2.16° rest median; old rig 49 and 1 name), source Jog pelvis position 0.245m; two full CI attempts failed new three-way render prerequisite (source imported 55 tracks, spine_01 absent). No actual V26 images, art blocked, production untouched, no merge/release."
+    "latestRound": "V0.29 draft PR #43 exact SHA d82fb76: Godot full PR/push, focused real 15-frame three-rig rendering and supervisor all PASS. 65-bone compatible character full-body movement visually improved vs old civilian, but base lacks acceptable clothing and continuous input/foot sole/Windows/WebGL remain blocked. No production changes or release."
   }
 }
