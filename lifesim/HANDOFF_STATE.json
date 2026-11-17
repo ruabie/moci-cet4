@@ -53,12 +53,13 @@
       "firstAttemptPrCiResult": "success",
       "latestPrCiRun": 44074870163,
       "latestPushCiRun": 44074860982,
-      "latestCiStatus": "in_progress_at_last_check",
-      "qaPassedForThisHead": false,
+      "latestCiStatus": "completed_success",
+      "qaPassedForThisHead": true,
       "visualApproved": false,
       "windowsPerformanceVerified": false,
       "finalRelease": false,
-      "changes": "travel-distance-driven animated knee/arm phases, bounded signed ankle height offset, 20 engine PNG+GIF, exact measured physics tick gaps"
+      "changes": "travel-distance-driven animated knee/arm phases, bounded signed ankle height offset, 20 engine PNG+GIF, exact measured physics tick gaps",
+      "ciMeaning": "Godot 4.7.2 same SHA engine import, economy/save/scene, V0.19 movement, V0.20 GIF capture/metric assertions passed; NOT subjective art or Windows FPS."
     },
     "issues": [
       {
@@ -166,10 +167,21 @@
       "finding": "V0.20 first attempt raised ankle reference up to ~11cm and guard never lowered visual root. Mesa capture skipped unknown numbers of physics ticks; GIF cannot be called fixed-period real-time video.",
       "secondAttemptFix": "bounded negative 5.5cm visual-root offset plus capture tick indices and variable-duration GIF",
       "secondAttemptSha": "93fb2112d3a8a1c47014789f632dbf83893848db",
-      "secondAttemptCiStatus": "in_progress",
-      "repairBudget": "2 of 2 bounded revisions; do not start unlimited repair chain",
+      "secondAttemptCiStatus": "completed_success",
+      "repairBudget": "2 of 2 consumed for this gait patch; next milestone requires licensed full walk/run/turn clip plus retargeting and IK, not more blind parameter changes",
       "subjectiveArtApproved": false,
-      "limitation": "ankle reference not shoe sole; no true IK or Windows realtime video"
+      "limitation": "ankle reference not shoe sole; no true IK or Windows realtime video",
+      "secondAttemptArtifactId": 14323684340,
+      "secondAttemptMetrics": {
+        "distanceMetres": 11.882,
+        "phaseAdvanceRad": 32.459,
+        "ankleClearanceMaxMetres": 0.07,
+        "ankleClearanceMinMetres": 0,
+        "visualRootOffsetMinMetres": -0.055,
+        "intendedTickGap": 3,
+        "observedMaxTickGap": 8
+      },
+      "secondAttemptReview": "20-frame images, contact sheet and a full-size frame independently viewed. Stiff stylized gait/weak foot contact remain; city repetition/road dominance unchanged. Actual foot slide, high-quality character motion, Windows FPS not proven."
     }
   },
   "gates": [
@@ -180,8 +192,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "requires_current_sha_run",
-      "why": "V0.20 first attempt SHA 07bf475e Godot PR CI #44074055179 passed. Current revised SHA 93fb2112 is under PR CI #44074870163; not yet verified. Do not transfer previous pass."
+      "state": "passed_current_sha_engine_ci_only",
+      "why": "Latest V0.20 SHA 93fb2112, PR CI 44074870163 + Push CI 44074860982 completed success, including 20-frame motion diagnostic. Does not certify graphics/real play."
     },
     {
       "id": "WebGL-browser",
@@ -191,7 +203,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "V0.20 first 20-frame images reviewed; foot hovered up to ~11cm relative to rest ankle and sampled at irregular real physics times. Second correction under review; no subjective art acceptance."
+      "why": "V0.20 second attempt 20 real Godot frames reviewed: ankle-bone height proxy max 7cm instead of 11cm and visual correction -5.5cm, but stiff gait/foot contact remains, capture skips 7-8 physics ticks between snapshots. Need professional licensed clip+retargeting/IK and real continuous video."
     },
     {
       "id": "Windows-RTX3060",
@@ -210,19 +222,19 @@
     }
   ],
   "nextActions": [
-    "Recheck exact head SHA 93fb2112 and PR CI #44074870163 (also push CI #44074860982), download/review 20-frame GIF and tick-index metrics; stop if second attempt fails and preserve failed evidence",
-    "For subsequent milestone use licensed retargeted walk animation + real foot IK/contact and side-by-side captured video; avoid calling procedural foot height clamp completed gait",
-    "Before any new V0.18 upstream branch push disable its old publish-isolated-path GitHub workflow; PR #33/#34 fix only exists in stacked candidates",
-    "Actual Chrome WebGL interaction + pointer lock, economy/save; main canonical HTML S0–S5 remains pending",
-    "Windows RTX3060 real FPS, input delay, collision and doorway testing remains unverified"
+    "Start NEW visual milestone rather than additional V0.20 repair: locate explicitly CC0-compatible human walk/run/turn animations for same imported rig; verify provenance and exact skeleton compatibility before retargeting, then proper foot plant IK",
+    "Measure actual shoe sole vs ground contact with continuous game capture and input/reorientation; no acceptance based solely on ankle proxy or Mesa sampled GIF",
+    "Disable legacy V0.18 push-to-main publication workflow before ever pushing its old branch; PR #34 safe build artifact is not global security fix",
+    "Actual Chrome/WebGL play plus save/interaction check on isolated V0.18 build; canonical main lifesim/index.html HTML-S0-S5 still pending",
+    "Windows RTX3060 device benchmark @1080p for FPS, input and camera/door collision; keep release blocked"
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-17 GitHub read: PR #34 head 93fb2112; first SHA 07bf475e CI success and screenshot review; later PR CI in_progress at last check",
+    "freshness": "2026-11-17 verified PR #34, PR CI #44074870163 and Push CI #44074860982 successes; examined artifact 14323684340 actual metrics and images",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.20 draft PR #34; second bounded adjustment underway, CI pending at snapshot; GitHub main handoff only, no game merge/release"
+    "latestRound": "V0.20 draft PR #34 SHA 93fb2112: same-SHA GitHub CI success, artifact reviewed, animation not art-approved; two bounded revisions exhausted; main handoff only"
   }
 }
