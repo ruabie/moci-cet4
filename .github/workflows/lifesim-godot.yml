@@ -44,6 +44,13 @@ jobs:
           set -euo pipefail
           python3 -m venv /tmp/lifesim-v14-python
           /tmp/lifesim-v14-python/bin/pip install --quiet trimesh==4.11.1 numpy pillow
+      - name: Acquire immutable CC0 Quaternius animation library (build-time only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/acquire_ual_v21.py"
+          test -s "$PROJECT_DIR/art/animations/v21/ual1_inplace.glb"
+          test -s "$PROJECT_DIR/tests/v21_ual_manifest.json"
       - name: Build reproducible original GLB assets
         shell: bash
         run: |
@@ -186,6 +193,21 @@ jobs:
           test -s "$PROJECT_DIR/tests/v20_gait_contact_sheet.png"
           test -s "$PROJECT_DIR/tests/v20_gait_metrics.json"
 
+      - name: V0.21 true licensed animation retarget smoke and fixed-camera rendering
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v21_retarget.gd 2>&1 | tee godot-v21-retarget.log
+          grep -F 'V21 RETARGET PASS:' godot-v21-retarget.log
+          for state in idle_a idle_b walk_a walk_b run_a run_b; do
+            test -s "$PROJECT_DIR/tests/v21_${state}.png"
+          done
+          test -s "$PROJECT_DIR/tests/v21_retarget_metrics.json"
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
@@ -212,6 +234,9 @@ jobs:
             godot-v18-visual.log
             godot-v19-motion.log
             godot-v20-gait.log
+            godot-v21-retarget.log
+            lifesim/godot/tests/v21_*.png
+            lifesim/godot/tests/v21_*.json
             lifesim/godot/tests/v20_*.png
             lifesim/godot/tests/v20_*.gif
             lifesim/godot/tests/v20_*.json
