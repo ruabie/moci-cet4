@@ -51,6 +51,15 @@ jobs:
           python3 "$PROJECT_DIR/tools/acquire_ual_v21.py"
           test -s "$PROJECT_DIR/art/animations/v21/ual1_inplace.glb"
           test -s "$PROJECT_DIR/tests/v21_ual_manifest.json"
+      - name: Acquire CC0 65-joint Universal Base trial and prove actual rest compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/acquire_base_v26.py"
+          python3 "$PROJECT_DIR/tools/audit_rigs_v26.py" | tee v26-rig-audit.log
+          grep -F 'V26 REAL RIG AUDIT PASS:' v26-rig-audit.log
+          test -s "$PROJECT_DIR/art/characters/v26/base_character_compatible.glb"
+          test -s "$PROJECT_DIR/tests/v26_rig_audit.json"
       - name: Build reproducible original GLB assets
         shell: bash
         run: |
@@ -308,6 +317,21 @@ jobs:
           test -s "$PROJECT_DIR/tests/v25_ik_render_metrics.json"
           test -s "$PROJECT_DIR/tests/v25_ik_render_comparison.json"
 
+      - name: V0.26 actual native UAL vs compatible full-body vs legacy civilian render evidence
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v26_rig_compare.gd 2>&1 | tee godot-v26-rig-review.log
+          grep -F 'V26 THREE RIG RENDER PASS:' godot-v26-rig-review.log
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/assemble_v26_review.py"
+          test -s "$PROJECT_DIR/tests/v26_three_rig_same_phase_review.jpg"
+          test -s "$PROJECT_DIR/tests/v26_visual_metrics.json"
+
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
@@ -340,6 +364,11 @@ jobs:
             godot-v23-native-ik.log
             godot-v24-city-ik.log
             godot-v25-ik-render.log
+            godot-v26-rig-review.log
+            v26-rig-audit.log
+            lifesim/godot/tests/v26_*.png
+            lifesim/godot/tests/v26_*.jpg
+            lifesim/godot/tests/v26_*.json
             lifesim/godot/tests/v25_*.png
             lifesim/godot/tests/v25_*.jpg
             lifesim/godot/tests/v25_*.json
