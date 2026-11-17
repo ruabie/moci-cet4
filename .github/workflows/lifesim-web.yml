@@ -1,9 +1,10 @@
-name: LifeSim V0.18 licensed block and furnished interiors Web preview
+name: LifeSim Web export - build artifact only, manual acceptance
 
 on:
   push:
     branches:
       - lifesim-v018-humanoid-art-pass
+      - lifesim-v019-motion-proof-safe-web
     paths:
       - '.github/workflows/lifesim-web.yml'
       - 'lifesim/godot/**'
@@ -148,10 +149,10 @@ jobs:
           assert 'Godot' in html or '.wasm' in html
           print('WEB EXPORT PASS: HTML, WebAssembly, PCK, JS exist')
           PY
-      - name: Upload verified V0.18 Web build for review and isolated publication
+      - name: Upload preview artifact for manual review only (no publication)
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v018-humanoid-art-pass-build
+          name: lifesim-web-review-${{ github.sha }}
           path: lifesim-web-build/
           if-no-files-found: error
           retention-days: 14
@@ -159,75 +160,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v018-humanoid-art-pass-logs
+          name: lifesim-web-build-logs-${{ github.sha }}
           path: |
             godot-web-import.log
             godot-web-qa.log
             godot-web-export.log
           if-no-files-found: warn
           retention-days: 14
-
-
-  publish-isolated-path:
-    name: Publish only lifesim/play-v18 to main without merging game source
-    needs: build
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    if: ${{ github.repository == 'ruabie/moci-cet4' && github.ref == 'refs/heads/lifesim-v018-humanoid-art-pass' }}
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: lifesim-v018-humanoid-art-pass-build
-          path: site-build
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          path: published-main
-          persist-credentials: true
-      - name: Verify existing repository site is preserved
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -s published-main/index.html
-          test -e published-main/.nojekyll
-          test -s site-build/index.html
-          compgen -G "site-build/*.wasm" >/dev/null
-          compgen -G "site-build/*.pck" >/dev/null
-          compgen -G "site-build/*.js" >/dev/null
-          test ! -e published-main/lifesim/play-v18/index.html || grep -q 'Godot' published-main/lifesim/play-v18/index.html
-      - name: Copy only the new Web export to its isolated URL path
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p published-main/lifesim/play-v18
-          find published-main/lifesim/play-v18 -maxdepth 1 -type f -delete
-          cp -a site-build/. published-main/lifesim/play-v18/
-          python3 - <<'PY'
-          import json, os
-          from pathlib import Path
-          (Path('published-main')/'lifesim'/'play-v18'/'build-info.json').write_text(
-              json.dumps({'version':'0.18','source_branch':'lifesim-v018-humanoid-art-pass',
-                          'commit':os.environ['GITHUB_SHA'],
-                          'build_system':'Godot 4.7.2 Web single thread'},indent=2)+'\n')
-          PY
-          cd published-main
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lifesim/play-v18
-          test -z "$(git diff --name-only -- . ':!lifesim/play-v18')" || { echo 'Unexpected modifications outside lifesim/play-v18'; exit 1; }
-          if git diff --cached --quiet; then
-            echo "Unchanged web files: no update needed"
-          else
-            git commit -m "deploy(lifesim): publish isolated V0.18 urban landscape Web build"
-            git push origin HEAD:main
-          fi
-      - name: Read GitHub Pages site status without altering it
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set +e
-          gh api "repos/$GITHUB_REPOSITORY/pages" --jq '{url, status, build_type, source}' || true
-          echo "NOTE: GITHUB_TOKEN git push does not trigger branch-source Pages rebuild. A separate authenticated publish trigger is required."
