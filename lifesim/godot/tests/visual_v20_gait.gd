@@ -45,6 +45,8 @@ func _run() -> void:
     var lowest_clearance: float = INF
     var highest_clearance: float = -INF
     var highest_visual_lift: float = -INF
+    var lowest_visual_lift: float = INF
+    var tick_indices: Array[int] = []
     var left_poses: Array[float] = []
     var clearances: Array[float] = []
     var frame_list: Array[String] = []
@@ -62,6 +64,8 @@ func _run() -> void:
         lowest_clearance = minf(lowest_clearance, clearance)
         highest_clearance = maxf(highest_clearance, clearance)
         highest_visual_lift = maxf(highest_visual_lift, player.gait_foot_lift)
+        lowest_visual_lift = minf(lowest_visual_lift, player.gait_foot_lift)
+        tick_indices.append(player.physics_tick_counter)
         var q: Quaternion = player.rig.get_bone_pose_rotation(thigh_index)
         left_poses.append(snappedf(q.get_angle(), 0.001))
 
@@ -84,6 +88,9 @@ func _run() -> void:
 
     var distance: float = player.global_position.distance_to(origin)
     var radians: float = player.anim_clock - initial_phase
+    var max_sample_tick_gap: int = 0
+    for idx in range(1, tick_indices.size()):
+        max_sample_tick_gap = maxi(max_sample_tick_gap, tick_indices[idx] - tick_indices[idx - 1])
     var stats: Dictionary = {
         "source": "Godot 4.7.2 physics process + actual held move_forward",
         "capture_frames": FRAME_COUNT,
@@ -94,12 +101,17 @@ func _run() -> void:
         "lowest_ankle_clearance_vs_idle_metres": snappedf(lowest_clearance, 0.001),
         "highest_ankle_clearance_vs_idle_metres": snappedf(highest_clearance, 0.001),
         "max_visual_floor_lift_metres": snappedf(highest_visual_lift, 0.001),
+        "min_visual_root_offset_metres": snappedf(lowest_visual_lift, 0.001),
+        "sample_physics_tick_indices": tick_indices,
+        "max_sample_tick_gap": max_sample_tick_gap,
+        "intended_tick_gap": TICKS_PER_FRAME,
         "ankle_clearances": clearances,
         "thigh_pose_angles": left_poses,
         "frames": frame_list,
         "limitations": [
             "ankle bone != exact shoe mesh sole",
             "diagnostic Linux software rendering, not real Windows GPU",
+            "render captures may include extra physics ticks; sample_physics_tick_indices reveal actual time spacing",
             "still requires subjective animation and foot skate assessment"
         ]
     }
@@ -119,8 +131,15 @@ func _run() -> void:
     if highest_visual_lift > 0.11:
         _fail("visual root lifted too far: " + str(highest_visual_lift))
         return
-    print("V20 GAIT PASS: distance=%s phase=%s clearance_min=%s lift_max=%s" % [
-        distance, radians, lowest_clearance, highest_visual_lift
+    if lowest_visual_lift > -0.005:
+        _fail("float reduction guard never activated: " + str(lowest_visual_lift))
+        return
+    if highest_clearance > 0.095:
+        _fail("ankle still floating more than 9.5cm vs idle: " + str(highest_clearance))
+        return
+    print("V20 GAIT PASS: distance=%s phase=%s clearance_range=%s..%s visual_offset_min=%s max_tick_gap=%d" % [
+        distance, radians, lowest_clearance, highest_clearance,
+        lowest_visual_lift, max_sample_tick_gap
     ])
     scene.queue_free()
     ProjectSettings.set_setting("application/config/qa_mode", false)
