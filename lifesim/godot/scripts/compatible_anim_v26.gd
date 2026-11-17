@@ -45,7 +45,7 @@ static func install(source_scene: Node, dest_scene: Node3D) -> Dictionary:
         rebuilt.loop_mode=Animation.LOOP_LINEAR
         var counts:Dictionary={"rotation":0,"pelvis_translation":0}
         for n in range(clip.get_track_count()):
-            var type:Animation.TrackType=clip.track_get_type(n)
+            var type:int=clip.track_get_type(n)
             if type!=Animation.TYPE_ROTATION_3D and type!=Animation.TYPE_POSITION_3D:
                 continue
             var original:NodePath=clip.track_get_path(n)
