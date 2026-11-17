@@ -26,7 +26,8 @@ var anim_weight: float = 0.0
 var walk_speed_ratio: float = 1.0
 var animation_verified: bool = false
 var resting_foot_height: float = 0.0
-var gait_foot_lift: float = 0.0
+var gait_foot_lift: float = 0.0  # Signed visual-root height offset (negative lowers floating ankles).
+var physics_tick_counter: int = 0
 var gait_stride_phase: float = 0.0
 
 func _ready() -> void:
@@ -124,6 +125,7 @@ func _unhandled_input(event: InputEvent) -> void:
         Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 func _physics_process(delta: float) -> void:
+    physics_tick_counter += 1
     var axis: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
     var basis := Basis(Vector3.UP, camera_yaw)
     var desired: Vector3 = basis * Vector3(axis.x, 0, axis.y)
@@ -169,15 +171,17 @@ func _physics_process(delta: float) -> void:
     _pose("LeftFoot", -s * power * .22 - swing_left * .12 * anim_weight)
     _pose("RightFoot", s * power * .22 - swing_right * .12 * anim_weight)
 
-    # Visual-only ankle floor clamp. The collision body stays untouched;
-    # small compensation cannot replace full plantar IK / a proper walk clip.
+    # V0.20.1: a high ankle above the idle reference is ALSO an error
+    # (floating shoes). Allow at most 5.5cm visual-root descent while the
+    # collider remains fixed. This is a bounded, diagnostic two-foot floor
+    # approximation, NOT exact mesh-sole contact or proper IK.
     var correction: float = clampf(
-        resting_foot_height - _lowest_foot_height_relative_to_body(), -0.015, 0.105
+        resting_foot_height - _lowest_foot_height_relative_to_body(), -0.055, 0.105
     )
     if correction > gait_foot_lift:
-        gait_foot_lift = correction  # Never ease slowly into floor penetration.
+        gait_foot_lift = correction  # Correct floor penetration immediately.
     else:
-        gait_foot_lift = move_toward(gait_foot_lift, correction, delta * 0.65)
+        gait_foot_lift = move_toward(gait_foot_lift, correction, delta * 2.4)
     character_visual.position.y = gait_foot_lift
     _update_camera(delta)
 
