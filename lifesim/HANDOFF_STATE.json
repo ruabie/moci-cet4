@@ -50,12 +50,14 @@
       "engineProject": "lifesim/godot/project.godot",
       "reportedChange": "Actual input-driven walking phases / turning / stop CI screenshots and metrics; candidate Web workflow removes publish-isolated-path",
       "engineCiRun": 44071855686,
-      "engineCiLastChecked": "in_progress",
+      "engineCiLastChecked": "completed_success",
       "sourceCommitted": true,
-      "qaPassedForThisHead": false,
+      "qaPassedForThisHead": true,
       "visualApproved": false,
       "windowsPerformanceVerified": false,
-      "finalRelease": false
+      "finalRelease": false,
+      "engineCiAlsoPushRun": 44071812324,
+      "ciMeaning": "Godot import + headless economy/movement tests and four input-driven capture/metric assertions passed; no real gameplay or subjective art acceptance"
     },
     "issues": [
       {
@@ -113,8 +115,19 @@
         "v19_stopped.png"
       ],
       "metricsExpected": "v19_motion_metrics.json",
-      "currentStatus": "code committed; PR #33 engine CI #44071855686 in progress when last checked",
-      "visualQualityApproved": false
+      "currentStatus": "Two same-SHA Godot runs succeeded, artifact downloaded, all four diagnostic PNGs viewed; technical motion PASS, art quality NOT approved",
+      "visualQualityApproved": false,
+      "artifactId": 14323676026,
+      "prCiRun": 44071855686,
+      "pushCiRun": 44071812324,
+      "metrics": {
+        "playerDisplacementMetres": 3.737,
+        "leftThighPhaseAngleRadians": 0.548,
+        "turnAngleRadians": 1.527,
+        "stopHorizontalSpeed": 0,
+        "stopAnimationWeight": 0
+      },
+      "visualReview": "Character remains angular with stiff arm/leg swing; potential feet/ground contact mismatch; repetitive skyline and oversized empty road. Single PNGs cannot determine foot sliding or camera/gameplay smoothness."
     }
   },
   "gates": [
@@ -125,8 +138,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "current_candidate_ci_in_progress",
-      "why": "V0.18 SHA c288af7 success on Godot run 43909344105. V0.19 SHA 31ba2aaf new engine test run 44071855686 was in progress at last observation."
+      "state": "passed_current_sha_engine_ci_only",
+      "why": "V0.19 exact SHA 31ba2aaf: both PR run 44071855686 and push run 44071812324 completed success (Godot 4.7.2 + simulated input motion metrics). This excludes subjective art, real Chrome, Windows FPS."
     },
     {
       "id": "WebGL-browser",
@@ -136,7 +149,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "V0.18 static images independently reviewed: simplified character, large empty road, repeated skyline; four real-motion screenshots proposed by PR #33 but not yet visually approved."
+      "why": "V0.19 four real-motion diagnostic PNGs independently viewed: stiff/low-poly figure, questionable foot contact, repetitive skyline/large bare road. Numerical leg/turn proof passes but visual quality not approved; video + Windows real play needed."
     },
     {
       "id": "Windows-RTX3060",
@@ -150,22 +163,22 @@
     },
     {
       "id": "Workflow-no-automatic-publication",
-      "state": "candidate_fix_pending",
-      "why": "V0.19 PR #33 removes auto-publish job only from stacked draft; original V0.18 workflow still has push-to-main capability."
+      "state": "fixed_in_v019_draft_only",
+      "why": "PR #33 branch removes publish-isolated-path and Git push to main; upstream V0.18 workflow still contains auto publish. No global security clearance."
     }
   ],
   "nextActions": [
-    "Recheck PR #33 head SHA and Godot workflow run #44071855686; fix failed tests at most twice, preserve logs",
-    "Inspect four V0.19 actual-motion screenshots + metrics for knees, arms, rotation, foot sliding and clipping; engine pass is not subjective art pass",
-    "Before any push to V0.18 original branch, remove/disable its legacy push-to-main publication job; never interpret PR #33 draft as applied production guard",
-    "Review actual Chrome WebGL interactions for existing lifesim/play-v18; keep canonical HTML S0-S5 independent and pending",
-    "Run Windows RTX3060 1080p real gameplay and FPS/input/collision proof; no release before evidence"
+    "Highest priority: replace stiff walking gait and apparent foot contact issue using physically grounded/retargeted animation, with actual sequence/video evidence instead of only four PNGs; retain PR #33 as technical baseline",
+    "Remove/disable V0.18 legacy push-to-main publish job before any further push to that upstream branch; PR #33 fix is draft-only",
+    "Run real browser Chrome for existing isolated play-v18 build, verify mouse/pointer lock, WebGL, gameplay and persistence; canonical HTML S0-S5 remain pending",
+    "Run Windows RTX3060 1080p gameplay/FPS/input delay/door/camera visual checks",
+    "Recheck all active branch SHA/PR and CI before any more edits; preserve draft/no merge/no release/no paid costs"
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-17 snapshot: verified GitHub PR #33, PR #32, original CI/artifacts and current main published files; workflow status is point-in-time only",
+    "freshness": "2026-11-17: PR #33 CI status refreshed from GitHub and same-SHA screenshot/metric artifact independently inspected",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
     "latestRound": "V0.19 motion/release safety candidate PR #33 (draft, not merged); main metadata-only handoff update requested by user"
