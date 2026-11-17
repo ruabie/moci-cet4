@@ -26,10 +26,27 @@ func _run() -> void:
         "spine_01_exists_in_skeleton":rig.find_bone("spine_01")>=0,
         "clips":{},"interpretation":"Imported GDScript Animation track inventory, compare with v27_source_constant_rest.json"}
     var supported: bool=rig.get_bone_count()==65 and rig.find_bone("spine_01")>=0
+    var actual_names: PackedStringArray=ap.get_animation_list()
+    report["godot_imported_animation_names"]=Array(actual_names)
     for motion in ["Idle_Loop","Walk_Loop","Jog_Fwd_Loop"]:
-        var clip: Animation=ap.get_animation(motion)
+        # Imported Godot AnimationLibrary names may differ from original GLB
+        # names. The project has always selected clips by semantic word.
+        var alternatives: Array[String]=[]
+        if motion=="Idle_Loop":
+            alternatives=["idle_loop","idle"]
+        elif motion=="Walk_Loop":
+            alternatives=["walk_loop","walk"]
+        else:
+            alternatives=["jog_fwd_loop","jog_fwd","jog","run"]
+        var imported_name:String=AnimationRetargetV22._select_name(actual_names,alternatives)
+        if imported_name=="":
+            printerr("V27 GODOT TRACK INVENTORY FAIL: original "+motion+
+                ", imported available "+JSON.stringify(Array(actual_names)))
+            quit(1)
+            return
+        var clip: Animation=ap.get_animation(imported_name)
         if clip==null:
-            printerr("V27 GODOT TRACK INVENTORY FAIL: missing imported "+motion)
+            printerr("V27 GODOT TRACK INVENTORY FAIL: selected name "+imported_name)
             quit(1)
             return
         var bones: Dictionary={}
@@ -53,6 +70,8 @@ func _run() -> void:
             if int(track["type"])==Animation.TYPE_POSITION_3D:
                 pelvis_moves+=1
         report["clips"][motion]={
+            "imported_name":imported_name,
+            "original_glb_name":motion,
             "total_imported_tracks":clip.get_track_count(),
             "type_counts":type_counts,
             "imported_spine_01_tracks":spine,
