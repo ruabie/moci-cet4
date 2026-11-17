@@ -37,32 +37,33 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.21 CC0 retarget verification (preview only)",
-      "pr": 35,
-      "url": "https://github.com/ruabie/moci-cet4/pull/35",
+      "version": "V0.22 bone-rest transform and ground shoe proxy diagnostic (draft; art not approved)",
+      "pr": 36,
+      "url": "https://github.com/ruabie/moci-cet4/pull/36",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v021-ual-retarget-pilot",
-      "headSha": "753f2dd577c161df486960d7a892c332b4184d15",
-      "baseBranch": "lifesim-v020-grounded-gait-review",
-      "baseSha": "93fb2112d3a8a1c47014789f632dbf83893848db",
+      "headBranch": "lifesim-v022-rest-foot-contact-pilot",
+      "headSha": "dd1203044e911707f3f91581dac023c3bf9dd68c",
+      "baseBranch": "lifesim-v021-ual-retarget-pilot",
+      "baseSha": "753f2dd577c161df486960d7a892c332b4184d15",
       "engineProject": "lifesim/godot/project.godot",
-      "firstAttemptSha": "801e3f9faabdebd3ff83ac42b7ff875b7e17ca52",
-      "firstAttemptPrCiRun": 44078406302,
-      "firstAttemptResult": "failed (only 1 exact bone name match)",
-      "currentPrCiRun": 44079086818,
-      "currentPushCiRun": 44079074579,
-      "currentSupervisorCiRun": 44079086776,
-      "currentCiResult": "success (same exact head)",
+      "firstAttemptSha": "5624c2f6611297ae769954aa5b14863bacc11401",
+      "secondAttemptSha": "dd1203044e911707f3f91581dac023c3bf9dd68c",
+      "prCiRun": 44083259830,
+      "pushCiRun": 44083250185,
+      "supervisorCiRun": 44083259710,
+      "latestCiResult": "completed_success, same exact SHA",
       "engineQaPassed": true,
-      "motionRetargetTechnicalPassed": true,
+      "retargetTechnicalPassed": true,
+      "roadGroundProxyPassed": true,
       "visualApproved": false,
-      "gameplayAnimationIntegrated": false,
-      "browserVerified": false,
+      "perFootIkImplemented": false,
+      "productionAnimationIntegrated": false,
+      "realInputContinuousVideoCaptured": false,
+      "chromeVerified": false,
       "windowsPerformanceVerified": false,
-      "finalRelease": false,
-      "note": "Exact-sha CI proves animation tracks actuate existing V0.18 avatar but visual screenshots show floating, unnatural run/arms; production V0.20 locomotion remains unchanged."
+      "finalRelease": false
     },
     "issues": [
       {
@@ -237,6 +238,76 @@
       "visualGate": "failed",
       "attemptsUsed": 2,
       "productionIntegration": false
+    },
+    "previousCandidateV021": {
+      "version": "V0.21 CC0 retarget verification (preview only)",
+      "pr": 35,
+      "url": "https://github.com/ruabie/moci-cet4/pull/35",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v021-ual-retarget-pilot",
+      "headSha": "753f2dd577c161df486960d7a892c332b4184d15",
+      "baseBranch": "lifesim-v020-grounded-gait-review",
+      "baseSha": "93fb2112d3a8a1c47014789f632dbf83893848db",
+      "engineProject": "lifesim/godot/project.godot",
+      "firstAttemptSha": "801e3f9faabdebd3ff83ac42b7ff875b7e17ca52",
+      "firstAttemptPrCiRun": 44078406302,
+      "firstAttemptResult": "failed (only 1 exact bone name match)",
+      "currentPrCiRun": 44079086818,
+      "currentPushCiRun": 44079074579,
+      "currentSupervisorCiRun": 44079086776,
+      "currentCiResult": "success (same exact head)",
+      "engineQaPassed": true,
+      "motionRetargetTechnicalPassed": true,
+      "visualApproved": false,
+      "gameplayAnimationIntegrated": false,
+      "browserVerified": false,
+      "windowsPerformanceVerified": false,
+      "finalRelease": false,
+      "note": "Exact-sha CI proves animation tracks actuate existing V0.18 avatar but visual screenshots show floating, unnatural run/arms; production V0.20 locomotion remains unchanged."
+    },
+    "v022Review": {
+      "artifactId": 14327039681,
+      "artifactUrl": "https://github.com/ruabie/moci-cet4/actions/runs/44083250185/artifacts/14327039681",
+      "visuallyInspected": "Six Godot fixed-camera pose frames, both 18-frame walk/run contact sheets, metrics JSON and GIF generation examined",
+      "firstAttemptSha": "5624c2f6611297ae769954aa5b14863bacc11401",
+      "secondAttemptSha": "dd1203044e911707f3f91581dac023c3bf9dd68c",
+      "ciPrRun": 44083259830,
+      "ciPushRun": 44083250185,
+      "ciResult": "success",
+      "sharedBones": 49,
+      "tracksPerClip": 47,
+      "groundYMetres": 0,
+      "bindShoeOffsetFromAnkleMetres": 0.0234,
+      "rootCorrectionRequiredMetresRange": [
+        0.21,
+        0.51
+      ],
+      "walk": {
+        "sourceClipDurationSeconds": 1.333,
+        "frames": 18,
+        "rootCorrectionRangeMetres": 0.067,
+        "maxNeighborDeltaMetres": 0.031
+      },
+      "run": {
+        "sourceClipDurationSeconds": 0.933,
+        "frames": 18,
+        "rootCorrectionRangeMetres": 0.122,
+        "maxNeighborDeltaMetres": 0.095
+      },
+      "betterThanV021": "Visible character shoe no longer consistently above road due root and rest-basis mapping",
+      "visualFailure": "Arms unnatural, run upper-body resembles punching/fighting, one ankle proxy grounded only; vertical root bob and transitions likely unacceptable. No true shoe skinned surface/left-right foot plant IK, no real-time input-driven video.",
+      "codePaths": [
+        "lifesim/godot/scripts/animation_retarget_v22.gd",
+        "lifesim/godot/scripts/foot_contact_v22.gd",
+        "lifesim/godot/tests/visual_v22_contact.gd",
+        "lifesim/godot/tests/visual_v22_sequence.gd",
+        "lifesim/godot/tools/assemble_v22_sequence.py"
+      ],
+      "repairsUsed": 2,
+      "productionUnchanged": true,
+      "finalArtApproved": false
     }
   },
   "gates": [
@@ -248,7 +319,7 @@
     {
       "id": "Godot-functional-QA",
       "state": "passed_current_sha_engine_ci_only",
-      "why": "PR #35 head 753f2dd, Godot CI #44079086818 and push run #44079074579 success after exact-source acquisition and test-only retarget; economics/save unchanged. Does not imply animation quality passed."
+      "why": "PR #36 exact head dd120304: CI #44083259830 and #44083250185 completed success, 6 stills + 36 actual imported-clip sample frames, original gameplay QA passes. This only proves bounded diagnostic retarget and shoe proxy, not art."
     },
     {
       "id": "WebGL-browser",
@@ -258,7 +329,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "V0.21 CC0 rig retarget technically actuates 49 mapped bones but six actual Godot renders show visibly floating shoe-floor gap, unnatural raised arms, exaggerated suspended run; NOT accepted in gameplay."
+      "why": "V0.22 ground-aligns a single bind-shoe ankle proxy (visible partial improvement), but Jog root height varies 12.2cm / up to 9.5cm neighboring frame, Walk 6.7cm, arms malformed, no per-foot IK or input-continuous live video. Two bounded attempts exhausted."
     },
     {
       "id": "Windows-RTX3060",
@@ -273,23 +344,23 @@
     {
       "id": "Workflow-no-automatic-publication",
       "state": "fixed_in_stacked_drafts_only",
-      "why": "PR #35 inherits V0.19 removal of auto publishing on its own branch; original V0.18 branch remains unsafe if pushed. No global safety clearance."
+      "why": "PR #36 inherited no-auto-publish from V0.19; V0.18 original branch still has risky job and must not be pushed without separately disabling."
     }
   ],
   "nextActions": [
-    "Start new independently bounded V0.22 art/IK milestone: calibrate Quaternius UAL1 source-to-target bone rest orientation and root height using Godot SkeletonProfileHumanoid/BoneMap; ensure feet contact ground and avoid floating. Validate against six V0.21 bad-frame references",
-    "Require rendered consecutive idle/walk/run/turn videos and foot-sole positions vs actual terrain, not only skeleton pose change or static frames; do not integrate V0.21 preview into game until human visual review passes",
-    "Repair old V0.18 branch auto-publish workflow before any future push to that branch; do not auto-merge or auto-deploy",
-    "Run real Chrome/WebGL, pointer lock, save/indoor interaction checks on isolated build; main canonical HTML S0-S5 pending",
-    "Run Windows RTX3060 1080p FPS/input delay and camera/door collision tests, keep release blocked"
+    "Next *separate* animation milestone: use Godot SkeletonProfileHumanoid / BoneMap import with authoritative source/target rest/axis alignment, review neutral arm pose and Hips/Root orientation against V0.22 screenshots; do not tune same V0.22 preview indefinitely",
+    "Implement true independent foot contact IK and root motion smoothing, test walk/jog transition against measured 6.7/12.2cm clip root ranges and 9.5cm max sampled jump, require 1080p actual Windows video and physics/input proof",
+    "Old V0.18 branch auto-publish workflow remains dangerous; do not push it until separate disable/fix",
+    "Check Chrome real browser for isolated Godot Web build and pointer lock/save/indoor movement; HTML-S0-S5 main entry missing",
+    "Verify Windows RTX3060 1080p graphics/FPS, camera obstruction, collisions; no public release"
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-17 GitHub PR #35 head 753f2dd independently verified, source 43 clips, Godot same-SHA CI passed, six preview images actually reviewed and rejected",
+    "freshness": "2026-11-17 PR #36 exact head dd120304 checked; two Godot same-SHA CI successes; downloaded and examined 36-frame animation and numeric artifacts",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.21 PR #35 draft: real CC0 animation library+retarget technical PASS; animation/art visual FAIL; two attempts done; do not merge, publish, or treat as game animation."
+    "latestRound": "V0.22 PR #36 draft, 2 bounded changes: ground proxy partial improvement/CI success, human art blocked, production animation unchanged, main documentation only"
   }
 }
