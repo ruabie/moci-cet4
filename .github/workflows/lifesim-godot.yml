@@ -57,6 +57,9 @@ jobs:
           set -euo pipefail
           python3 "$PROJECT_DIR/tools/acquire_base_v26.py"
           python3 "$PROJECT_DIR/tools/audit_rigs_v26.py" | tee v26-rig-audit.log
+          python3 "$PROJECT_DIR/tools/audit_constant_rest_v27.py" | tee v27-source-constant.log
+          grep -F 'V27 REAL GLB CONSTANT REST PASS:' v27-source-constant.log
+          test -s "$PROJECT_DIR/tests/v27_source_constant_rest.json"
           grep -F 'V26 REAL RIG AUDIT PASS:' v26-rig-audit.log
           test -s "$PROJECT_DIR/art/characters/v26/base_character_compatible.glb"
           test -s "$PROJECT_DIR/tests/v26_rig_audit.json"
@@ -317,6 +320,19 @@ jobs:
           test -s "$PROJECT_DIR/tests/v25_ik_render_metrics.json"
           test -s "$PROJECT_DIR/tests/v25_ik_render_comparison.json"
 
+      - name: V0.27 actual Godot imported track inventory before full-body three-way render
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/diagnostic_v27_import_tracks.gd 2>&1 | tee godot-v27-track-inventory.log
+          grep -F 'V27 GODOT TRACK INVENTORY PASS:' godot-v27-track-inventory.log
+          test -s "$PROJECT_DIR/tests/v27_godot_import_tracks.json"
+
       - name: V0.26 actual native UAL vs compatible full-body vs legacy civilian render evidence
         shell: bash
         env:
@@ -365,6 +381,9 @@ jobs:
             godot-v24-city-ik.log
             godot-v25-ik-render.log
             godot-v26-rig-review.log
+            godot-v27-track-inventory.log
+            v27-source-constant.log
+            lifesim/godot/tests/v27_*.json
             v26-rig-audit.log
             lifesim/godot/tests/v26_*.png
             lifesim/godot/tests/v26_*.jpg

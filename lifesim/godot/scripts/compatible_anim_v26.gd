@@ -1,6 +1,26 @@
 extends RefCounted
 class_name CompatibleAnimV26
 
+# V0.27: static/rest rotation fallback is ALLOWED ONLY if the exact pinned
+# source GLB has independently proven the joint stays at rest in this clip.
+# Godot often optimizes away redundant constant tracks; no arbitrary missing
+# dynamic bone can be silently ignored.
+const REST_AUDIT_FILE: String = "res://tests/v27_source_constant_rest.json"
+const PINNED_SOURCE_BLOB: String = "473e59080288428d0b6da826ba19324d07b191f0"
+
+static func _rest_fallback_proven(clip: String, bone: String) -> bool:
+    if not FileAccess.file_exists(REST_AUDIT_FILE):
+        return false
+    var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(REST_AUDIT_FILE))
+    if not (parsed is Dictionary):
+        return false
+    var proof: Dictionary = parsed as Dictionary
+    if str(proof.get("source_git_blob","")) != PINNED_SOURCE_BLOB:
+        return false
+    var by_clip: Dictionary = proof.get("constant_rotation_bones_by_clip",{})
+    var accepted: Variant = by_clip.get(clip,[])
+    return accepted is Array and (accepted as Array).has(bone)
+
 # Comparison-only full-body animation transfer from UAL1 into the Quaternius
 # Universal Base Character. Preserve mapped pelvis POSITION as well as ROTATION.
 # No game CityPlayer mutation, no automatic asset replacement.
@@ -100,9 +120,22 @@ static func install(source_scene: Node, dest_scene: Node3D) -> Dictionary:
         # Godot's actual imported source Idle has 55 rotation tracks; do not
         # demand 60 animated leaf bones when they are absent from SOURCE.
         # Enforce all important bilateral torso/arm/leg joint tracks instead.
-        if int(counts["rotation"])<50 or int(counts["pelvis_translation"])!=1                 or missing_critical.size()>0:
-            return {"ok":false,"reason":"real source lost important full-body tracks: "+key,
-                "counts":counts,"missing_critical":missing_critical}
+        var rest_fallback:Array[String]=[]
+        var rejected_missing:Array[String]=[]
+        for missing in missing_critical:
+            if _rest_fallback_proven(str(selected[key]),missing):
+                # Target Skeleton3D starts in its own rest orientation; the
+                # exact source has no meaningful animation for this bone.
+                rest_fallback.append(missing)
+            else:
+                rejected_missing.append(missing)
+        counts["verified_static_rest_fallback"]=rest_fallback
+        counts["rejected_missing_dynamic_bones"]=rejected_missing
+        if int(counts["rotation"])<50 or int(counts["pelvis_translation"])!=1 \
+                or rejected_missing.size()>0:
+            return {"ok":false,"reason":"critical dynamic bone unexpectedly missing: "+key,
+                "counts":counts,"missing_source":missing_critical,
+                "verified_static_rest_fallback":rest_fallback}
         lib.add_animation(key,rebuilt)
         clip_tracks[key]=counts
     var driver:=AnimationPlayer.new()
