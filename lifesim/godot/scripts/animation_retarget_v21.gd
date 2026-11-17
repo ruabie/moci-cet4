@@ -6,6 +6,37 @@ class_name AnimationRetargetV21
 # values must be transferred as a delta relative to each source bone rest.
 # The game must not install this player until scene, animation and art QA pass.
 const MIN_SHARED_BONES: int = 30
+# UAL1 Standard uses an Unreal-style humanoid skeleton, whereas the V0.18
+# modular civilian pack uses the Blender-style Quaternius naming. Explicit
+# semantic mapping is required; name equality alone matched just the head.
+const HUMANOID_MAP: Dictionary = {
+    "root":"Root", "pelvis":"Hips",
+    "spine_01":"Abdomen", "spine_02":"Torso", "spine_03":"Chest",
+    "neck_01":"Neck", "Head":"Head",
+    "clavicle_l":"Shoulder.L", "upperarm_l":"UpperArm.L",
+    "lowerarm_l":"LowerArm.L", "hand_l":"Hand.L",
+    "clavicle_r":"Shoulder.R", "upperarm_r":"UpperArm.R",
+    "lowerarm_r":"LowerArm.R", "hand_r":"Hand.R",
+    "thigh_l":"UpperLeg.L", "calf_l":"LowerLeg.L", "foot_l":"Foot.L",
+    "thigh_r":"UpperLeg.R", "calf_r":"LowerLeg.R", "foot_r":"Foot.R"
+}
+
+static func _target_bone(source_name: String) -> String:
+    if HUMANOID_MAP.has(source_name):
+        return str(HUMANOID_MAP[source_name])
+    # The source has finger_01..03 + an unskinned leaf, while destination
+    # exposes Finger2..4. Do not map leaf or extra source thumb joints.
+    for part in ["index", "middle", "ring", "pinky", "thumb"]:
+        for side in ["l", "r"]:
+            for digit in range(1, 4):
+                if part == "thumb" and digit == 3:
+                    continue
+                var source: String = "%s_%02d_%s" % [part, digit, side]
+                if source_name == source:
+                    var title: String = part.capitalize()
+                    var target_number: int = digit + 1
+                    return "%s%d.%s" % [title, target_number, side.to_upper()]
+    return ""
 
 static func _find_skeleton(node: Node) -> Skeleton3D:
     if node is Skeleton3D and (node as Skeleton3D).get_bone_count() >= 35:
@@ -53,14 +84,15 @@ static func _retarget_rotations(
             continue
         var bone_name: String = str(original_path.get_subname(0))
         var source_idx: int = source_rig.find_bone(bone_name)
-        var target_idx: int = target_rig.find_bone(bone_name)
+        var target_name: String = _target_bone(bone_name)
+        var target_idx: int = target_rig.find_bone(target_name) if target_name != "" else -1
         if source_idx < 0 or target_idx < 0:
             rejected.append(bone_name)
             continue
         var src_rest: Quaternion = source_rig.get_bone_rest(source_idx).basis.get_rotation_quaternion()
         var dst_rest: Quaternion = target_rig.get_bone_rest(target_idx).basis.get_rotation_quaternion()
         var index: int = rewritten.add_track(Animation.TYPE_ROTATION_3D)
-        rewritten.track_set_path(index, NodePath(target_path + ":" + bone_name))
+        rewritten.track_set_path(index, NodePath(target_path + ":" + target_name))
         rewritten.track_set_interpolation_type(index, clip.track_get_interpolation_type(track))
         for key in range(clip.track_get_key_count(track)):
             var time: float = clip.track_get_key_time(track, key)
@@ -78,7 +110,9 @@ static func install(source_scene: Node, target_rig: Skeleton3D, target_owner: No
         return {"ok":false, "reason":"missing actual animation player or skeleton"}
     var shared: int = 0
     for idx in range(src_rig.get_bone_count()):
-        if target_rig.find_bone(src_rig.get_bone_name(idx)) >= 0:
+        var source_name: String = str(src_rig.get_bone_name(idx))
+        var dest_name: String = _target_bone(source_name)
+        if dest_name != "" and target_rig.find_bone(dest_name) >= 0:
             shared += 1
     if shared < MIN_SHARED_BONES:
         return {"ok":false, "reason":"insufficient matching skeleton names", "shared":shared}
