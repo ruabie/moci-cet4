@@ -164,6 +164,12 @@ func _run() -> void:
             ]:
                 var role:String=str(row[0])
                 var actor:Node3D=row[1] as Node3D
+                # Strict one-avatar-at-a-time photography: avoid letting the
+                # two other real character models contaminate each screenshot.
+                source.hide()
+                base.hide()
+                old.hide()
+                actor.show()
                 camera.global_position=actor.global_position+Vector3(1.24,1.64,-3.0)
                 camera.look_at(actor.global_position+Vector3.UP*1.04)
                 await process_frame
@@ -173,6 +179,11 @@ func _run() -> void:
                     return
                 sample["frames"][role]="v26_"+filename+".png"
                 frames.append("v26_"+filename+".png")
+            # Reenable all actors for the next phase; only the single-subject
+            # photo is isolated, animation source and gameplay remain intact.
+            source.show()
+            base.show()
+            old.show()
             series.append(sample)
         observations[motion]=series
     var report:Dictionary={
@@ -183,6 +194,7 @@ func _run() -> void:
         "compatible_audit":compatible,
         "legacy_shared_bones":legacy["shared_bones"],
         "total_raw_godot_frames":frames.size(),
+        "single_actor_visible_per_capture":true,
         "source_clip_phases":observations,
         "frames":frames,
         "evidence_scope":"Actual rendered imported CC0 source Mannequin, 65-bone compatible BaseCharacter, and 49-bone legacy civilian. Fixed local camera per actor.",
