@@ -37,29 +37,32 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.20 (revised second bounded attempt)",
-      "pr": 34,
-      "url": "https://github.com/ruabie/moci-cet4/pull/34",
+      "version": "V0.21 CC0 retarget verification (preview only)",
+      "pr": 35,
+      "url": "https://github.com/ruabie/moci-cet4/pull/35",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v020-grounded-gait-review",
-      "headSha": "93fb2112d3a8a1c47014789f632dbf83893848db",
-      "baseBranch": "lifesim-v019-motion-proof-safe-web",
-      "baseSha": "31ba2aafb97784ac25133fe8df4bac85fa2b3fea",
+      "headBranch": "lifesim-v021-ual-retarget-pilot",
+      "headSha": "753f2dd577c161df486960d7a892c332b4184d15",
+      "baseBranch": "lifesim-v020-grounded-gait-review",
+      "baseSha": "93fb2112d3a8a1c47014789f632dbf83893848db",
       "engineProject": "lifesim/godot/project.godot",
-      "firstAttemptSha": "07bf475e78f9efbbebdac620cc10da4972e55fd9",
-      "firstAttemptPrCiRun": 44074055179,
-      "firstAttemptPrCiResult": "success",
-      "latestPrCiRun": 44074870163,
-      "latestPushCiRun": 44074860982,
-      "latestCiStatus": "completed_success",
-      "qaPassedForThisHead": true,
+      "firstAttemptSha": "801e3f9faabdebd3ff83ac42b7ff875b7e17ca52",
+      "firstAttemptPrCiRun": 44078406302,
+      "firstAttemptResult": "failed (only 1 exact bone name match)",
+      "currentPrCiRun": 44079086818,
+      "currentPushCiRun": 44079074579,
+      "currentSupervisorCiRun": 44079086776,
+      "currentCiResult": "success (same exact head)",
+      "engineQaPassed": true,
+      "motionRetargetTechnicalPassed": true,
       "visualApproved": false,
+      "gameplayAnimationIntegrated": false,
+      "browserVerified": false,
       "windowsPerformanceVerified": false,
       "finalRelease": false,
-      "changes": "travel-distance-driven animated knee/arm phases, bounded signed ankle height offset, 20 engine PNG+GIF, exact measured physics tick gaps",
-      "ciMeaning": "Godot 4.7.2 same SHA engine import, economy/save/scene, V0.19 movement, V0.20 GIF capture/metric assertions passed; NOT subjective art or Windows FPS."
+      "note": "Exact-sha CI proves animation tracks actuate existing V0.18 avatar but visual screenshots show floating, unnatural run/arms; production V0.20 locomotion remains unchanged."
     },
     "issues": [
       {
@@ -182,6 +185,58 @@
         "observedMaxTickGap": 8
       },
       "secondAttemptReview": "20-frame images, contact sheet and a full-size frame independently viewed. Stiff stylized gait/weak foot contact remain; city repetition/road dominance unchanged. Actual foot slide, high-quality character motion, Windows FPS not proven."
+    },
+    "previousCandidateV020": {
+      "version": "V0.20 (revised second bounded attempt)",
+      "pr": 34,
+      "url": "https://github.com/ruabie/moci-cet4/pull/34",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v020-grounded-gait-review",
+      "headSha": "93fb2112d3a8a1c47014789f632dbf83893848db",
+      "baseBranch": "lifesim-v019-motion-proof-safe-web",
+      "baseSha": "31ba2aafb97784ac25133fe8df4bac85fa2b3fea",
+      "engineProject": "lifesim/godot/project.godot",
+      "firstAttemptSha": "07bf475e78f9efbbebdac620cc10da4972e55fd9",
+      "firstAttemptPrCiRun": 44074055179,
+      "firstAttemptPrCiResult": "success",
+      "latestPrCiRun": 44074870163,
+      "latestPushCiRun": 44074860982,
+      "latestCiStatus": "completed_success",
+      "qaPassedForThisHead": true,
+      "visualApproved": false,
+      "windowsPerformanceVerified": false,
+      "finalRelease": false,
+      "changes": "travel-distance-driven animated knee/arm phases, bounded signed ankle height offset, 20 engine PNG+GIF, exact measured physics tick gaps",
+      "ciMeaning": "Godot 4.7.2 same SHA engine import, economy/save/scene, V0.19 movement, V0.20 GIF capture/metric assertions passed; NOT subjective art or Windows FPS."
+    },
+    "animationLibraryV21": {
+      "source": "Quaternius Universal Animation Library 1 (in-place)",
+      "officialUrl": "https://quaternius.itch.io/universal-animation-library",
+      "license": "CC0 1.0 Universal",
+      "mirrorRepo": "Barbatos6669/elderforge",
+      "mirrorCommit": "bb2ce469f0ab2ccfc487faef55550ba07fae2483",
+      "sourceGitBlob": "473e59080288428d0b6da826ba19324d07b191f0",
+      "sourceSha256": "69591853d817488edaa8fd9bf8fc1d821eaeaf789f8627b3cd23b41c4ed67997",
+      "sizeBytes": 7618436,
+      "clipCount": 43,
+      "buildTimeDownloadOnly": true,
+      "runtimeCdnRequired": false,
+      "note": "source included in exact-SHA verified Godot CI source archive only; bare git branch requires explicit acquisition script before Godot import",
+      "firstAttemptFailure": "source Unreal-style names pelvis/spine_01/thigh_l matched target Blender-style names Hips/Abdomen/UpperLeg.L only at Head",
+      "secondAttemptResult": "49 semantic shared bones; 47 mapped rotation tracks in each of Idle, Walk, Jog_Fwd; real player left thigh changes 0.044/0.407/0.759 rad",
+      "sourceClipNames": [
+        "Idle",
+        "Walk",
+        "Jog_Fwd"
+      ],
+      "screenshotArtifactId": 14326357015,
+      "actualImageReview": "Six real Godot frames independently examined; avatar floating above road in all states, arms excessively raised, run resembles airborne jump, no foot-contact quality proof.",
+      "technicalGate": "passed_same_sha",
+      "visualGate": "failed",
+      "attemptsUsed": 2,
+      "productionIntegration": false
     }
   },
   "gates": [
@@ -193,7 +248,7 @@
     {
       "id": "Godot-functional-QA",
       "state": "passed_current_sha_engine_ci_only",
-      "why": "Latest V0.20 SHA 93fb2112, PR CI 44074870163 + Push CI 44074860982 completed success, including 20-frame motion diagnostic. Does not certify graphics/real play."
+      "why": "PR #35 head 753f2dd, Godot CI #44079086818 and push run #44079074579 success after exact-source acquisition and test-only retarget; economics/save unchanged. Does not imply animation quality passed."
     },
     {
       "id": "WebGL-browser",
@@ -203,7 +258,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "V0.20 second attempt 20 real Godot frames reviewed: ankle-bone height proxy max 7cm instead of 11cm and visual correction -5.5cm, but stiff gait/foot contact remains, capture skips 7-8 physics ticks between snapshots. Need professional licensed clip+retargeting/IK and real continuous video."
+      "why": "V0.21 CC0 rig retarget technically actuates 49 mapped bones but six actual Godot renders show visibly floating shoe-floor gap, unnatural raised arms, exaggerated suspended run; NOT accepted in gameplay."
     },
     {
       "id": "Windows-RTX3060",
@@ -217,24 +272,24 @@
     },
     {
       "id": "Workflow-no-automatic-publication",
-      "state": "fixed_in_v019_draft_only",
-      "why": "PR #33 branch removes publish-isolated-path and Git push to main; upstream V0.18 workflow still contains auto publish. No global security clearance."
+      "state": "fixed_in_stacked_drafts_only",
+      "why": "PR #35 inherits V0.19 removal of auto publishing on its own branch; original V0.18 branch remains unsafe if pushed. No global safety clearance."
     }
   ],
   "nextActions": [
-    "Start NEW visual milestone rather than additional V0.20 repair: locate explicitly CC0-compatible human walk/run/turn animations for same imported rig; verify provenance and exact skeleton compatibility before retargeting, then proper foot plant IK",
-    "Measure actual shoe sole vs ground contact with continuous game capture and input/reorientation; no acceptance based solely on ankle proxy or Mesa sampled GIF",
-    "Disable legacy V0.18 push-to-main publication workflow before ever pushing its old branch; PR #34 safe build artifact is not global security fix",
-    "Actual Chrome/WebGL play plus save/interaction check on isolated V0.18 build; canonical main lifesim/index.html HTML-S0-S5 still pending",
-    "Windows RTX3060 device benchmark @1080p for FPS, input and camera/door collision; keep release blocked"
+    "Start new independently bounded V0.22 art/IK milestone: calibrate Quaternius UAL1 source-to-target bone rest orientation and root height using Godot SkeletonProfileHumanoid/BoneMap; ensure feet contact ground and avoid floating. Validate against six V0.21 bad-frame references",
+    "Require rendered consecutive idle/walk/run/turn videos and foot-sole positions vs actual terrain, not only skeleton pose change or static frames; do not integrate V0.21 preview into game until human visual review passes",
+    "Repair old V0.18 branch auto-publish workflow before any future push to that branch; do not auto-merge or auto-deploy",
+    "Run real Chrome/WebGL, pointer lock, save/indoor interaction checks on isolated build; main canonical HTML S0-S5 pending",
+    "Run Windows RTX3060 1080p FPS/input delay and camera/door collision tests, keep release blocked"
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-17 verified PR #34, PR CI #44074870163 and Push CI #44074860982 successes; examined artifact 14323684340 actual metrics and images",
+    "freshness": "2026-11-17 GitHub PR #35 head 753f2dd independently verified, source 43 clips, Godot same-SHA CI passed, six preview images actually reviewed and rejected",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.20 draft PR #34 SHA 93fb2112: same-SHA GitHub CI success, artifact reviewed, animation not art-approved; two bounded revisions exhausted; main handoff only"
+    "latestRound": "V0.21 PR #35 draft: real CC0 animation library+retarget technical PASS; animation/art visual FAIL; two attempts done; do not merge, publish, or treat as game animation."
   }
 }
