@@ -242,6 +242,24 @@ jobs:
           done
           test -s "$PROJECT_DIR/tests/v22_sequence_metrics.json"
 
+      - name: V0.23 Godot-native two-leg IK, humanoid BoneMap and actual skeletal foot-error proof
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v23_native_ik.gd 2>&1 | tee godot-v23-native-ik.log
+          grep -F 'V23 NATIVE IK PASS:' godot-v23-native-ik.log
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/assemble_v23_native_ik.py"
+          for motion in walk run; do
+            test -s "$PROJECT_DIR/tests/v23_${motion}_ik.gif"
+            test -s "$PROJECT_DIR/tests/v23_${motion}_ik_sheet.jpg"
+          done
+          test -s "$PROJECT_DIR/tests/v23_native_ik_metrics.json"
+
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
@@ -271,6 +289,11 @@ jobs:
             godot-v21-retarget.log
             godot-v22-contact.log
             godot-v22-sequence.log
+            godot-v23-native-ik.log
+            lifesim/godot/tests/v23_*.png
+            lifesim/godot/tests/v23_*.jpg
+            lifesim/godot/tests/v23_*.gif
+            lifesim/godot/tests/v23_*.json
             lifesim/godot/tests/v22_*.gif
             lifesim/godot/tests/v22_*.jpg
             lifesim/godot/tests/v22_*.png
