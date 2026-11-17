@@ -1,10 +1,25 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
 > **交接快照：2026-11-17（Asia/Singapore）**  
-> **最新开发候选：V0.25 草稿 PR #39（原生 IK 开关真实蒙皮渲染对照；未合并、未发布）。同 SHA Godot CI 通过，8/8 组真实渲染画面发生明显变化，但人工复核膝盖、摆臂与跑步姿态仍不自然，美术验收 FAIL。**  
+> **最新开发候选：V0.26 草稿 PR #40（Quaternius CC0 65 骨骼通用人物兼容性审核；未合并、未发布）。固定来源模型 65/65 骨骼及层级均匹配、独立审核 CI PASS，但两轮 Godot 三方渲染前置测试失败，未产生新角色对比截图。**  
 > 这是一次有证据的历史快照，不是实时仪表板。每次接班仍需独立查最新 GitHub PR/SHA/CI/Issue。
 
-## 最新一轮：V0.25 真实蒙皮 IK 对照图与美术阻断（2026-11-17）
+## 最新一轮：V0.26 CC0 原生兼容骨架与未完成的实际渲染（2026-11-17）
+
+- **候选：** [草稿 PR #40](https://github.com/ruabie/moci-cet4/pull/40)，base V0.25，最终 head `87a5399cc7c4be920ca2d35e8b0ec5fd54403ff4`，**open / draft / merged=false**。没有自动合并、发布、收费，也没有替换正式 `CityPlayer`。
+- 重新核实 Quaternius 官方 [Universal Base Characters](https://quaternius.itch.io/universal-base-characters) 和 [Universal Animation Library](https://quaternius.itch.io/universal-animation-library)，二者均为 **CC0 1.0**，官方明确提及互相兼容。新增 `tools/acquire_base_v26.py` 从只读固定镜像 `Barbatos6669/elderforge@bb2ce469f0ab2ccfc487faef55550ba07fae2483` 于 **CI 构建时**取得 `BaseCharacter.glb`；验证 Git blob `59c4044d5146146170f1c6d5e765985a73bc7875`、SHA256 `2d6792e77f337cf6fac3a81e1caf92798b898401140485b55307c9f14785ec25`、大小 1,085,752B、真实蒙皮与骨骼。裸 git checkout **不内含该二进制**，不能声称完全离线直接启动；运行时游戏也不请求网络。
+- 新增 `tools/audit_rigs_v26.py` 和免费 CI `.github/workflows/lifesim-rig-v26.yml`，真实解析 3 份 GLB 二进制：动画库原生人偶 **65 根骨骼**，配套候选基础人物 **65 根骨骼**，**65 个名称和 65 个父子层级全部一致**；对应静止局部旋转差异中位数 **2.16°**，髋部约 **1.91°**、左肩锁骨约 **11.92°**。现有 V0.18 旧市民模型 49 根骨骼，与 UAL 同名者仅 **1 根**。候选在结构上明显比旧市民更匹配，但并不意味着最终游戏美术已通过。
+- 在真实动画库原始 GLB 中还核实到 Walk/Jog 的 `pelvis` 平移：Walk 局部 Z 变化约 **0.05264m**，Jog 约 **0.24482m**。V0.21–V0.25 旧重定向只复制旋转轨道，没有保留这段髋部平移，**可能**导致步态失真，具体对画质影响未验证。
+- **同最终 SHA 的独立骨架审核 CI** [#44098933766](https://github.com/ruabie/moci-cet4/actions/runs/44098933766) 为 `completed/success`，工件中有原始来源、许可核对及 JSON 指标。随后新增 `scripts/compatible_anim_v26.gd`（候选角色保留全身骨骼旋转+髋部平移）与 `tests/visual_v26_rig_compare.gd`（原生动画人偶、配套基础人物、旧市民同相位同机位对照），期待得到真实 Godot 截图，但**两次有界测试均在渲染前置检查处被阻断**：
+  1. 第一轮 SHA `31888015b7c0d04e70d65ddbbfff6af0bf479f0d`，[全量 Godot CI #44097738717](https://github.com/ruabie/moci-cet4/actions/runs/44097738717) **FAILED**：Godot 实际读取了 **55 条可映射旋转轨道+1 条 pelvis 平移**，测试要求 `>=60`，与真实导入数量不一致。
+  2. 第二轮 / 最终 SHA `87a5399cc7c4be920ca2d35e8b0ec5fd54403ff4`，修改为 `>=50` 且检查躯干、双臂双腿的必要轨道，但 [PR Godot CI #44098933886](https://github.com/ruabie/moci-cet4/actions/runs/44098933886) 与 [Push #44098911548](https://github.com/ruabie/moci-cet4/actions/runs/44098911548) 均 `completed/failure`：原始 GLB 虽包含 `spine_01` 动画通道，Godot 已导入的动作里缺少这一要求的旋转轨道；究竟是常量轨道被过滤还是路径映射不同，**还未核实**。
+- **重要区分：骨骼结构和授权来源审核 PASS；V0.26 三方人物动作应用与截图未完成；美术质量未知且发布继续 BLOCKED。** 没有任何可诚实呈现的 V0.26 三方对照 PNG，禁止用 V0.25 图片代替或称“新的全身动作已通过”。原有旧人物 V0.25 美术仍 FAIL。原玩法经济/存档/旧场景回归测试通过，但不能替代新环节。
+- **下一独立 V0.27：** 对照 GLB 源动画频道与 Godot 导入 `AnimationPlayer` 的实际 TrackType/NodePath，先查清 `spine_01` 为什么缺失；针对确认为静止不动的关节允许使用源骨架 rest-pose，真正有运动的骨骼必须保留；然后才能重新输出三方同相位真实截图，人工检查膝盖、摆臂、鞋底及生活风格适配。V0.26 已用满两轮有界修正，禁止第三次盲改。
+- 严格保留现有边界：V0.18 旧分支仍有推送自动发布 main 的高风险工作流，禁止 push；Issues #15/#18 继续开放，主分支 `lifesim/index.html` 缺失、S0–S5 未验收；Chrome/WebGL 与 Windows RTX3060 尚未实测。
+
+---
+
+## 历史里程碑：V0.25 真实蒙皮 IK 对照图与美术阻断（2026-11-17）
 
 - **当前候选**：[草稿 PR #39](https://github.com/ruabie/moci-cet4/pull/39)，base `lifesim-v024-ik-signal-diagnostics`，最终 head `fbfc0a184f46de88a1aec9e080d9cee36d2baf7d`；**open / draft / merged=false**。零新增费用，未自动合并/发布，正式 `CityPlayer` 动作未替换。
 - 在 V0.24 已证明 IK 修改器信号内真能改变玩家脚踝后，本轮新增 `lifesim/godot/tests/visual_v25_ik_render.gd` 和 `tools/analyze_v25_ik_render.py`：对实际 CC0 LifeSim 玩家、真实 Quaternius UAL1 Walk/Jog 两个动作、四个相位各拍摄 **IK OFF vs IK ON 的成对 Godot OpenGL3 原始 PNG**。每对同一相位、同一镜头、同一游戏场景，1280×720 共 16 张，不以代码想象或 AI 生图替代实际渲染。分析脚本读取 PNG 原图做 RGB 像素差分并生成并排 JPG。
@@ -120,14 +135,14 @@ GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/m
 
 ## 4. 下一步最优先任务
 
-1. **V0.26 独立美术里程碑：先质疑当前动作/人物骨骼重定向方案本身是否适用。** V0.25 已以 8/8 组 Godot 原始截图证明 IK 实际影响蒙皮，但人物膝盖过直、跑步腾空、手臂像出拳；应优先对比源动作骨架/目标静止肩膀髋部轴向，研究换用骨架天然兼容的 CC0 人物和动作，不能再无限调 IK 数字。
-2. 建立真实连续输入操作和足底蒙皮-地面接触测量，审查走/停/转/跑全身动作、膝盖、鞋底滑动、原始脚步相位。美术合格前不替换正式 CityPlayer。
-3. 不向 V0.18 旧分支 push：尚存在自动发布至 main 的危险工作流；只在独立草稿产出 CI 工件。
-4. 保持 HTML S0–S5 独立验收，核实隔离版 Chrome WebGL 真实试玩、指针锁、商店/存档及 Windows RTX3060 性能。
+1. **V0.27 先修导入语义，不再第三次盲改 V0.26**：原生 UAL GLB 包含 `spine_01` 轨道，Godot 已导入动作在 V0.26 却没有该旋转轨道。必须逐项核对动画导入后的 `NodePath`、`TrackType` 和常量/动态轨道，给真正静止的骨骼 rest-pose 合理回退；对 pelvis 平移及双腿/双臂动态轨道保持严格验收。
+2. 在功能兼容性真正通过后，出 **真实 Godot 三方截图**：原生 UAL 人偶、CC0 65 骨骼基础人物、49 骨骼旧市民同相位对照，人工审查膝盖、鞋底、上半身、走跑自然度。配套基础角色只是技术试验，不是生活市民最终外观。
+3. 未经过人眼和实机验证，不改正式 CityPlayer、不合并/发布。禁止向带危险自动部署工作的旧 V0.18 分支推送。继续守住零新增付费、#15/#18 阻断。
+4. 主分支 HTML S0–S5、Chrome WebGL 真实浏览器试玩、Windows RTX3060 1080p FPS/输入仍待独立验收。
 
 ## 5. 下次新聊天直接复制
 
-> 继续《游戏计划书／同频之城》。先用 GitHub 读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新独立验证 PR/head SHA/CI/Issues 和 main HTML S0–S5。当前开发候选 V0.25 草稿 [PR #39](https://github.com/ruabie/moci-cet4/pull/39)，head `fbfc0a184f46de88a1aec9e080d9cee36d2baf7d`。同 SHA Godot CI 技术 PASS：8 组成对真实原始渲染图，8/8 组 IK 开/关均显示约 1.1%–1.9% 像素差；人工打开对照图发现膝盖、脚底和跑步悬空/摆臂仍 FAIL。下一独立 V0.26 优先对比 UAL 与 Quaternius 人物的全身骨骼静止取向和可替代 CC0 骨架匹配方案，不再只调 IK；须提供真实漫游/接地连续视频证据。不要自动合并、发布、花钱、改其他项目，禁止推送仍带危险自动发布任务的旧 V0.18 分支。结束时同步两份 main 交接文件并列出实际 SHA。
+> 继续《游戏计划书／同频之城》开发。先用 GitHub 读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新核实 PR/head SHA/CI/Issue/main HTML。最新 V0.26 草稿 PR #40，head `87a5399cc7c4be920ca2d35e8b0ec5fd54403ff4`，确切 CC0 Universal Base Character 与 UAL 65/65 共享骨骼与层级，静止旋转差异中位数 2.16°，旧 49 骨骼市民仅 1 个同名骨骼；快审核 CI 通过。注意 V0.26 两次完整 Godot CI 均在三方渲染前失败：原始导入有 55 条旋转+1 条 pelvis 平移，而第二轮关键轨道检查发现 `spine_01` 缺失。**没有 V0.26 新截图，不要谎称画质改善。** 下一独立 V0.27 先调查 Godot 动画轨道导入/常量轨道过滤，再用严格 rest-pose 回退保持动态髋部/双腿动作，之后取得真实同相位三方截图。不能第三次盲改旧 PR、不自动合并或发布、不付费、不推送危险 V0.18 旧分支、不修改其他项目，结束时再核实并更新两份交接及 SHA。
 
 ## 6. 交接文件和监工
 
