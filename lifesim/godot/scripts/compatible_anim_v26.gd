@@ -18,7 +18,18 @@ static func _rest_fallback_proven(clip: String, bone: String) -> bool:
     if str(proof.get("source_git_blob","")) != PINNED_SOURCE_BLOB:
         return false
     var by_clip: Dictionary = proof.get("constant_rotation_bones_by_clip",{})
-    var accepted: Variant = by_clip.get(clip,[])
+    # Proven by V0.27's exact Godot imported AnimationPlayer inventory:
+    # the importer removes the "_Loop" suffix and shortens Jog_Fwd_Loop.
+    # Never guess another clip's original identity; unlisted names fail closed.
+    const IMPORTED_TO_PINNED: Dictionary = {
+        "Idle":"Idle_Loop",
+        "Walk":"Walk_Loop",
+        "Jog_Fwd":"Jog_Fwd_Loop"
+    }
+    var original_name: String = str(IMPORTED_TO_PINNED.get(clip,""))
+    if original_name=="":
+        return false
+    var accepted: Variant = by_clip.get(original_name,[])
     return accepted is Array and (accepted as Array).has(bone)
 
 # Comparison-only full-body animation transfer from UAL1 into the Quaternius
