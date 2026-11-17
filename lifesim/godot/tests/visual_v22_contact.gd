@@ -69,6 +69,10 @@ func _run() -> void:
             player.character_visual.position.y = 0.0
             driver.play("v22/"+name)
             driver.seek(minf(clip.length * float(moment),clip.length-.02),true)
+            # Freeze the sampled pose before physics-ray grounding, otherwise
+            # AnimationPlayer advances while screenshots await process_frame
+            # and its shoes no longer correspond to the saved contact metrics.
+            driver.stop(true)
             await process_frame
             var grounded: Dictionary = FootContactV22.lock_preview_height(player,calibration)
             if not bool(grounded.get("ok",false)):
