@@ -21,7 +21,7 @@
 | [上游 V0.18 草稿 PR #32](https://github.com/ruabie/moci-cet4/pull/32) | `open`/`draft`/`merged=false`，head `c288af7b7cd75fd8baa9d3369610d9f8b178b0dc` | 引擎功能候选；非主分支 |
 | [V0.18 Godot CI](https://github.com/ruabie/moci-cet4/actions/runs/43909344105) | `success`，对应准确 SHA；导入、逻辑 QA、固定机位人物截图任务均完成 | **引擎 CI 通过，不代表实际动作/画质/Windows 通过** |
 | [最新 V0.19 草稿 PR #33](https://github.com/ruabie/moci-cet4/pull/33) | `open`/`draft`/`merged=false`；head `31ba2aafb97784ac25133fe8df4bac85fa2b3fea`；base = V0.18 分支 | **新开发候选；未验收** |
-| [V0.19 Godot CI #44071855686](https://github.com/ruabie/moci-cet4/actions/runs/44071855686) | 本轮最后查询时 `in_progress`；下次须重新读取结果与产物 | **不提前宣称成功** |
+| [V0.19 Godot CI #44071855686](https://github.com/ruabie/moci-cet4/actions/runs/44071855686) | 对应 V0.19 SHA 的 PR/Push 两次引擎 CI 均 `success`；四张动态 PNG 与 JSON 已实际下载复核 | **技术输入/动画运转通过；美术仍不达标** |
 
 GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/moci-cet4/issues/10)、[Issue #12 Godot 实机验证](https://github.com/ruabie/moci-cet4/issues/12)、[Issue #15 美术重构](https://github.com/ruabie/moci-cet4/issues/15)、[Issue #18 画质/HUD/动作/FPS](https://github.com/ruabie/moci-cet4/issues/18)。除非证据变化，不要关闭。
 
@@ -36,18 +36,18 @@ GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/m
 
 **重要安全边界：** 上述自动发布修复目前只在 PR #33 的开发分支。V0.18 旧分支仍带有“推送即向 main 自动部署隔离目录”的旧工作流；在对旧分支继续 push 之前必须单独禁用或移除该任务，不能将 PR #33 的存在误当成全局已修复。历史 `play-v18` 文件已在 main，但**未独立验证浏览器实际可玩**。
 
-本轮 PR #33 的机器测试状态、四张截图内容、Windows FPS 和输入手感需要下一轮重新查证。零新增费用，未执行自动合并/发布。
+本轮 V0.19 的 [PR CI #44071855686](https://github.com/ruabie/moci-cet4/actions/runs/44071855686) 及 [Push CI #44071812324](https://github.com/ruabie/moci-cet4/actions/runs/44071812324) 已针对**同一 SHA**验证成功。已下载并打开 [四张真实输入动作截图与指标工件 #14323676026](https://github.com/ruabie/moci-cet4/actions/runs/44071855686/artifacts/14323676026)：走路位移 **3.737 m**、左右相位的左大腿姿态角变化 **0.548 rad**、转向 **1.527 rad**、停止速度及动画权重均为 **0**。这证明脚本驱动角色产生了物理位移与骨骼/转向变化；但视觉复核显示角色仍较僵硬、手臂与腿部动作幅度不自然，脚部触地感存疑，远景建筑重复、空旷路面占比仍高。四张 PNG 无法证明连续脚滑或镜头无穿模。美术审美与真实试玩继续 **blocked/unverified**；零新增费用，未自动合并/发布。
 
 ## 4. 下一步最优先任务
 
-1. 重新读取 PR #33 head SHA 与 [Godot CI #44071855686](https://github.com/ruabie/moci-cet4/actions/runs/44071855686)；若失败最多两轮修复，并保留失败原始记录；若成功下载四张动态截图和 JSON，**人工判读走路方向、膝盖弯曲、步态、转身、脚滑/穿模**。
+1. 以 PR #33 通过的技术基线为起点，优先修正人物**僵硬步态与脚部触地问题**：采用可验证的重定向动画/足部落地约束，并采集连续动作录屏，逐帧比对前进、转身和停止；不能凭四张静态 PNG 宣称画质达标。
 2. 确保所有后续开发分支均禁止未审核自动发布；尤其不要直接向 V0.18 旧分支 push 而触发旧发布任务。
 3. 保持 `lifesim/index.html` 的浏览器 S0–S5 契约独立；核实现有隔离 Web 构建在真实 Chrome 的 WebGL/指针锁/输入/保存和加载表现。
 4. 用 Windows RTX 3060 真机测 1080p 帧率、输入延迟、碰撞/相机、进出商店；达不到可用性与画质标准则继续阻断最终交付。
 
 ## 5. 下次新聊天直接复制
 
-> 继续《游戏计划书／同频之城》开发。用 GitHub 连接器读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新核实最新 PR/SHA/Issue/CI 和主分支 HTML S0–S5（不将交接快照误当实时）。当前需优先复核草稿 PR #33 的 V0.19 真实输入驱动动作截图与 Godot 引擎运行证据；若未过关，保留失败证据，有界修复。严格禁止自动合并/自动发布/新增付费/修改其他项目；结束时同步两份交接记录与提交 SHA。
+> 继续《游戏计划书／同频之城》开发。用 GitHub 连接器读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新核实最新 PR/SHA/Issue/CI 和主分支 HTML S0–S5（不将交接快照误当实时）。草稿 PR #33 的 V0.19 Godot CI/实际输入驱动动作数值已经通过，截图人工评审仍判定画质/步态未达标；继续修复人物动画并取得视频和 Windows 实机证据。严格禁止自动合并/自动发布/新增付费/修改其他项目；结束时同步两份交接记录与提交 SHA。
 
 ## 6. 交接文件和监工
 
