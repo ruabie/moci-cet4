@@ -147,6 +147,29 @@ jobs:
           test -s "$PROJECT_DIR/tests/v18_player_in_city.png"
           test -s "$PROJECT_DIR/tests/v18_player_closeup.png"
           test -s "$PROJECT_DIR/tests/v18_six_residents.png"
+      - name: Capture V0.19 actual-input walking phases, turn and stop
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v19_motion.gd 2>&1 | tee godot-v19-motion.log
+          grep -F 'V19 MOTION PASS:' godot-v19-motion.log
+          for state in walking_early walking_late turning stopped; do
+            test -s "$PROJECT_DIR/tests/v19_${state}.png"
+          done
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          obj = json.loads(Path("lifesim/godot/tests/v19_motion_metrics.json").read_text())
+          assert obj["player_displacement_metres"] >= 1.4
+          assert obj["left_thigh_phase_angle_radians"] >= 0.12
+          assert obj["turn_angle_radians"] >= 0.45
+          print("V19 MOTION METRICS PASS", obj)
+          PY
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
@@ -171,6 +194,9 @@ jobs:
             godot-import.log
             godot-qa.log
             godot-v18-visual.log
+            godot-v19-motion.log
+            lifesim/godot/tests/v19_*.png
+            lifesim/godot/tests/v19_motion_metrics.json
             lifesim/godot/tests/v18_*.png
             godot-visual.log
             godot-v08-visual.log
