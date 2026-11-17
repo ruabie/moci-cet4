@@ -132,7 +132,11 @@ func _run() -> void:
         if src_clip==null or mapped_clip==null or old_clip==null:
             _fail("one of three real clip variants is absent for "+motion)
             return
-        var phases:Array[float]=[0.18] if motion=="idle" else PHASES
+        # Godot conditional array literals may be untyped at runtime. Explicit
+        # typed assignment preserves Array[float] for both cases.
+        var phases:Array[float]=[0.18]
+        if motion!="idle":
+            phases=PHASES
         var series:Array[Dictionary]=[]
         for t in range(phases.size()):
             var fraction:float=phases[t]
