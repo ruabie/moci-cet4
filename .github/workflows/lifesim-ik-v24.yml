@@ -1,0 +1,62 @@
+name: LifeSim V0.24 isolated IK root-cause check (free)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'lifesim/godot/tests/diagnostic_v24_minimal_ik.gd'
+      - '.github/workflows/lifesim-ik-v24.yml'
+  pull_request:
+    paths:
+      - 'lifesim/godot/tests/diagnostic_v24_minimal_ik.gd'
+      - '.github/workflows/lifesim-ik-v24.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-ik-modifier-signal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install official Godot 4.7.2 (no extra paid services)
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 \
+            https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip \
+            -o /tmp/v24-godot.zip
+          mkdir -p /tmp/v24-godot
+          unzip -q /tmp/v24-godot.zip -d /tmp/v24-godot
+          chmod +x /tmp/v24-godot/Godot_v4.7.2-stable_linux.x86_64
+      - name: Run truly isolated synthetic skeleton, no game assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/v24-minimal/tests
+          printf 'config_version=5\n' > /tmp/v24-minimal/project.godot
+          cp lifesim/godot/tests/diagnostic_v24_minimal_ik.gd /tmp/v24-minimal/tests/
+          /tmp/v24-godot/Godot_v4.7.2-stable_linux.x86_64 \
+            --headless --path /tmp/v24-minimal \
+            --script res://tests/diagnostic_v24_minimal_ik.gd 2>&1 | tee v24-minimal-ik.log
+          grep -F 'V24 MINIMAL IK PASS:' v24-minimal-ik.log
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          o=json.loads(Path('/tmp/v24-minimal/tests/v24_minimal_ik_metrics.json').read_text())
+          assert o['passed'] and o['target_resolves'] and o['pole_resolves']
+          assert o['signal_count']>=1
+          assert o['signal_min_error']<=o['initial_error_metres']-0.04
+          print('V24 MINIMAL IK SIGNAL EVIDENCE VERIFIED',o)
+          PY
+      - name: Archive real metrics and failure logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v024-minimal-ik-signal
+          path: |
+            v24-minimal-ik.log
+            /tmp/v24-minimal/tests/v24_minimal_ik_metrics.json
+          if-no-files-found: warn
+          retention-days: 14
