@@ -37,30 +37,30 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.23 native TwoBoneIK3D attempted; failed exact-SHA IK target-error gate",
-      "pr": 37,
-      "url": "https://github.com/ruabie/moci-cet4/pull/37",
+      "version": "V0.24 native TwoBoneIK3D modifier-timing diagnosis (technical pass, art blocked)",
+      "pr": 38,
+      "url": "https://github.com/ruabie/moci-cet4/pull/38",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v023-native-two-bone-ik",
-      "headSha": "7dc7d47add4ad62c95d610504725c70523bbbd9b",
-      "baseBranch": "lifesim-v022-rest-foot-contact-pilot",
-      "baseSha": "dd1203044e911707f3f91581dac023c3bf9dd68c",
-      "engineProject": "lifesim/godot/project.godot",
-      "firstAttemptSha": "f55fc47adb9fb86ed14372ab8a855c71bb347637",
-      "firstAttemptPrRun": 44085960249,
-      "firstAttemptError": "Called nonexistent SkeletonProfileHumanoid.get_bone_count() API",
-      "secondAttemptSha": "7dc7d47add4ad62c95d610504725c70523bbbd9b",
-      "secondAttemptPrRun": 44086627399,
-      "secondAttemptPushRun": 44086618495,
-      "lastCiResult": "completed_failure, actual IK acceptance condition unsatisfied",
-      "originalGameplayRegressionPassed": true,
-      "newIkAcceptancePassed": false,
+      "headBranch": "lifesim-v024-ik-signal-diagnostics",
+      "headSha": "5ed2a6db7a96c757dc35c2176befa4c22efc259e",
+      "baseBranch": "lifesim-v023-native-two-bone-ik",
+      "baseSha": "7dc7d47add4ad62c95d610504725c70523bbbd9b",
+      "GodotVersion": "4.7.2 stable",
+      "sameHeadCi": {
+        "minimalPr": 44089439638,
+        "godotPr": 44089439985,
+        "godotPush": 44089426494,
+        "supervisorPr": 44089439690,
+        "all": "completed_success"
+      },
+      "debugTestPassed": true,
+      "nativeIkActuallyModifiesAvatarBonesDuringSignal": true,
+      "formerV023FailureInterpretedAsMeasurementTimingError": true,
+      "productionPlayerUpdated": false,
       "visualApproved": false,
-      "nativeIkTargetEffective": false,
-      "productionAnimationIntegrated": false,
-      "continuousInputVideo": false,
+      "imageAndContinuousInputIkEvidence": false,
       "chromeVerified": false,
       "windowsPerformanceVerified": false,
       "finalRelease": false
@@ -366,6 +366,68 @@
       "visualGate": "failed",
       "productionPlayerUntouched": true,
       "nextDiagnostic": "Inspect SkeletonModifier3D.modification_processed events, skeleton advance and target NodePaths/IK active updates with a minimal no-animation test; establish actual bone motion before integrating any IK into CityPlayer."
+    },
+    "previousCandidateV023": {
+      "version": "V0.23 native TwoBoneIK3D attempted; failed exact-SHA IK target-error gate",
+      "pr": 37,
+      "url": "https://github.com/ruabie/moci-cet4/pull/37",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v023-native-two-bone-ik",
+      "headSha": "7dc7d47add4ad62c95d610504725c70523bbbd9b",
+      "baseBranch": "lifesim-v022-rest-foot-contact-pilot",
+      "baseSha": "dd1203044e911707f3f91581dac023c3bf9dd68c",
+      "engineProject": "lifesim/godot/project.godot",
+      "firstAttemptSha": "f55fc47adb9fb86ed14372ab8a855c71bb347637",
+      "firstAttemptPrRun": 44085960249,
+      "firstAttemptError": "Called nonexistent SkeletonProfileHumanoid.get_bone_count() API",
+      "secondAttemptSha": "7dc7d47add4ad62c95d610504725c70523bbbd9b",
+      "secondAttemptPrRun": 44086627399,
+      "secondAttemptPushRun": 44086618495,
+      "lastCiResult": "completed_failure, actual IK acceptance condition unsatisfied",
+      "originalGameplayRegressionPassed": true,
+      "newIkAcceptancePassed": false,
+      "visualApproved": false,
+      "nativeIkTargetEffective": false,
+      "productionAnimationIntegrated": false,
+      "continuousInputVideo": false,
+      "chromeVerified": false,
+      "windowsPerformanceVerified": false,
+      "finalRelease": false
+    },
+    "v024Review": {
+      "evidenceArtifactId": 14331276265,
+      "evidenceUrl": "https://github.com/ruabie/moci-cet4/actions/runs/44089439985/artifacts/14331276265",
+      "verifiedArtifactContent": "Read exact-head Godot CI runtime logs and independently inspected ZIP v24_city_ik_metrics.json",
+      "sourceChanges": [
+        "lifesim/godot/tests/diagnostic_v24_minimal_ik.gd",
+        "lifesim/godot/tests/diagnostic_v24_city_ik.gd",
+        ".github/workflows/lifesim-ik-v24.yml",
+        ".github/workflows/lifesim-godot.yml"
+      ],
+      "minimalThreeBone": {
+        "callbackEvents": 4,
+        "initialErrorM": 0.44,
+        "withinSignalErrorM": 0,
+        "postFrameErrorM": 0.44,
+        "test": "passed"
+      },
+      "realCityPlayer": {
+        "source": "Quaternius UAL CC0 Walk/Jog, existing V0.23 native IK configuration, actual Godot CityPlayer model",
+        "clipSamplePairs": 10,
+        "modifierSignalEvents": 10,
+        "stanceFootSamples": 7,
+        "meaningfullyImprovedStanceFeet": 5,
+        "meanAnkleTargetErrorBeforeMetres": 0.248,
+        "meanAnkleTargetErrorWithinModifierSignalMetres": 0,
+        "meanAnkleTargetErrorAfterFrameMetres": 0.248,
+        "test": "passed"
+      },
+      "trueRootCauseFinding": "V0.23 measured get_bone_global_pose after modifier processing rather than in modification_processed; this produced false negative for native IK actuation. Historical V0.23 test remains legitimately failed but its 'native IK cannot modify bones' inference is corrected.",
+      "ciLegacyTreatment": "Exact historical failed V0.23 test executed as explicit expected-failing negative control. The new V0.24 signal-time test independently gates CI; do not remove/hide historical failure.",
+      "limitations": "No rendered IK-applied skinned mesh pose/camera/foot sole contact, no real-time foot skate proof, no Windows or Chrome device performance, no production player movement change.",
+      "decision": "engine signal-time IK proof PASSED, animation/art approval BLOCKED, release BLOCKED"
     }
   },
   "gates": [
@@ -376,8 +438,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "blocked_current_head",
-      "why": "V0.23 SHA 7dc7d47: original import, game economy/save, V0.19-V0.22 regressions pass; NEW native IK target-error gate failed in both PR CI 44086627399 and push CI 44086618495. Do not use V0.22 historical success to mark latest candidate PASS."
+      "state": "passed_current_sha_diagnostic_only",
+      "why": "V0.24 exact SHA 5ed2a6db: isolated IK CI #44089439638, full PR CI #44089439985, full push CI #44089426494 all success. V0.23 negative-control failure preserved; V0.24 proves actual native IK signal-time ankle movement, but not game visual quality."
     },
     {
       "id": "WebGL-browser",
@@ -387,7 +449,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "V0.23 native two-leg IK ineffective: stance 12, improved 0, mean ankle target error 0.249m before and after. Reviewed 16 actual Godot frames; awkward arms and airborne running persist; no live footage, no real foot plant."
+      "why": "V0.24 actual player IK signal-time error 0m vs 0.248m pre, proving solver works, but no image of correctly deformed skinned avatar, no knee/sole contact, no continuous game control or Windows footage. Historical V0.22/23 stiff arms and airborne run remain unresolved."
     },
     {
       "id": "Windows-RTX3060",
@@ -402,23 +464,23 @@
     {
       "id": "Workflow-no-automatic-publication",
       "state": "fixed_in_stacked_drafts_only",
-      "why": "PR #36 inherited no-auto-publish from V0.19; V0.18 original branch still has risky job and must not be pushed without separately disabling."
+      "why": "V0.24 branch inherits V0.19 safe artifact-only Web job, but unsafe original V0.18 branch still contains push-to-main publication. No merges/releases; old branch must not be pushed."
     }
   ],
   "nextActions": [
-    "Begin separate V0.24 diagnostics rather than third V0.23 blind fix: prove TwoBoneIK3D/SkeletonModifier3D modification_processed fires and actually changes ankle bone poses in a minimal Skeleton3D scene; inspect target node path, active/update order and Skeleton3D.advance() in Godot 4.7. Only proceed to city integration if this test passes",
-    "After IK demonstrably changes bones, validate both foot contact and individual ground stance with pinned CC0 rest-pose and actual skinned shoe bounds, and check knee bending under real world locomotion, transitions and full video",
-    "Keep PR #37 draft; do not auto merge/publish; legacy V0.18 branch still has unsafe push-to-main Web workflow, do not push that branch",
-    "Real Chrome WebGL play, pointer lock, indoor interaction, time/economy/save, canonical main HTML S0-S5 remain unverified/pending",
-    "Windows RTX3060 1080p FPS and input latency, camera/door collision, visual approval remain blocked"
+    "V0.25 independent visual gate: capture Godot skin-deformed avatar after TwoBoneIK3D has actually solved inside SkeletonModifier3D.modification_processed; use same target/path/real CC0 clips, then inspect knee direction, foot penetration, both sole meshes and arm pose before any production integration",
+    "Add real input-driven walk/turn/stop with IK applied in CityPlayer only after actual animation visuals pass, and measure planted-foot world drift, walk/run blend and root motion on continuous game footage; do not confuse sampled source clip GIF with gameplay video",
+    "Disable old V0.18 publish-to-main web workflow before touching/pushing upstream V0.18; currently no public release",
+    "Chrome WebGL actual interaction, S0-S5 main HTML, pointer lock, indoor interaction, local time/money/save remain unverified or pending",
+    "Windows RTX3060 1080p FPS, camera collision, input latency and subjective art acceptance remain blocked"
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-17 independently fetched PR #37, Godot PR/push workflow failures, downloaded artifact 14329447830 and inspected 16 actual images plus v23 metrics",
+    "freshness": "2026-11-17: verified PR #38 exact SHA, 4 same-SHA CI successes, independently read artifact 14331276265 and V24 source; corrected PR #37 interpretation without hiding historical failed test.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.23 PR #37 draft SHA 7dc7d47: attempted Godot native IK, two bounded CI attempts, new target-error tests FAILED; screenshots reviewed; no merge/release; main handoff updated only"
+    "latestRound": "V0.24 PR #38 draft (SHA 5ed2a6db), same-SHA Godot CI + synthetic CI PASS: actual signal-time two-leg IK actuates avatar, V0.23 misleading post-frame failure corrected; visuals and release still blocked; no production code merged."
   }
 }
