@@ -1,5 +1,11 @@
 # 游戏计划书 / LifeSim — 现实时间人生模拟
 
+## 跨对话交接（先读）
+
+长期开发可从 [HANDOFF.md](HANDOFF.md) 接续；机器可读快照：[HANDOFF_STATE.json](HANDOFF_STATE.json)；更新规则：[HANDOFF_PROTOCOL.md](HANDOFF_PROTOCOL.md)。
+
+**注意：** 本 README 与 `project.json` 描述的是 `main` 上的 HTML 独立监督入口状态，不能据此否认在草稿 PR 分支中的 Godot 开发成果。每次恢复开发前应重新核对最新 PR 的 head SHA、CI 及视觉/实机证据；交接快照不保证实时更新。
+
 **状态：已建立独立监工与验收规范；当前尚未将可玩的游戏源码接入 GitHub。**
 
 这个项目不是 WordRide 的分支玩法。前期使用现有已连接 GitHub 仓库内的 `lifesim/` 独立目录进行质量监控，以后可迁移至专用仓库。
