@@ -37,27 +37,28 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.19 motion proof + safe Web build (draft)",
-      "pr": 33,
-      "url": "https://github.com/ruabie/moci-cet4/pull/33",
+      "version": "V0.20 (revised second bounded attempt)",
+      "pr": 34,
+      "url": "https://github.com/ruabie/moci-cet4/pull/34",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v019-motion-proof-safe-web",
-      "headSha": "31ba2aafb97784ac25133fe8df4bac85fa2b3fea",
-      "baseBranch": "lifesim-v018-humanoid-art-pass",
-      "baseSha": "c288af7b7cd75fd8baa9d3369610d9f8b178b0dc",
+      "headBranch": "lifesim-v020-grounded-gait-review",
+      "headSha": "93fb2112d3a8a1c47014789f632dbf83893848db",
+      "baseBranch": "lifesim-v019-motion-proof-safe-web",
+      "baseSha": "31ba2aafb97784ac25133fe8df4bac85fa2b3fea",
       "engineProject": "lifesim/godot/project.godot",
-      "reportedChange": "Actual input-driven walking phases / turning / stop CI screenshots and metrics; candidate Web workflow removes publish-isolated-path",
-      "engineCiRun": 44071855686,
-      "engineCiLastChecked": "completed_success",
-      "sourceCommitted": true,
-      "qaPassedForThisHead": true,
+      "firstAttemptSha": "07bf475e78f9efbbebdac620cc10da4972e55fd9",
+      "firstAttemptPrCiRun": 44074055179,
+      "firstAttemptPrCiResult": "success",
+      "latestPrCiRun": 44074870163,
+      "latestPushCiRun": 44074860982,
+      "latestCiStatus": "in_progress_at_last_check",
+      "qaPassedForThisHead": false,
       "visualApproved": false,
       "windowsPerformanceVerified": false,
       "finalRelease": false,
-      "engineCiAlsoPushRun": 44071812324,
-      "ciMeaning": "Godot import + headless economy/movement tests and four input-driven capture/metric assertions passed; no real gameplay or subjective art acceptance"
+      "changes": "travel-distance-driven animated knee/arm phases, bounded signed ankle height offset, 20 engine PNG+GIF, exact measured physics tick gaps"
     },
     "issues": [
       {
@@ -128,6 +129,47 @@
         "stopAnimationWeight": 0
       },
       "visualReview": "Character remains angular with stiff arm/leg swing; potential feet/ground contact mismatch; repetitive skyline and oversized empty road. Single PNGs cannot determine foot sliding or camera/gameplay smoothness."
+    },
+    "intermediateCandidateV019": {
+      "version": "V0.19 motion proof + safe Web build (draft)",
+      "pr": 33,
+      "url": "https://github.com/ruabie/moci-cet4/pull/33",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v019-motion-proof-safe-web",
+      "headSha": "31ba2aafb97784ac25133fe8df4bac85fa2b3fea",
+      "baseBranch": "lifesim-v018-humanoid-art-pass",
+      "baseSha": "c288af7b7cd75fd8baa9d3369610d9f8b178b0dc",
+      "engineProject": "lifesim/godot/project.godot",
+      "reportedChange": "Actual input-driven walking phases / turning / stop CI screenshots and metrics; candidate Web workflow removes publish-isolated-path",
+      "engineCiRun": 44071855686,
+      "engineCiLastChecked": "completed_success",
+      "sourceCommitted": true,
+      "qaPassedForThisHead": true,
+      "visualApproved": false,
+      "windowsPerformanceVerified": false,
+      "finalRelease": false,
+      "engineCiAlsoPushRun": 44071812324,
+      "ciMeaning": "Godot import + headless economy/movement tests and four input-driven capture/metric assertions passed; no real gameplay or subjective art acceptance"
+    },
+    "v020Review": {
+      "firstAttemptSourceSha": "07bf475e78f9efbbebdac620cc10da4972e55fd9",
+      "firstAttemptArtifactId": 14323738171,
+      "firstAttemptResult": "engine CI passed, images independently viewed; *rejected as final visual proof*",
+      "firstAttemptMetrics": {
+        "distanceMetres": 11.882,
+        "phaseAdvanceRad": 32.459,
+        "ankleClearanceMaxMetres": 0.11,
+        "maxVisualCompensationMetres": 0
+      },
+      "finding": "V0.20 first attempt raised ankle reference up to ~11cm and guard never lowered visual root. Mesa capture skipped unknown numbers of physics ticks; GIF cannot be called fixed-period real-time video.",
+      "secondAttemptFix": "bounded negative 5.5cm visual-root offset plus capture tick indices and variable-duration GIF",
+      "secondAttemptSha": "93fb2112d3a8a1c47014789f632dbf83893848db",
+      "secondAttemptCiStatus": "in_progress",
+      "repairBudget": "2 of 2 bounded revisions; do not start unlimited repair chain",
+      "subjectiveArtApproved": false,
+      "limitation": "ankle reference not shoe sole; no true IK or Windows realtime video"
     }
   },
   "gates": [
@@ -138,8 +180,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "passed_current_sha_engine_ci_only",
-      "why": "V0.19 exact SHA 31ba2aaf: both PR run 44071855686 and push run 44071812324 completed success (Godot 4.7.2 + simulated input motion metrics). This excludes subjective art, real Chrome, Windows FPS."
+      "state": "requires_current_sha_run",
+      "why": "V0.20 first attempt SHA 07bf475e Godot PR CI #44074055179 passed. Current revised SHA 93fb2112 is under PR CI #44074870163; not yet verified. Do not transfer previous pass."
     },
     {
       "id": "WebGL-browser",
@@ -149,7 +191,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "V0.19 four real-motion diagnostic PNGs independently viewed: stiff/low-poly figure, questionable foot contact, repetitive skyline/large bare road. Numerical leg/turn proof passes but visual quality not approved; video + Windows real play needed."
+      "why": "V0.20 first 20-frame images reviewed; foot hovered up to ~11cm relative to rest ankle and sampled at irregular real physics times. Second correction under review; no subjective art acceptance."
     },
     {
       "id": "Windows-RTX3060",
@@ -168,19 +210,19 @@
     }
   ],
   "nextActions": [
-    "Highest priority: replace stiff walking gait and apparent foot contact issue using physically grounded/retargeted animation, with actual sequence/video evidence instead of only four PNGs; retain PR #33 as technical baseline",
-    "Remove/disable V0.18 legacy push-to-main publish job before any further push to that upstream branch; PR #33 fix is draft-only",
-    "Run real browser Chrome for existing isolated play-v18 build, verify mouse/pointer lock, WebGL, gameplay and persistence; canonical HTML S0-S5 remain pending",
-    "Run Windows RTX3060 1080p gameplay/FPS/input delay/door/camera visual checks",
-    "Recheck all active branch SHA/PR and CI before any more edits; preserve draft/no merge/no release/no paid costs"
+    "Recheck exact head SHA 93fb2112 and PR CI #44074870163 (also push CI #44074860982), download/review 20-frame GIF and tick-index metrics; stop if second attempt fails and preserve failed evidence",
+    "For subsequent milestone use licensed retargeted walk animation + real foot IK/contact and side-by-side captured video; avoid calling procedural foot height clamp completed gait",
+    "Before any new V0.18 upstream branch push disable its old publish-isolated-path GitHub workflow; PR #33/#34 fix only exists in stacked candidates",
+    "Actual Chrome WebGL interaction + pointer lock, economy/save; main canonical HTML S0–S5 remains pending",
+    "Windows RTX3060 real FPS, input delay, collision and doorway testing remains unverified"
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-17: PR #33 CI status refreshed from GitHub and same-SHA screenshot/metric artifact independently inspected",
+    "freshness": "2026-11-17 GitHub read: PR #34 head 93fb2112; first SHA 07bf475e CI success and screenshot review; later PR CI in_progress at last check",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.19 motion/release safety candidate PR #33 (draft, not merged); main metadata-only handoff update requested by user"
+    "latestRound": "V0.20 draft PR #34; second bounded adjustment underway, CI pending at snapshot; GitHub main handoff only, no game merge/release"
   }
 }
