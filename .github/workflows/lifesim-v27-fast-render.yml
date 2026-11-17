@@ -86,7 +86,8 @@ jobs:
             --rendering-driver opengl3 --path lifesim/godot \
             --script res://tests/diagnostic_v27_import_tracks.gd 2>&1 | tee v27-track-import.log
           grep -F 'V27 GODOT TRACK INVENTORY PASS:' v27-track-import.log
-          xvfb-run -a -s '-screen 0 1280x720x24' \
+          timeout --signal=TERM --kill-after=10s 150s \
+            xvfb-run -a -s '-screen 0 1280x720x24' \
             /tmp/godot-v27/Godot_v4.7.2-stable_linux.x86_64 \
             --rendering-driver opengl3 --path lifesim/godot \
             --script res://tests/visual_v26_rig_compare.gd 2>&1 | tee v27-actual-renders.log
