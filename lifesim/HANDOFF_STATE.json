@@ -114,6 +114,7 @@
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
     "freshness": "快照仅代表 2026-11-17 已核实信息；每次新对话或重大变更必须重新核对 GitHub；不基于旧快照自称当前最新",
-    "monitorIntegration": "not_verified"
+    "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
+    "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files."
   }
 }
