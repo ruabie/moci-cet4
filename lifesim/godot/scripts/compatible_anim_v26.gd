@@ -21,12 +21,12 @@ static func _rest_fallback_proven(clip: String, bone: String) -> bool:
     # Proven by V0.27's exact Godot imported AnimationPlayer inventory:
     # the importer removes the "_Loop" suffix and shortens Jog_Fwd_Loop.
     # Never guess another clip's original identity; unlisted names fail closed.
-    const IMPORTED_TO_PINNED: Dictionary = {
+    var imported_to_pinned: Dictionary = {
         "Idle":"Idle_Loop",
         "Walk":"Walk_Loop",
         "Jog_Fwd":"Jog_Fwd_Loop"
     }
-    var original_name: String = str(IMPORTED_TO_PINNED.get(clip,""))
+    var original_name: String = str(imported_to_pinned.get(clip,""))
     if original_name=="":
         return false
     var accepted: Variant = by_clip.get(original_name,[])
