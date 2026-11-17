@@ -10,8 +10,8 @@
 - 更新 `scripts/player.gd`：以实际位移推进 2.30m/步态周期（旧版约 4.25m），改进交替膝盖屈伸和手臂摆动，增加小幅受限的角色视觉根节点高度补偿（不会修改玩家物理碰撞体）。
 - 新增 `tests/visual_v20_gait.gd` 与 `tools/assemble_gait_v20.py`，Godot CI 采集真实物理运行的 20 张截图、动态 GIF、逐帧图和数值报告。必须记录采样时真正经过的物理帧数，不能把 Mesa 延迟造成的跳帧误称为正常实时视频。
 - **第一轮实证：** V0.20 初版 SHA `07bf475e78f9efbbebdac620cc10da4972e55fd9`，PR CI [#44074055179](https://github.com/ruabie/moci-cet4/actions/runs/44074055179) 为 `success`；已下载并查看 [20 帧证据工件 #14323738171](https://github.com/ruabie/moci-cet4/actions/runs/44074055179/artifacts/14323738171)。发现脚踝基准相对闲置姿势最大抬升约 **0.110m**，视觉补偿未生效（0m）；截图横跨 **11.882m** 运动，采样间隔不严格。**技术 QA 通过，但画质/脚部贴地验收不通过。**
-- **第二轮有界修正：** 允许视觉根节点最多约 5.5cm 的缓和下移来减少悬空，记录各帧 `physics_tick_counter`、实际采样间隔并据此调整 GIF 播放时长；新 SHA `93fb2112d3a8a1c47014789f632dbf83893848db`。本次更新交接时 [PR CI #44074870163](https://github.com/ruabie/moci-cet4/actions/runs/44074870163) 仍在运行，**不得提前写为通过**。
-- 已使用两轮有界尝试；如果最新 CI 或实际画面仍失败，保留证据并明确阻断，后续改用真实许可角色动作动画/足部 IK 的独立里程碑，不循环盲改。
+- **第二轮有界修正已验证：** SHA `93fb2112d3a8a1c47014789f632dbf83893848db`；[PR CI #44074870163](https://github.com/ruabie/moci-cet4/actions/runs/44074870163) 与 [Push CI #44074860982](https://github.com/ruabie/moci-cet4/actions/runs/44074860982) **均完成 success**。已下载并检查 [本提交 20 帧截图/GIF/JSON 工件 #14323684340](https://github.com/ruabie/moci-cet4/actions/runs/44074870163/artifacts/14323684340)：脚踝骨骼相对静止的高度代理最大值从约 **11cm 降至 7cm**；视觉根节点下移最多 **5.5cm**。每帧原拟相隔 3 物理 tick，实际最大间隔 **8 tick**，GIF 已基于真实 tick 间距编码。**引擎/玩法自动化测试 PASS，美术与真实步态未通过**：人物依旧僵硬，缺专业接触 IK；街景过于重复，无法凭 Mesa 截帧断言无脚滑、流畅或 Windows FPS 合格。
+- 本轮两次有界尝试已经结束，技术证明已归档，但主观人物美术/运动质量仍**阻断**。下一独立里程碑需可验证许可证的完整走/跑/转向动画、骨骼重定向、足部接触约束及连续实机录屏；不继续无限微调现有摆腿公式。
 - V0.18 旧分支仍带自动将 Web 构建 push 到 main 的工作流；仅 PR #33、#34 的候选分支移除此任务。**不要推送旧 V0.18 分支或自动发布**。主分支 HTML S0–S5、Chrome 真实试玩及 Windows RTX3060 FPS 均未通过。
 
 ---
@@ -52,14 +52,14 @@ GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/m
 
 ## 4. 下一步最优先任务
 
-1. **优先查最新 V0.20 PR #34 的二轮修正 CI #44074870163、对照 GIF 和采样间隔指标**。技术 PASS 不代表美术 PASS，若有明显悬空或跳帧，应保留证据并停止该轮修复；下一独立里程碑采用可授权的专业步态动画 + 足部 IK。
+1. **启动下一独立视觉里程碑（非 V0.20 第三轮盲改）**：寻找并核实可用于当前 Quaternius 人物骨骼的 CC0 或明确可再分发专业行走/跑步/转身动画，做重定向与足部接触约束，提交前后完整录屏和走/停/转实机证据。V0.20 当前仅技术 QA 通过。
 2. 确保所有后续开发分支均禁止未审核自动发布；尤其不要直接向 V0.18 旧分支 push 而触发旧发布任务。
 3. 保持 `lifesim/index.html` 的浏览器 S0–S5 契约独立；核实现有隔离 Web 构建在真实 Chrome 的 WebGL/指针锁/输入/保存和加载表现。
 4. 用 Windows RTX 3060 真机测 1080p 帧率、输入延迟、碰撞/相机、进出商店；达不到可用性与画质标准则继续阻断最终交付。
 
 ## 5. 下次新聊天直接复制
 
-> 继续《游戏计划书／同频之城》开发。用 GitHub 连接器读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新核实最新 PR/SHA/Issue/CI 和主分支 HTML S0–S5（不将交接快照误当实时）。草稿 PR #33 的 V0.19 Godot CI/实际输入驱动动作数值已经通过，截图人工评审仍判定画质/步态未达标；继续修复人物动画并取得视频和 Windows 实机证据。严格禁止自动合并/自动发布/新增付费/修改其他项目；结束时同步两份交接记录与提交 SHA。
+> 继续《游戏计划书／同频之城》开发。用 GitHub 连接器读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，重新核实最新 PR/SHA/Issue/CI 和主分支 HTML S0–S5（不将交接快照误当实时）。当前最新草稿 PR #34（V0.20，head 93fb2112）已有同 SHA Godot CI 技术通过，但两轮受限修复后美术和步态仍未验收；继续下一独立动作资源重定向/足部 IK 里程碑，并取得视频和 Windows 实机证据。严格禁止自动合并/自动发布/新增付费/修改其他项目；结束时同步两份交接记录与提交 SHA。
 
 ## 6. 交接文件和监工
 
