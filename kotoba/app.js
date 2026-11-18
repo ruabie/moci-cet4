@@ -16,13 +16,27 @@
   ]){if(!BOOK.lessons.some(x=>x.id===entry.id))BOOK.lessons.push(entry);}
   const thirteen=BOOK.lessons.find(x=>x.id==='13');
   if(thirteen&&SUPPLEMENT_WORDS.some(w=>w.lesson==='13')){thirteen.pages='34–38';thirteen.isPartial=false;}
-  BOOK.lessons.sort((a,b)=>Number(a.id)-Number(b.id));
+  // Existing single-digit lessons are book III; existing double-digit lessons are book II.
+  // A future overlapping number can use an explicit ID such as "3-10".
+  const volumeOfLesson=id=>{
+    const idString=String(id),match=idString.match(/^([23])-(\d+)$/);
+    if(match)return Number(match[1]);
+    return /^\d+$/.test(idString)?(Number(idString)<10?3:2):null;
+  };
+  const lessonNumber=id=>String(id).replace(/^[23]-/,'');
+  BOOK.lessons.forEach(l=>{l.volume=Number(l.volume)||volumeOfLesson(l.id);});
+  BOOK.lessons.sort((a,b)=>(b.volume||0)-(a.volume||0)||Number(lessonNumber(a.id))-Number(lessonNumber(b.id)));
   const BOOK_WORDS=[...BOOK.words,...SUPPLEMENT_WORDS].map(w=>({...w}));
   // Maintained from this chat: separate source, shared memory progress with the textbook.
   const CHAT_WORDS=(Array.isArray(window.KOTOBA_EXTRAS)?window.KOTOBA_EXTRAS:[])
     .filter(w=>w&&w.jp&&w.cn)
     .map(w=>({...w,lesson:'extra',section:'聊天课外词',source:'chat'}));
   const COURSE=new Map(BOOK.lessons.map(x=>[x.id,x]));
+  const volumeName=n=>Number(n)===3?'第三册':'第二册';
+  const lessonLabel=id=>{
+    const vol=COURSE.get(String(id))?.volume||volumeOfLesson(id);
+    return vol?volumeName(vol)+' · 第'+lessonNumber(id)+'课':'第'+lessonNumber(id)+'课';
+  };
   const STORAGE={get(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}},set(k,x){try{localStorage.setItem(k,JSON.stringify(x));return true}catch{return false}}};
   const clean=s=>String(s??'').trim().slice(0,180);
   const norm=s=>String(s??'').normalize('NFKC').trim().toLowerCase().replace(/[\s　。、，,.!?！？・（）()「」『』]/g,'');
@@ -200,10 +214,16 @@
     else toast('目前没有到期复习词。先学习几组新词吧。');
   };
   function renderLessons(){
-    $('lessonList').innerHTML=BOOK.lessons.map(lesson=>{
-      const pool=allWords().filter(w=>w.lessons?.includes(lesson.id));
-      const left=remainingNewWords(pool,coverageScope('lesson',lesson.id)).length;
-      return `<button class="lesson-card" data-lesson="${lesson.id}"><span class="lesson-num">${lesson.id.padStart(2,'0')}</span><span class="lesson-name"><strong>${esc(lesson.name)}</strong><small>${esc(lesson.cn)}${lesson.isPartial?' · 照片仅含部分词汇':''}</small></span><span class="lesson-count">${left}<small>待学 / ${pool.length}</small></span></button>`;
+    const words=allWords();
+    $('lessonList').innerHTML=[3,2].map(volume=>{
+      const lessons=BOOK.lessons.filter(l=>Number(l.volume)===volume);
+      if(!lessons.length)return '';
+      const cards=lessons.map(lesson=>{
+        const pool=words.filter(w=>w.lessons?.includes(lesson.id));
+        const left=remainingNewWords(pool,coverageScope('lesson',lesson.id)).length;
+        return `<button class="lesson-card" data-lesson="${esc(lesson.id)}"><span class="lesson-num">${lessonNumber(lesson.id).padStart(2,'0')}</span><span class="lesson-name"><strong>${esc(lesson.name)}</strong><small>${esc(lesson.cn)}${lesson.isPartial?' · 照片仅含部分词汇':''}</small></span><span class="lesson-count">${left}<small>待学 / ${pool.length}</small></span></button>`;
+      }).join('');
+      return `<section class="volume-group" aria-label="${volumeName(volume)}"><div class="volume-heading"><h2>${volumeName(volume)}</h2><span>已收录 ${lessons.length} 课</span></div><div class="volume-lessons">${cards}</div></section>`;
     }).join('');
     $('lessonList').querySelectorAll('[data-lesson]').forEach(btn=>btn.onclick=()=>openSetup('lesson',btn.dataset.lesson));
   }
@@ -219,8 +239,8 @@
     const pool=scope?(newCycle?fullPool:remaining):fullPool;
     setup={type,lesson,pool,fullSize:fullPool.length,scope,newCycle,qtyTouched:false};
     const titles={all:'总词汇库学习',extra:'课外词学习',lesson:COURSE.get(lesson)?.name||'按课学习',due:'到期复习',weak:'薄弱词复习',selected:'继续巩固'};
-    const captions={all:'总词汇库包含课内、课外和自定义词；未学完前各轮不重复。',extra:'只学习课外词；与课内重合的单词只计一个，保留共同记忆进度。',lesson:`第 ${lesson} 课 · ${COURSE.get(lesson)?.cn||'教材词语'}`,due:'先回忆已经到复习时间的词。',weak:'这些是你过去标记过“不记得了”的词。',selected:'巩固刚才标记为遗忘的词。'};
-    $('setupKicker').textContent=type==='lesson'?'TEXTBOOK / LESSON '+String(lesson).padStart(2,'0'):'KOTOBA / COLLECTION';
+    const captions={all:'总词汇库包含课内、课外和自定义词；未学完前各轮不重复。',extra:'只学习课外词；与课内重合的单词只计一个，保留共同记忆进度。',lesson:`${lessonLabel(lesson)} · ${COURSE.get(lesson)?.cn||'教材词语'}`,due:'先回忆已经到复习时间的词。',weak:'这些是你过去标记过“不记得了”的词。',selected:'巩固刚才标记为遗忘的词。'};
+    $('setupKicker').textContent=type==='lesson'?'TEXTBOOK / BOOK '+String(COURSE.get(lesson)?.volume||'?')+' / LESSON '+lessonNumber(lesson).padStart(2,'0'):'KOTOBA / COLLECTION';
     $('setupTitle').textContent=titles[type]||titles.all;
     const status=scope?(newCycle?` · 全部 ${fullPool.length} 个词已看过；本次开始新一遍。`:` · 尚未学过 ${remaining.length} / ${fullPool.length} 个；本轮不重复旧词。`):'';
     $('setupDesc').textContent=(captions[type]||captions.all)+status;
@@ -261,7 +281,7 @@
     $('cardWord').classList.toggle('very-long-word',[...w.jp].length>=12);
     $('cardKana').textContent=w.kana;$('cardCn').textContent=w.cn;
     $('cardPos').textContent='词性 · '+posLabel(w.pos||'单词');
-    $('cardLesson').textContent=w.lesson==='extra'?'个人词库':`第 ${w.lesson} 课 · P.${w.page}`;
+    $('cardLesson').textContent=w.lesson==='extra'?'个人词库':`${lessonLabel(w.lesson)} · P.${w.page}`;
     $('studyLabel').textContent=session.kind==='lesson'?`LESSON ${String(session.lesson).padStart(2,'0')}`:'WORD COLLECTION';
     $('cardNumber').textContent=String(session.cursor+1).padStart(3,'0');
     $('studyPage').textContent=`${String(session.cursor+1).padStart(2,'0')} / ${String(session.queue.length).padStart(2,'0')}`;
@@ -387,7 +407,7 @@
     btn.classList.toggle('hidden',!next);
     status.classList.toggle('hidden',!next);
     if(!next)return;
-    const label=next.kind==='lesson'?`第 ${next.lesson} 课`:(next.kind==='extra'?'课外词库':'总词汇库');
+    const label=next.kind==='lesson'?lessonLabel(next.lesson):(next.kind==='extra'?'课外词库':'总词汇库');
     if(!next.remaining.length){
       btn.disabled=true;
       btn.textContent='新词已全部学完';
@@ -424,14 +444,36 @@
   $('swapMode').onclick=()=>startTest(quiz?.mode==='cn-jp'?'jp-cn':'cn-jp');
   $('doneReview').onclick=()=>{if(lastWrong.length)beginSession([...lastWrong],'weak');else toast('本轮没有薄弱词');};
   /* Word library + backups */
+  function populateLibraryFilters(){
+    const select=$('libLesson'),previous=select.value;
+    const sections=[3,2].map(volume=>{
+      const lessons=BOOK.lessons.filter(l=>Number(l.volume)===volume);
+      if(!lessons.length)return '';
+      return `<optgroup label="${volumeName(volume)}"><option value="volume:${volume}">${volumeName(volume)} · 全部单词</option>${lessons.map(l=>`<option value="${esc(l.id)}">第${esc(lessonNumber(l.id))}课 · ${esc(l.name)}</option>`).join('')}</optgroup>`;
+    }).join('');
+    select.innerHTML='<option value="all">总词汇库（全部）</option><option value="textbook">课内词（两册）</option>'+sections+'<option value="extra">课外词</option>';
+    if(Array.from(select.options).some(x=>x.value===previous))select.value=previous;
+  }
+  populateLibraryFilters();
   $('wordSearch').oninput=renderLibrary;
   $('libLesson').onchange=renderLibrary;
   function renderLibrary(){
     const term=norm($('wordSearch').value),lesson=$('libLesson').value;
-    const words=allWords().filter(w=>(lesson==='all'||(lesson==='textbook'?w.lessons?.some(l=>l!=='extra'):w.lessons?.includes(lesson)))&&(!term||norm(w.jp).includes(term)||norm(w.kana).includes(term)||norm(w.cn).includes(term)||Object.values(w.lessonVariants||{}).some(x=>norm(x.cn).includes(term))));
-    const displayWord=w=>(lesson==='all'||lesson==='textbook')?w:{...w,...(w.lessonVariants?.[lesson]||{})};
+    const selectedVolume=lesson.startsWith('volume:')?Number(lesson.slice(7)):null;
+    const words=allWords().filter(w=>{
+      const matchesScope=lesson==='all'||(lesson==='textbook'?w.lessons?.some(l=>l!=='extra'):selectedVolume?w.lessons?.some(l=>Number(COURSE.get(l)?.volume)===selectedVolume):w.lessons?.includes(lesson));
+      return matchesScope&&(!term||norm(w.jp).includes(term)||norm(w.kana).includes(term)||norm(w.cn).includes(term)||Object.values(w.lessonVariants||{}).some(x=>norm(x.cn).includes(term)));
+    });
+    const displayWord=w=>{
+      const match=selectedVolume?w.lessons.find(l=>Number(COURSE.get(l)?.volume)===selectedVolume):null;
+      if(match)return {...w,...(w.lessonVariants?.[match]||{})};
+      return lesson==='all'||lesson==='textbook'?w:{...w,...(w.lessonVariants?.[lesson]||{})};
+    };
+    const sourceLabel=(w,original)=>lesson==='all'&&original.lessons.length>1
+      ?original.lessons.map(l=>l==='extra'?'课外词':lessonLabel(l)).join(' / ')
+      :(w.lesson==='extra'?'课外词':lessonLabel(w.lesson)+' · '+w.page+'页');
     $('libCount').textContent=`显示 ${words.length} / ${allWords().length} 条`;
-    $('wordList').innerHTML=words.length?words.map(original=>{const w=displayWord(original);return `<div class="word-line"><div class="word-line-main"><strong>${esc(w.jp)}</strong><span class="line-kana">${esc(w.kana)}</span><span class="line-cn">${esc(w.cn)}</span></div>${w.source==='custom'?`<button class="delete-word" data-delete="${encodeURIComponent(w.jp)}">删除</button>`:`<span class="line-source">${lesson==='all'&&original.lessons.length>1?original.lessons.map(l=>l==='extra'?'课外词':'第'+l+'课').join(' / '):w.lesson==='extra'?'课外词':`第${w.lesson}课 · ${w.page}页`}</span>`}</div>`}).join(''):'<div class="empty-state">没有符合条件的单词。</div>';
+    $('wordList').innerHTML=words.length?words.map(original=>{const w=displayWord(original);return `<div class="word-line"><div class="word-line-main"><strong>${esc(w.jp)}</strong><span class="line-kana">${esc(w.kana)}</span><span class="line-cn">${esc(w.cn)}</span></div>${w.source==='custom'?`<button class="delete-word" data-delete="${encodeURIComponent(w.jp)}">删除</button>`:`<span class="line-source">${esc(sourceLabel(w,original))}</span>`}</div>`;}).join(''):'<div class="empty-state">没有符合条件的单词。</div>';
     $('wordList').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{
       const jp=decodeURIComponent(b.dataset.delete);if(!confirm(`删除自定义单词“${jp}”？`))return;
       db.custom=db.custom.filter(w=>w.jp!==jp);delete db.progress[jp];save();renderLibrary();updateHome();
@@ -481,7 +523,7 @@
     const words=allWords();
     $('attemptsCount').textContent=db.logs.reduce((a,x)=>a+(Number(x.total)||0),0);
     $('learnedCount').textContent=words.filter(w=>progressFor(w.jp).seen>0).length;
-    $('logsList').innerHTML=db.logs.length?[...db.logs].reverse().slice(0,35).map(x=>`<div class="log-row"><span>${esc(typeof x.date==='number'?dateText(x.date):x.date)}<small>${x.mode==='cn-jp'?'中文 → 日语':'日语 → 中文'}${x.lesson?' · 第'+esc(x.lesson)+'课':''}</small></span><strong>${Number(x.right)||0} / ${Number(x.total)||0}</strong></div>`).join(''):'<div class="empty-state">暂时还没有默写记录。</div>';
+    $('logsList').innerHTML=db.logs.length?[...db.logs].reverse().slice(0,35).map(x=>`<div class="log-row"><span>${esc(typeof x.date==='number'?dateText(x.date):x.date)}<small>${x.mode==='cn-jp'?'中文 → 日语':'日语 → 中文'}${x.lesson?' · '+esc(lessonLabel(x.lesson)):''}</small></span><strong>${Number(x.right)||0} / ${Number(x.total)||0}</strong></div>`).join(''):'<div class="empty-state">暂时还没有默写记录。</div>';
   }
   if('serviceWorker' in navigator&&location.protocol==='https:'){
     window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
