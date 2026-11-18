@@ -1,8 +1,8 @@
-const CACHE='kotoba-v7.0-20261116-lessons-3-5';
-const FILES=['./','./index.html','./styles.css?v=6.3','./book-data.js?v=5.1',
+const CACHE='kotoba-v7.1-20261118-volume-groups';
+const FILES=['./','./index.html','./styles.css?v=7.1','./book-data.js?v=5.1',
   './vocab-03-page08.js?v=7.0','./vocab-04.js?v=7.0','./vocab-05.js?v=7.0',
   './vocab-13.js?v=6.0','./vocab-14.js?v=6.0','./vocab-15.js?v=6.0','./vocab-16.js?v=6.0',
-  './extra-words.js?v=6.1','./app.js?v=7.0','./manifest.webmanifest','./icon.svg'];
+  './extra-words.js?v=6.1','./app.js?v=7.1','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()));
 });
