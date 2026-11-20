@@ -37,32 +37,29 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.29 full-body CC0 source-compatible rest-backed animation real 3-rig render (technical PASS, final civilian art blocked)",
-      "pr": 43,
-      "url": "https://github.com/ruabie/moci-cet4/pull/43",
+      "version": "V0.31 CC0 65-bone modular garment actual skinning/render proof; final urban art blocked",
+      "pr": 45,
+      "url": "https://github.com/ruabie/moci-cet4/pull/45",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v029-three-rig-typed-frame-capture",
-      "headSha": "d82fb76e649dbcf3d9c0c6787be755d3d75acfcc",
-      "baseBranch": "lifesim-v028-import-name-rest-proof",
-      "baseSha": "782c7be2774c6f251570297e5bc5060139bd4b2b",
-      "allSameHeadCI": {
-        "focusedPr": 44106195024,
-        "fullGodotPr": 44106195075,
-        "fullGodotPush": 44106180691,
-        "supervisor": 44106195051,
-        "status": "completed_success"
-      },
-      "pinnedCC0SourceVerified": true,
-      "fullBody65BoneSourceCompatible": true,
-      "actualRendered3RigSourceBaseLegacyApprovedAsEvidence": true,
-      "actualThreeRigScreenshots": 15,
-      "humanoidBaseComparableMotionBetterThanLegacy": true,
-      "finalCivilianVisualApproved": false,
-      "footSoleContactApproved": false,
-      "continuityInputVideoPassed": false,
-      "productionCityPlayerModified": false,
+      "headBranch": "lifesim-v031-verified-clothing-manifest-render",
+      "headSha": "5af61bc80df3633292b6077e2fa62aa32ea7f2db",
+      "baseBranch": "lifesim-v030-compatible-civilian-outfit-trial",
+      "baseSha": "1a8bc678a91dbeaf097cbc6ce1968545170b23e5",
+      "focusedPrRun": 44747482726,
+      "focusedPushRun": 44747428071,
+      "fullGodotPrRun": 44747482752,
+      "fullGodotPushRun": 44747428072,
+      "supervisorPrRun": 44747482682,
+      "allSameShaCI": "completed_success",
+      "rigidJointClothingSourceVerified": true,
+      "allClothing65BoneParentMatches": true,
+      "actualClothingSkeletalMotionRendered": true,
+      "actualClothingPosePairs": 5,
+      "finalUrbanArtApproved": false,
+      "productionCityPlayerUpdated": false,
+      "browserV029Published": false,
       "chromeVerified": false,
       "windowsPerformanceVerified": false,
       "finalRelease": false
@@ -721,6 +718,109 @@
       "allExactHeadChecksCompletedSuccess": true,
       "productionGameChanged": false,
       "publicRelease": false
+    },
+    "previousCandidateV029": {
+      "version": "V0.29 full-body CC0 source-compatible rest-backed animation real 3-rig render (technical PASS, final civilian art blocked)",
+      "pr": 43,
+      "url": "https://github.com/ruabie/moci-cet4/pull/43",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v029-three-rig-typed-frame-capture",
+      "headSha": "d82fb76e649dbcf3d9c0c6787be755d3d75acfcc",
+      "baseBranch": "lifesim-v028-import-name-rest-proof",
+      "baseSha": "782c7be2774c6f251570297e5bc5060139bd4b2b",
+      "allSameHeadCI": {
+        "focusedPr": 44106195024,
+        "fullGodotPr": 44106195075,
+        "fullGodotPush": 44106180691,
+        "supervisor": 44106195051,
+        "status": "completed_success"
+      },
+      "pinnedCC0SourceVerified": true,
+      "fullBody65BoneSourceCompatible": true,
+      "actualRendered3RigSourceBaseLegacyApprovedAsEvidence": true,
+      "actualThreeRigScreenshots": 15,
+      "humanoidBaseComparableMotionBetterThanLegacy": true,
+      "finalCivilianVisualApproved": false,
+      "footSoleContactApproved": false,
+      "continuityInputVideoPassed": false,
+      "productionCityPlayerModified": false,
+      "chromeVerified": false,
+      "windowsPerformanceVerified": false,
+      "finalRelease": false
+    },
+    "v030Review": {
+      "pr": 44,
+      "finalSha": "1a8bc678a91dbeaf097cbc6ce1968545170b23e5",
+      "twoBoundedAttemptsUsed": 2,
+      "result": "FAIL_at_pinned_source_manifest_guard_no_clothing_screenshots",
+      "firstFailure": "Expected SHA for Male_Peasant_Feet.bin missing final f; actual Git blob dd5f381d37518d97189b663a70a3efd92081487f",
+      "secondFailure": "Expected SHA for T_Peasant_ORM.png started with 9 rather than correct 5; actual Git blob 5ce2e1abd526a736ab3a16a3b83a0922e5dcf12e",
+      "decision": "No visual acceptance and no third patch. Independent V0.31 repeats exact source audit before rendering."
+    },
+    "v031Review": {
+      "pr": 45,
+      "exactHeadSha": "5af61bc80df3633292b6077e2fa62aa32ea7f2db",
+      "source": "Quaternius Modular Character Outfits Fantasy Standard free CC0 peasant parts, mirrored as immutable agentkaerf/FreeModels@db3df04d1e4714298a09510b26fb6de6645138a2",
+      "pinnedCC0LicensedInputs": 9,
+      "separateSkinnedGarments": [
+        "Male_Peasant_Body",
+        "Male_Peasant_Legs",
+        "Male_Peasant_Feet"
+      ],
+      "eachGarmentJointCount": 65,
+      "eachGarmentParentMatchCount": 65,
+      "originalUALRotationTracks": 55,
+      "originalUALPelvisTranslationTracks": 1,
+      "genuineGodotClothingRenderScreenshots": 10,
+      "actualRenderedPosePairs": 5,
+      "poses": [
+        "Idle 0.18",
+        "Walk 0.19",
+        "Walk 0.59",
+        "Jog 0.19",
+        "Jog 0.59"
+      ],
+      "actualPixelsChangedPerPair": [
+        15182,
+        15399,
+        12085,
+        10844,
+        11116
+      ],
+      "rgbMaxChannelThreshold": 20,
+      "focusedArtifactId": 14633412999,
+      "focusedArtifactUrl": "https://github.com/ruabie/moci-cet4/actions/runs/44747428071/artifacts/14633412999",
+      "visualReview": "Inspected actual Godot before/after screenshot sheet. Clothes really follow compatible source animation; but fantasy/peasant silhouette, repetitive textures, visible body coverage and potential intersections are not acceptable as modern-city civilian art.",
+      "technicalGates": "source/65-joint parent audit PASSED, rendered skinned outfit change PASSED, full original game regression PASSED",
+      "finalArtGate": "FAILED",
+      "productionAvatarModified": false,
+      "continuousLivePlayerInputTest": false,
+      "actualShoeSoleGroundContact": false,
+      "chromeBrowserPlaybackVerified": false,
+      "windowsGPUVerified": false,
+      "twoAttemptSourceFixesAppliedInSeparateV031": true
+    },
+    "webPreviewCurrent": {
+      "builtVersion": "V0.18",
+      "repoDirectory": "lifesim/play-v18/",
+      "buildInfoRepoBlob": "85de96ccb6be1a93b8d70b030349f53595ddb685",
+      "buildSourceCommit": "c288af7b7cd75fd8baa9d3369610d9f8b178b0dc",
+      "buildWorkflowRun": 43909332249,
+      "buildArtifactId": 14245624663,
+      "verifiedAssets": [
+        "index.html",
+        "index.js",
+        "index.pck",
+        "index.wasm",
+        "index.png"
+      ],
+      "storedInMain": true,
+      "liveGitHubPagesUrlVerified": false,
+      "browserChromeStartedAndTested": false,
+      "locallyPackagedWindowsPreview": "A session download package with PowerShell localhost HTTP script was created and ZIP verified; not committed, not Windows-tested, not publicly hosted.",
+      "canonicalMainHtml": "lifesim/index.html still 404; original S0-S5 stage pending"
     }
   },
   "gates": [
@@ -731,18 +831,18 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "passed_current_sha_engine_and_three_rig_render_only",
-      "why": "V0.29 PR #43 exact head d82fb76: focused true CC0 source/base/legacy render #44106195024, full Godot PR #44106195075, full push #44106180691, supervisor #44106195051 all completed SUCCESS; original economy/save/game regressions intact. No production avatar integration or live input verification."
+      "state": "passed_current_sha_engine_and_wearable_render_only",
+      "why": "PR #45 SHA 5af61bc: focused authentic CC0 65-joint clothing source/5-pose rendered pairs PR CI #44747482726, push #44747428071, full Godot game PR #44747482752, push #44747428072, supervisor #44747482682 all completed/success. This is not production game/visual acceptance."
     },
     {
       "id": "WebGL-browser",
       "state": "unverified",
-      "why": "main contains isolated lifesim/play-v18 Web export/build-info but no independently verified Chrome interaction; canonical lifesim/index.html still 404."
+      "why": "Verified main lifesim/play-v18/ old Godot 4.7.2 web export (HTML/JS/PCK/WASM) and downloaded zipped web build; live ruabie.github.io Pages URL not verified working. Local Windows launcher zip created in conversation but untested on Windows. Main canonical lifesim/index.html missing, S0-S5 pending. V0.31 draft animation/wardrobe is NOT in web."
     },
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "15 actual independent isolated real Godot screenshots show source-compatible 65-bone base full-body motions more natural than old 49-bone dressed civilian, but compatible base is unclothed/unfinished; shoe soles and continuous input transitions unmeasured. Comparative art improvement is not final civilian visual acceptance."
+      "why": "V0.31 10 real Godot outfit screenshots prove separately skinned compatible shirt/trousers/shoes move with 65-joint UAL full-body animation, but peasant fantasy outfit is incompatible with desired modern urban civilian appearance, potential intersections and shoe contacts unverified. Do not promote candidate to player."
     },
     {
       "id": "Windows-RTX3060",
@@ -752,7 +852,7 @@
     {
       "id": "Release",
       "state": "not_ready",
-      "why": "功能、画面与实机性能尚未全面验收"
+      "why": "Only old V0.18 isolated Web export and technical draft V0.31 wardrobe. Required actual browser/real input, modern clothing art, foot contact and Windows GPU gates remain open."
     },
     {
       "id": "Workflow-no-automatic-publication",
@@ -761,19 +861,19 @@
     }
   ],
   "nextActions": [
-    "Next independent V0.30 art milestone: identify or create legally licensed everyday civilian clothing, shoes and hair compatible with the verified 65-bone CC0 Universal Base Character and source UAL animation skeleton. Preserve 65-bone hierarchy and pelvis translation; inspect actual Godot skinned material and silhouette against user preference for realistic city art before integrating.",
-    "After clothing quality passes, run actual input-driven Walk/Stop/Turn/Jog in LifeSim streets with new dressed compatible rig, prove skinned shoe sole-ground contact, correct knee bending, foot-world drift, smooth animation blending and camera, not just static-phase comparison.",
-    "Keep V0.29 PR #43 draft, #10/#12/#15/#18 issues open, zero new paid services, no merge/release. Never push legacy V0.18 branch with unsafe auto-publish-to-main job.",
-    "Main canonical HTML S0-S5 remains sourceState not_connected and lifesim/index.html absent. Chrome actual WebGL playable controls, pointer lock, shops, save and local-clock correctness still independently unverified.",
-    "Windows RTX3060 1080p frame rate, input response, collisions and final visual signoff required prior to playable user delivery."
+    "Choose/author actually contemporary CC0 daily clothing, shoes, hair on proven 65-bone compatible universal rig; do not reuse fantasy/peasant V0.31 outfit as final art. Preserve pinned source/65-joint parent audit, UAL rotation and pelvis translation, produce real render and inspect penetration & silhouette.",
+    "Run game-state-safe isolated CityPlayer preview with real input-driven Idle/Walk/Turn/Stop/Jog, blend and grounded skinned shoe sole trajectories, then assess camera, interaction and scene lighting on continuous video. Do not integrate unapproved costume into production.",
+    "User can inspect/download verified current V0.18 Web build from main lifesim/play-v18/ or conversation-local Windows localhost launcher. Public GitHub Pages live URL and Chrome gameplay remain unverified; do not claim online playable V0.31. Canonical main HTML S0-S5 pending.",
+    "Keep PR #45 draft, all art/issues #10/#12/#15/#18 open, no auto merge/publish/fee, no changes to other projects. Never push old V0.18 branch containing push-to-main Web auto-publication.",
+    "Windows RTX3060 1080p FPS/input latency/collision and real Chrome browser control, local clock/economy/save must pass before releasing a playable updated version."
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-17 independent exact-SHA PR #43 and 4 CI successes verified, GitHub artifact 14338513188 downloaded; 15 real PNGs and clean 5x3 comparison manually viewed, numeric per-pose ankle bone distances audited. Main handoff updated.",
+    "freshness": "2026-11-20 independently read main Web build-info, PR #45 head, all 5 same-SHA CI completions, downloaded artifact #14633412999 and viewed real 5x2 outfit contact sheet; main handoff updated with exact evidence.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.29 draft PR #43 exact SHA d82fb76: Godot full PR/push, focused real 15-frame three-rig rendering and supervisor all PASS. 65-bone compatible character full-body movement visually improved vs old civilian, but base lacks acceptable clothing and continuous input/foot sole/Windows/WebGL remain blocked. No production changes or release."
+    "latestRound": "2026-11-20 V0.31 PR #45 SHA 5af61bc: five CI runs PASS; 9 pinned CC0 source inputs checked, 3 outfit mesh skins have 65/65 bone hierarchy; 10 actual Godot base/outfit frames reviewed. Technical clothing motion PASS, urban civilian art FAIL. V0.18 web files/zip verified but public Pages online playback and Windows launcher unverified. No production update/merge/publish."
   }
 }
