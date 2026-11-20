@@ -25,7 +25,7 @@ ITEMS={
  "Male_Peasant_Feet.bin":("dd5f381d37518d97189b663a70a3efd92081487f",139880),
  "T_Peasant_BaseColor.png":("8f1cb9966e9c4a7c1b84188897faa54d241eb9bb",5055760),
  "T_Peasant_Normal.png":("78498b58beb3335d34ff71b630d438f19a408638",14110336),
- "T_Peasant_ORM.png":("9ce2e1abd526a736ab3a16a3b83a0922e5dcf12e",9903835),
+ "T_Peasant_ORM.png":("5ce2e1abd526a736ab3a16a3b83a0922e5dcf12e",9903835),
 }
 
 def blob_sha(data:bytes)->str:
