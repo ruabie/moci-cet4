@@ -7,6 +7,9 @@ on:
       - 'lifesim/godot/tools/audit_constant_rest_v27.py'
       - 'lifesim/godot/scripts/compatible_anim_v26.gd'
       - 'lifesim/godot/tests/diagnostic_v27_import_tracks.gd'
+      - 'lifesim/godot/tools/acquire_outfit_v30.py'
+      - 'lifesim/godot/tests/visual_v30_outfit.gd'
+      - 'lifesim/godot/tools/assemble_v30_outfit.py'
   pull_request:
     paths:
       - '.github/workflows/lifesim-v27-fast-render.yml'
@@ -14,6 +17,9 @@ on:
       - 'lifesim/godot/scripts/compatible_anim_v26.gd'
       - 'lifesim/godot/tests/diagnostic_v27_import_tracks.gd'
       - 'lifesim/godot/tests/visual_v26_rig_compare.gd'
+      - 'lifesim/godot/tools/acquire_outfit_v30.py'
+      - 'lifesim/godot/tests/visual_v30_outfit.gd'
+      - 'lifesim/godot/tools/assemble_v30_outfit.py'
   workflow_dispatch:
 
 permissions:
@@ -31,7 +37,7 @@ jobs:
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq xvfb libgl1-mesa-dri libgl1 libglu1-mesa
-          python3 -m pip install --user --break-system-packages 'pillow>=10,<12'
+          python3 -m pip install --user --break-system-packages 'pillow>=10,<12' 'numpy>=1.26,<3'
           curl --fail --location --retry 3 --retry-delay 2 \
             https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip \
             -o /tmp/godot-v27.zip
@@ -58,6 +64,14 @@ jobs:
           assert sha=='8de02ab8cc15be5d4375373675f886d347bef11e',sha
           print('V27 LEGACY GLB PIN VERIFIED:',sha)
           PY
+      - name: Audit 3 licensed and strictly pinned 65-bone peasant garment sources (nonproduction)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 lifesim/godot/tools/acquire_outfit_v30.py | tee v30-licensed-clothes.log
+          grep -F 'V30 CC0 CLOTHING RIG SOURCE PASS:' v30-licensed-clothes.log
+          test -s lifesim/godot/tests/v30_outfit_audit.json
+
       - name: Independently prove original spine_01 is identical to rest; reject missing animated legs
         shell: bash
         run: |
@@ -94,6 +108,22 @@ jobs:
           grep -F 'V26 THREE RIG RENDER PASS:' v27-actual-renders.log
           python3 lifesim/godot/tools/assemble_v26_review.py
           test -s lifesim/godot/tests/v26_three_rig_same_phase_review.jpg
+      - name: V0.30 genuine skinned casual clothing over compatible character (separate gate)
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=10s 150s \
+            xvfb-run -a -s '-screen 0 1280x720x24' \
+            /tmp/godot-v27/Godot_v4.7.2-stable_linux.x86_64 \
+            --rendering-driver opengl3 --path lifesim/godot \
+            --script res://tests/visual_v30_outfit.gd 2>&1 | tee v30-godot-clothing-render.log
+          grep -F 'V30 SKINNED OUTFIT RENDER PASS:' v30-godot-clothing-render.log
+          python3 lifesim/godot/tools/assemble_v30_outfit.py | tee v30-pixel-gate.log
+          grep -F 'V30 REAL SKINNED CLOTHING PIXEL GATE PASS:' v30-pixel-gate.log
+          test -s lifesim/godot/tests/v30_cc0_outfit_real_render_review.jpg
+
       - name: Preserve real source/engine evidence, including failures
         if: always()
         uses: actions/upload-artifact@v4
@@ -104,6 +134,12 @@ jobs:
             v27-godot-import.log
             v27-track-import.log
             v27-actual-renders.log
+            v30-licensed-clothes.log
+            v30-godot-clothing-render.log
+            v30-pixel-gate.log
+            lifesim/godot/tests/v30_*.json
+            lifesim/godot/tests/v30_*.png
+            lifesim/godot/tests/v30_*.jpg
             lifesim/godot/tests/v27_source_constant_rest.json
             lifesim/godot/tests/v27_godot_import_tracks.json
             lifesim/godot/tests/v26_visual_metrics.json
