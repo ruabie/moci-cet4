@@ -1,10 +1,23 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
-> **交接快照：2026-11-17（Asia/Singapore）**  
-> **最新开发候选：V0.29 草稿 PR #43（CC0 原生配套骨架完整动作和真实三方渲染对照；未合并、未发布）。同提交 Godot 全量/快速/监工 CI 均通过，真实 15 张人物对照显示全身步态较旧市民自然，但缺少合格生活服装与实机连续操作，最终美术仍 BLOCKED。**  
+> **交接快照：2026-11-20（Asia/Singapore）**  
+> **最新开发候选：V0.31 草稿 PR #45（65 骨骼配套人物的真实 CC0 模块服装蒙皮与走跑渲染试验；未合并、未发布）。5 条同 SHA CI 通过，3 件衣物分别 65/65 骨骼与层级匹配，10 张 Godot 对照图证明衣服随动作变形，但奇幻乡村衣着不符合现代城市，美术仍 BLOCKED。当前唯一已核实保存的 Web 构建仍是 V0.18。**  
 > 这是一次有证据的历史快照，不是实时仪表板。每次接班仍需独立查最新 GitHub PR/SHA/CI/Issue。
 
-## 最新一轮：V0.27–V0.29 导入修复、15 张真实同相位人物截图（2026-11-17）
+## 最新一轮：V0.30–V0.31 模块服装真实蒙皮试验与现有 Web 体验核对（2026-11-20）
+
+- **最新候选：** [V0.31 草稿 PR #45](https://github.com/ruabie/moci-cet4/pull/45)，head `5af61bc80df3633292b6077e2fa62aa32ea7f2db`，base V0.30；open/draft/未合并、未发布。原主角 `CityPlayer`、玩法和网页构建未修改。
+- 用户要求查看网页版后已再次查询 **main**：`lifesim/index.html` **404**，`lifesim/project.json` 的 HTML S0–S5 仍 pending/sourceState=not_connected。唯一确认存在的隔离版是 [`lifesim/play-v18/`](https://github.com/ruabie/moci-cet4/tree/main/lifesim/play-v18)，真实 `build-info.json` 记载 **V0.18**、源 commit `c288af7b7cd75fd8baa9d3369610d9f8b178b0dc`。已从 [Web Actions #43909332249](https://github.com/ruabie/moci-cet4/actions/runs/43909332249) 下载 artifact `#14245624663`，核实 index.html/index.js/index.pck/index.wasm 均齐全，并在该聊天中另制作 Windows 本地 PowerShell localhost 一键启动 ZIP（仅会话文件，未写入仓库），但 **无法确认 GitHub Pages 网址真实在线可玩或 Windows 浏览器已经通过测试**。V0.31 未发布到网页。
+- V0.30 [草稿 PR #44](https://github.com/ruabie/moci-cet4/pull/44) 做 Quaternius CC0 服装来源接入，但**两轮素材清单 SHA 抄写错误**先后将 `Male_Peasant_Feet.bin`、`T_Peasant_ORM.png` 的真实来源误拒绝，在渲染前失败。两次受限修复用完，保留失败证据，没有在旧 PR 无上限修补。
+- V0.31 采用作者 Quaternius [Modular Character Outfits – Fantasy](https://quaternius.com/packs/modularcharacteroutfitsfantasy.html)，原始许可 CC0-1.0，源文件来自固定只读镜像 `agentkaerf/FreeModels@db3df04d1e4714298a09510b26fb6de6645138a2`。构建时严格比对 9 个 glTF/.bin/贴图 Git Blob SHA 与字节数；**上衣 Body、裤装 Legs、鞋 Foot** 三份独立蒙皮 GLTF 各自 **65 根骨骼、65 个父子对应关系均与 Universal Base Character 相同**，沿用 V0.29 正确处理的 55 条动画旋转+1 条 pelvis 平移。
+- 真正的 Godot 4.7.2 OpenGL3 画面：待机×1、步行×2、跑步×2，共 **5 组同相位穿衣开关对照 / 10 张 1280×720 PNG**。真实 RGB 像素变化计数 **15,182 / 15,399 / 12,085 / 10,844 / 11,116**；原始截图、`v30_outfit_audit.json`、`v30_outfit_render.json`、`v30_outfit_pixel_gate.json` 与 5×2 对照 JPG 已从 [focused Push CI artifact #14633412999](https://github.com/ruabie/moci-cet4/actions/runs/44747428071/artifacts/14633412999) 下载并人工打开核查。
+- **同最终 SHA 五条 CI 都 completed/success：** [Focused PR #44747482726](https://github.com/ruabie/moci-cet4/actions/runs/44747482726)、[Focused Push #44747428071](https://github.com/ruabie/moci-cet4/actions/runs/44747428071)、[完整 Godot PR #44747482752](https://github.com/ruabie/moci-cet4/actions/runs/44747482752)、[完整 Godot Push #44747428072](https://github.com/ruabie/moci-cet4/actions/runs/44747428072)、[监工 #44747482682](https://github.com/ruabie/moci-cet4/actions/runs/44747482682)。
+- **审核结论严格区分：** 许可/资源固定、三份服装骨骼层级、Godot 实际蒙皮动作、原有引擎玩法 QA **通过**；**最终美术 FAIL**：现有素材只是较朴素的奇幻乡村装扮，面部/头发不完整、衣服可能和基础人体穿插，绝不能作为现代都市市民直接集成。连续真实输入/鞋底接地/Chrome WebGL/Windows RTX3060 尚未验证。画面改变≠服装符合项目美术标准。
+- **下一独立美术目标：** 暂停将 Peasant 服装作为生产候选，保留 65 骨骼/动画/服装蒙皮兼容技术，优先寻找或制作确实符合现代生活的 CC0 上衣、长裤、鞋、头发及面部细节；通过用户标准及连续走/停/转/跑之后，才考虑在封闭试玩中替换正式 `CityPlayer`。不合并、不自动发布、不增加费用，#10/#12/#15/#18 保留；旧 V0.18 分支仍含危险 push-to-main Web 自动发布工作流，禁止直接推送。
+
+---
+
+## 历史里程碑：V0.27–V0.29 导入修复、15 张真实同相位人物截图（2026-11-17）
 
 - **最新候选：** [V0.29 草稿 PR #43](https://github.com/ruabie/moci-cet4/pull/43)，最终 head `d82fb76e649dbcf3d9c0c6787be755d3d75acfcc`，base `lifesim-v028-import-name-rest-proof`；**open / draft / merged=false**。当前只是验证美术方向，不合并、不自动发布、不替换生产 `CityPlayer`。
 - V0.27 **独立诊断**发现问题并非源素材缺少脊柱动画：原始 Quaternius UAL1 GLB 的 `spine_01` 在 `Idle_Loop`、`Walk_Loop`、`Jog_Fwd_Loop` 整条轨道的旋转变化均约 **0°** 且完全等于源骨骼 rest；反面证据是同一 Walk 的 `upperarm_l` 振幅 **32.57°**、Jog **26.51°**，不允许丢弃这些真正运动的关节。真实 Godot 4.7.2 导入把 `Idle_Loop/Walk_Loop/Jog_Fwd_Loop` 分别改名 `Idle/Walk/Jog_Fwd`，并优化掉静止的 `spine_01`，保留每个动作 **55 条旋转+1 条 pelvis 平移**。新代码只允许带 pinned GLB Git blob 证据的缺失恒定轨道回退到目标 rest，其他动态关键骨骼仍为阻断项。
@@ -148,14 +161,14 @@ GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/m
 
 ## 4. 下一步最优先任务
 
-1. **V0.30 先补真实市民美术而非再调脊柱或脚踝：** V0.29 已证明 65 骨骼 Quaternius Universal Base Character 与 UAL1 动作高度适配，15 张真实画面中走跑比旧市民协调。下一独立工作包先检查可用 CC0 都市衣着、鞋靴和头发，或制作简洁有真实比例的蒙皮服装；保持兼容 65 关节、source rest / `pelvis` 平移，取得着装角色的实际 Godot 截图并验收。
-2. 保留此技术基线，待穿衣角色视觉通过后再做实际 LifeSim 街景输入驱动的连续走/停/转/跑、独立鞋底接地/脚滑指标、镜头、防穿模与碰撞。未经验证禁止修改正式 CityPlayer。
-3. 旧 V0.18 分支含自动 push 发布到 main 的危险工作流，不得直接推送；V0.29 PR #43 保持草稿、原美术/交付 Issues 不关闭、不自动合并或公开发布、不启用新增付费服务。
-4. 独立跟进 main HTML S0–S5/Chrome WebGL 浏览器实际试玩、存档/真实时钟，以及 Windows RTX3060 1080p FPS、输入延迟与最终人眼美术验收。
+1. **下一独立美术候选以真正现代服装为准，而不是在 V0.31 的奇幻衣服上反复修色：** 保留经实际 Godot 验证的 CC0 65 骨骼通用人物/55 旋转+髋部平移/三件服装蒙皮路线，找或制作现实日常衬衫、卫衣、裤子、鞋和自然头发，确定授权并看实际 Godot 3D 蒙皮截图。质量不合格就不集成。
+2. 审核真实城市内的输入驱动连续 Idle/Walk/Stop/Turn/Jog 以及鞋底蒙皮接地、脚滑、膝盖和镜头，不能以 5 个源片段相位推导可玩画质。
+3. 当前仅有已确认的 **V0.18 Web 构建** 存于 main `lifesim/play-v18/`。在线 GitHub Pages 是否可访问无法证实；浏览器 Chrome/Windows 真正操作与 FPS 未通过，canonical main HTML S0–S5 仍 pending。应在许可和技术成熟后单独审核更新网页版，不自动公开发布。
+4. V0.31 PR #45 仅保持 draft，#10/#12/#15/#18 不关闭；不推送带 push-to-main 自动发布风险的 V0.18 旧分支，不改变其他项目或开启付费服务。
 
 ## 5. 下次新聊天直接复制
 
-> 继续《游戏计划书／同频之城》。先用 GitHub 读取 `ruabie/moci-cet4` 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，独立查 PR/head SHA/CI/Issue/main HTML。最新 V0.29 草稿 [PR #43](https://github.com/ruabie/moci-cet4/pull/43)，head `d82fb76e649dbcf3d9c0c6787be755d3d75acfcc`；同 SHA 快速 15 张原始 Godot 三方截图 CI #44106195024、完整 PR Godot #44106195075、完整 Push #44106180691、监工 #44106195051 全部 PASS。原生 UAL 65 骨骼与 Universal Base Character 65 根关节/父子层级完全一致，Godot 原始名变化已核实；原始 `spine_01` 三个动作都恒定等于 rest，允许 SHA pin 的静止轨道回退；各动作真实动画传递 55 条旋转+1 条 pelvis 平移。已人工复查干净的 5×3 角色对照图：新基础人物全身动作较旧市民自然，但还没有合格的都市服装、鞋底物理/连续输入实测，因此不得宣称游戏已经有可交付的新市民。下一独立 V0.30 优先挑选/制作许可合规的现代日常衣服/鞋/头发并匹配 65 骨骼后出真正游戏内蒙皮图，不合格不合并发布。保持零新增费用，绝不触碰 V0.18 危险自动发布分支和其他项目，完成后更新两份交接文件及 SHA。
+> 继续《游戏计划书／同频之城》开发。先读取 GitHub `ruabie/moci-cet4` main 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，再独立核实最新 PR/SHA/CI/Issue。最新开发 V0.31 草稿 PR #45 head `5af61bc80df3633292b6077e2fa62aa32ea7f2db`；5 条同 SHA CI PASS，真正 Godot 5 组穿衣前后图验证原有 Quaternius 65 骨骼基础模型+CC0 上衣/裤装/鞋均兼容，55 条旋转+1 pelvis 平移保留，但这批衣服是 Peasant 奇幻风，不符合现代城市市民审美，**美术仍 FAIL**。当前 main 仅存在 `lifesim/play-v18/` V0.18 旧 Web 导出；已下载 ZIP，本聊天另做 Windows localhost 启动包但 Windows/Chrome 未实测，公开在线 GitHub Pages URL 未验证可访问。下一阶段研究真正都市风 CC0 衣着/发型，实际蒙皮和连续输入接地，完成前不自动合并发布、不花钱、不推送危险旧 V0.18 分支。结束时按协议更新两份 main 交接文件和实际 SHA。
 
 ## 6. 交接文件和监工
 
