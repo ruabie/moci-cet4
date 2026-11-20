@@ -22,7 +22,7 @@ ITEMS={
  "Male_Peasant_Legs.gltf":("2152efe6f524d7de14d7fce783d1402e9b9e8d0f",23721),
  "Male_Peasant_Legs.bin":("77358725c73dc2835ded8bc7839b770572bf0d98",52816),
  "Male_Peasant_Feet.gltf":("ce5d81d52a2e3eb058bb80b7c3fa4bb6fe96f087",23740),
- "Male_Peasant_Feet.bin":("dd5f381d37518d97189b663a70a3efd92081487",139880),
+ "Male_Peasant_Feet.bin":("dd5f381d37518d97189b663a70a3efd92081487f",139880),
  "T_Peasant_BaseColor.png":("8f1cb9966e9c4a7c1b84188897faa54d241eb9bb",5055760),
  "T_Peasant_Normal.png":("78498b58beb3335d34ff71b630d438f19a408638",14110336),
  "T_Peasant_ORM.png":("9ce2e1abd526a736ab3a16a3b83a0922e5dcf12e",9903835),
