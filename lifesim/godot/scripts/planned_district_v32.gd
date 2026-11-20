@@ -78,7 +78,7 @@ func _slab(parent:Node3D,x:float,z:float,w:float,d:float,hex:String,y:float=.054
 
 func _roads(plan: Dictionary) -> void:
     var asphalt: String="#303940"
-    var pavement: String="#858883"
+    var pavement: String="#747d79"
     var edge:String="#5a625f"
     var lines:String="#d9d9ce"
     # The old CityBuilder main road ends at z=88.5. This begins at z=87,
@@ -113,7 +113,7 @@ func _roads(plan: Dictionary) -> void:
     for row_x in [-15.0,15.0]:
         for n in range(-5,6,2):
             _box(self,Vector3(row_x,.087,165+float(n)),Vector3(2.7,.009,1.05),lines)
-    var concrete: String="#8e918a"
+    var concrete: String="#79817b"
     for route in plan["pedestrian_connectors"]:
         var z:float=float(route["z"])
         var width:float=float(route["width"])
@@ -154,7 +154,9 @@ func _building(lot: Dictionary) -> void:
     add_child(root)
     var w:float=float(lot["w"]);var d:float=float(lot["d"])
     var h:float=float(lot["h"]);var floors:int=int(lot["levels"])
-    var wall:String=str(lot["facade"])
+    # Existing sky/tonemap washes light base materials nearly white.
+    # Darker, locally-authored wall pigment preserves material contrast in QA.
+    var wall:String=Color(str(lot["facade"])).darkened(.17).to_html(false)
     var accent:String=str(lot["accent"])
     var glass:String="#405b63"
     var frame:String="#838e89"
@@ -221,6 +223,37 @@ func _building(lot: Dictionary) -> void:
                 _box(root,Vector3(xx,y-.73,fz+side_z*.06),
                     Vector3(w*.13,.10,.11),frame)
                 _windows+=1
+    # Rear elevations used to be blank, visibly boxlike from the aerial QA.
+    # Add genuine framed glazing on the opposite street-facing side, without
+    # collision or access claims for these upper floors.
+    for level in range(1,floors):
+        var y:float=minf(4.8+float(level-1)*2.82,h-1.16)
+        for col in range(4):
+            var lit:bool=((col*3+level*2+name.length())%11)==0
+            var tint:String="#9d917b" if lit else glass
+            if x_face:
+                var back_x:float=-side_x*(w*.5+.115)
+                var pz:float=-d*.34+float(col)*d*.225
+                _box(root,Vector3(back_x,y,pz),
+                    Vector3(.055,1.44,d*.12),tint,.27)
+                _box(root,Vector3(back_x-side_x*.07,y-.75,pz),
+                    Vector3(.14,.105,d*.135),frame)
+            else:
+                var back_z:float=-side_z*(d*.5+.115)
+                var px:float=-w*.34+float(col)*w*.225
+                _box(root,Vector3(px,y,back_z),
+                    Vector3(w*.12,1.44,.055),tint,.27)
+                _box(root,Vector3(px,y-.75,back_z-side_z*.07),
+                    Vector3(w*.135,.105,.14),frame)
+            _windows+=1
+    # Upper parapet and rooftop service volumes, not repeated floor-height boxes.
+    for zz in [-d*.41,d*.41]:
+        _box(root,Vector3(0,h+.37,zz),Vector3(w*.88,.5,.13),frame)
+    for xx in [-w*.42,w*.42]:
+        _box(root,Vector3(xx,h+.37,0),Vector3(.13,.5,d*.84),frame)
+    _box(root,Vector3(w*.28,h+.62,-d*.23),
+        Vector3(1.35,1.0,1.15),"#586460")
+
     # Side elevation windows, drain pipes, wall bay and rooftop mechanicals.
     for level in range(1,maxi(2,floors-1)):
         var y:float=4.8+float(level-1)*2.82
@@ -256,22 +289,24 @@ func _landmark(kind:String) -> String:
         _:return "AOKAWA HOMES"
 
 func _tree(x:float,z:float,scale:float=1.0) -> void:
+    # Reuse the project's already built original glTF foliage, not toy spheres.
+    # Source is build_landscape_v10.py (three nonidentical leaf/branch shapes).
+    var variants:Array[String]=["zelkova_full","katsura_warm","zelkova_narrow"]
+    var seed:int=absi(roundi(x*19.0+z*7.0))
+    var species:String=variants[seed%variants.size()]
+    var resource:PackedScene=load("res://art/vegetation/%s.glb" % species) as PackedScene
+    if resource==null:
+        push_error("V32 QA must not substitute procedural sphere for missing imported foliage")
+        return
     var tree:=Node3D.new()
+    tree.name="V32AuthoredFoliage_%s_%d" % [species,seed]
     tree.position=Vector3(x,0,z)
+    tree.rotation.y=float(seed%13)*.30
+    tree.scale=Vector3.ONE*scale
     add_child(tree)
-    _box(tree,Vector3(0,.95*scale,0),
-        Vector3(.30*scale,1.9*scale,.30*scale),"#64584b")
-    # Geometric pruning: avoid low foliage protruding into the walkway.
-    var crown:=SphereMesh.new()
-    crown.radius=1.65*scale
-    crown.height=3.1*scale
-    var leaves:=MeshInstance3D.new()
-    leaves.mesh=crown
-    leaves.material_override=_material("#62766b",.97)
-    leaves.position=Vector3(0,3.05*scale,0)
-    leaves.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-    tree.add_child(leaves)
-    _pieces+=1
+    tree.add_child(resource.instantiate())
+    statistics["original_glb_foliage_instances"]=int(statistics.get(
+        "original_glb_foliage_instances",0))+1
 
 func _seat(x:float,z:float,angle:float=0.0) -> void:
     var root:=Node3D.new()
@@ -289,7 +324,7 @@ func _park(park:Dictionary) -> void:
     var root:=Node3D.new()
     root.name="V32CommunityGreenAndPublicPath"
     add_child(root)
-    _slab(root,cx,cz,w,d,"#647a61",.052)
+    _slab(root,cx,cz,w,d,"#55735e",.052)
     # Continuous public path from east-west foot lane z222 into park.
     _slab(root,cx,228,2.8,12.4,"#b9b5aa",.082)
     _slab(root,cx,cz,2.8,d-2,"#b7b2a8",.082)
@@ -363,6 +398,11 @@ func _ready() -> void:
         match str(facility["type"]):
             "shelter":_bus_stop(facility)
             "bike_rack":_bikes(facility)
+    # Keep real branched foliage away from all 11 authored door corridors.
+    # Three differentiated shapes also reduce the oversized empty green gaps.
+    for x in [-13.4,13.4]:
+        for z in [97.0,178.5,230.0,265.0]:
+            _tree(x,z,.78)
     for z in [110.0,129.0,194.0,242.0]:
         _street_lamp(-10.8,z)
         _street_lamp(10.8,z)
