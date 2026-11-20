@@ -74,8 +74,11 @@ func _execute() -> void:
     if int(stats.get("doors_with_paths",0))!=11 or int(stats.get("parks",0))!=1:
         _fail("door access or public park missing")
         return
-    if int(stats.get("visible_facade_windows",0))<180:
-        _fail("too few facade/window bays to claim improved street detail")
+    if int(stats.get("visible_facade_windows",0))<350:
+        _fail("too few four-sided facade/window bays for the enlarged district")
+        return
+    if int(stats.get("original_glb_foliage_instances",0))<14:
+        _fail("missing original branched glTF landscape assets; primitive trees are not acceptable")
         return
     if float(stats.get("ground_m2",0))<33000:
         _fail("new physical walkable land is not really larger")
@@ -131,6 +134,7 @@ func _execute() -> void:
         "door_access_routes":stats["doors_with_paths"],
         "public_park_count":stats["parks"],
         "facade_window_bays":stats["visible_facade_windows"],
+        "actual_glb_foliage_instances":stats["original_glb_foliage_instances"],
         "geometry_parts":stats["geometry_pieces"],
         "ghost_backdrop_visible":old.visible,
         "public_ground_rays":hits,
@@ -152,6 +156,7 @@ func _execute() -> void:
         "new_ground_m2":stats["ground_m2"],
         "road_and_sidewalk_physics_samples":hits.size(),
         "windows":stats["visible_facade_windows"],
+        "real_modelled_tree_count":stats["original_glb_foliage_instances"],
         "screenshot_count":captures.size(),
         "ghost_backdrop_hidden":true
     }))
