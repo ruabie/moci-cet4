@@ -111,6 +111,17 @@ func create_city() -> void:
     _integrated_forecourts()
     var legal_block := LicensedBlockV11.new()
     add_child(legal_block)
+    # Explicit QA-only opt-in: V0.31 player, save limits and released Web
+    # remain untouched until art, navigation, collisions and FPS pass.
+    if bool(ProjectSettings.get_setting("application/config/v32_spatial_preview", false)):
+        var old_backdrop: Node3D = get_node_or_null("V10DistantUrbanBackdrop") as Node3D
+        if old_backdrop != null:
+            # The original backdrop at z=110 is visual-only; inside the
+            # proposed north expansion it would become a ghost building.
+            old_backdrop.visible = false
+        var north := PlannedDistrictV32.new()
+        north.name = "V32NorthWalkableDistrictPreview"
+        add_child(north)
 
 func _ground() -> void:
     _box(self, Vector3(0, -0.36, 0), Vector3(180, 0.6, 180), _color("#66736a"))
