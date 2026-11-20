@@ -1,0 +1,288 @@
+{
+  "schema": 1,
+  "version": "V0.32",
+  "name": "Aokawa North — QA-only walkable extension",
+  "units": "metres",
+  "reference_origin": "Existing CityBuilder trunk road at x=0; original ground x=-90..90, z=-90..90",
+  "bounds": {
+    "x_min": -89,
+    "x_max": 89,
+    "z_min": 87,
+    "z_max": 278
+  },
+  "roads": [
+    {
+      "id": "north_spine",
+      "axis": "z",
+      "center": 0,
+      "from": 87,
+      "to": 275,
+      "width": 13,
+      "sidewalk_width": 5,
+      "desc": "Existing road continuation; road/sidewalk seam overlaps original by 1.5 m"
+    },
+    {
+      "id": "community_cross",
+      "axis": "x",
+      "center": 165,
+      "from": -85,
+      "to": 85,
+      "width": 13,
+      "sidewalk_width": 5,
+      "desc": "Single 13 m junction, pedestrian crossings at both main approaches"
+    }
+  ],
+  "pedestrian_connectors": [
+    {
+      "id": "north_market_walk",
+      "z": 145,
+      "segments": [
+        [
+          -82,
+          -11.5
+        ],
+        [
+          11.5,
+          82
+        ]
+      ],
+      "width": 3.4,
+      "marked_crossing": true
+    },
+    {
+      "id": "library_green_walk",
+      "z": 222,
+      "segments": [
+        [
+          -82,
+          -11.5
+        ],
+        [
+          11.5,
+          82
+        ]
+      ],
+      "width": 3.4,
+      "marked_crossing": true
+    }
+  ],
+  "lots": [
+    {
+      "id": "west_homes_a",
+      "name": "青川住宅",
+      "type": "residential",
+      "x": -28,
+      "z": 116,
+      "w": 20,
+      "d": 22,
+      "h": 19.2,
+      "levels": 6,
+      "door": "east",
+      "facade": "#a7adab",
+      "accent": "#596b6c"
+    },
+    {
+      "id": "east_clinic",
+      "name": "社区诊所",
+      "type": "clinic",
+      "x": 28,
+      "z": 116,
+      "w": 20,
+      "d": 22,
+      "h": 11.6,
+      "levels": 3,
+      "door": "west",
+      "facade": "#aab4b0",
+      "accent": "#46716b"
+    },
+    {
+      "id": "west_laundry",
+      "name": "街角洗衣店",
+      "type": "retail",
+      "x": -28,
+      "z": 201,
+      "w": 22,
+      "d": 25,
+      "h": 12.8,
+      "levels": 4,
+      "door": "east",
+      "facade": "#a6aaa2",
+      "accent": "#5c747c"
+    },
+    {
+      "id": "east_library",
+      "name": "社区图书馆",
+      "type": "library",
+      "x": 28,
+      "z": 201,
+      "w": 22,
+      "d": 24,
+      "h": 15.6,
+      "levels": 4,
+      "door": "west",
+      "facade": "#b7ac9d",
+      "accent": "#6d645b"
+    },
+    {
+      "id": "west_homes_b",
+      "name": "枫丘公寓",
+      "type": "residential",
+      "x": -28,
+      "z": 247,
+      "w": 19,
+      "d": 20,
+      "h": 14.7,
+      "levels": 4,
+      "door": "east",
+      "facade": "#b4b1a7",
+      "accent": "#6a756a"
+    },
+    {
+      "id": "east_grocery",
+      "name": "生活超市",
+      "type": "retail",
+      "x": 28,
+      "z": 247,
+      "w": 21,
+      "d": 23,
+      "h": 11.4,
+      "levels": 3,
+      "door": "west",
+      "facade": "#a1aaa6",
+      "accent": "#61756e"
+    },
+    {
+      "id": "west_terrace_a",
+      "name": "西区住宅",
+      "type": "residential",
+      "x": -65,
+      "z": 117,
+      "w": 18,
+      "d": 22,
+      "h": 20.5,
+      "levels": 6,
+      "door": "north",
+      "facade": "#a7b0ae",
+      "accent": "#6e7973"
+    },
+    {
+      "id": "east_terrace_a",
+      "name": "东区办公",
+      "type": "office",
+      "x": 65,
+      "z": 117,
+      "w": 19,
+      "d": 22,
+      "h": 22.8,
+      "levels": 7,
+      "door": "north",
+      "facade": "#9daaa9",
+      "accent": "#556b73"
+    },
+    {
+      "id": "west_terrace_b",
+      "name": "共享工坊",
+      "type": "studio",
+      "x": -65,
+      "z": 201,
+      "w": 19,
+      "d": 24,
+      "h": 13.2,
+      "levels": 4,
+      "door": "north",
+      "facade": "#b2afa7",
+      "accent": "#746d65"
+    },
+    {
+      "id": "east_terrace_b",
+      "name": "青年公寓",
+      "type": "residential",
+      "x": 65,
+      "z": 201,
+      "w": 19,
+      "d": 24,
+      "h": 18.5,
+      "levels": 5,
+      "door": "north",
+      "facade": "#a7b4ae",
+      "accent": "#667c76"
+    },
+    {
+      "id": "east_terrace_c",
+      "name": "社区服务中心",
+      "type": "public",
+      "x": 65,
+      "z": 246,
+      "w": 18,
+      "d": 22,
+      "h": 14.7,
+      "levels": 4,
+      "door": "south",
+      "facade": "#b9b7ae",
+      "accent": "#727d74"
+    }
+  ],
+  "park": {
+    "id": "west_community_park",
+    "name": "邻里绿地",
+    "x": -65,
+    "z": 246,
+    "w": 28,
+    "d": 25,
+    "path_to_z": 222,
+    "bench_count": 3,
+    "tree_count": 6
+  },
+  "facilities": [
+    {
+      "id": "bus_stop",
+      "type": "shelter",
+      "x": -14.6,
+      "z": 135,
+      "access_side": "west",
+      "width": 3,
+      "depth": 2.4,
+      "connected_walkway": "north_spine west sidewalk"
+    },
+    {
+      "id": "shared_bikes",
+      "type": "bike_rack",
+      "x": 14.1,
+      "z": 182,
+      "qty": 5,
+      "access_side": "east",
+      "connected_walkway": "north_spine east sidewalk"
+    },
+    {
+      "id": "junction_crossing",
+      "type": "marked_crosswalk",
+      "x": 0,
+      "z": 165,
+      "connected_walkway": "north_spine both sides"
+    },
+    {
+      "id": "market_crossing",
+      "type": "marked_crosswalk",
+      "x": 0,
+      "z": 145,
+      "connected_walkway": "north_market_walk"
+    },
+    {
+      "id": "library_crossing",
+      "type": "marked_crosswalk",
+      "x": 0,
+      "z": 222,
+      "connected_walkway": "library_green_walk"
+    },
+    {
+      "id": "community_park_benches",
+      "type": "park_benches",
+      "x": -65,
+      "z": 246,
+      "qty": 3,
+      "connected_walkway": "library_green_walk"
+    }
+  ],
+  "poi_policy": "Trial exterior facades and land-use intent only. Not yet enterable or gameplay-interactive. Do not add to CityMain.poi until doors, interiors and interactions verified.",
+  "build_policy": "QA-only ProjectSettings application/config/v32_spatial_preview; not part of default V0.31 player or V0.18 Web export."
+}
