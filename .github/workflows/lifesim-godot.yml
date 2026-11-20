@@ -91,6 +91,14 @@ jobs:
           /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tests/check_mart_visual_v16.py"
           /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/build_mart_v17.py"
           /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tests/check_mart_visual_v17.py"
+      - name: V0.32 authored land-use, entrances, crossing and walkway geometric gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/audit_north_district_v32.py" | tee v32-plan-audit.log
+          grep -F 'V32 CONNECTED LAND USE PLAN PASS:' v32-plan-audit.log
+          test -s "$PROJECT_DIR/tests/v32_spatial_audit.json"
+
       - name: Static checks
         shell: bash
         run: |
@@ -348,6 +356,23 @@ jobs:
           test -s "$PROJECT_DIR/tests/v26_three_rig_same_phase_review.jpg"
           test -s "$PROJECT_DIR/tests/v26_visual_metrics.json"
 
+      - name: V0.32 QA-only physically expanded north district scene and five screenshot evidence
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=10s 180s \
+            xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v32_north_district.gd 2>&1 | tee godot-v32-north-spatial.log
+          grep -F 'V32 REAL EXPANDED CITY SPATIAL PASS:' godot-v32-north-spatial.log
+          test -s "$PROJECT_DIR/tests/v32_actual_city_metrics.json"
+          for f in north_aerial road_continuity community_cross park_walkway bus_stop; do
+            test -s "$PROJECT_DIR/tests/v32_${f}.png"
+          done
+
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
@@ -381,6 +406,10 @@ jobs:
             godot-v24-city-ik.log
             godot-v25-ik-render.log
             godot-v26-rig-review.log
+            v32-plan-audit.log
+            godot-v32-north-spatial.log
+            lifesim/godot/tests/v32_*.png
+            lifesim/godot/tests/v32_*.json
             godot-v27-track-inventory.log
             v27-source-constant.log
             lifesim/godot/tests/v27_*.json
