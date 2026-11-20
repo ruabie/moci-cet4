@@ -10,9 +10,6 @@ on:
       - 'lifesim/godot/tools/acquire_outfit_v30.py'
       - 'lifesim/godot/tests/visual_v30_outfit.gd'
       - 'lifesim/godot/tools/assemble_v30_outfit.py'
-      - 'lifesim/godot/tools/acquire_outfit_v30.py'
-      - 'lifesim/godot/tests/visual_v30_outfit.gd'
-      - 'lifesim/godot/tools/assemble_v30_outfit.py'
   pull_request:
     paths:
       - '.github/workflows/lifesim-v27-fast-render.yml'
@@ -20,6 +17,9 @@ on:
       - 'lifesim/godot/scripts/compatible_anim_v26.gd'
       - 'lifesim/godot/tests/diagnostic_v27_import_tracks.gd'
       - 'lifesim/godot/tests/visual_v26_rig_compare.gd'
+      - 'lifesim/godot/tools/acquire_outfit_v30.py'
+      - 'lifesim/godot/tests/visual_v30_outfit.gd'
+      - 'lifesim/godot/tools/assemble_v30_outfit.py'
   workflow_dispatch:
 
 permissions:
