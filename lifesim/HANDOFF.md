@@ -1,8 +1,20 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
 > **交接快照：2026-11-22（Asia/Singapore）**  
-> **最新开发候选：V0.35 草稿 PR #49** (head `0e4d2066b5541ee52cbe28f6bcb61209fd74eb13`, base V0.34, open/draft/unmerged). 已完成**两栋不同建筑轮廓的真实 Godot QA 试验**，同 SHA 的 focused PR 与 push CI / V0.34 旧图回归 / 监工已成功；真实四张同机位截图已下载并检查，证明视觉有变化，但仍明显低多边形/程序化，**专业街区美术 FAIL**。完整 Godot engine CI 在本次复核时仍运行中；没有发布 V0.35 网页，不是正式交付。main `lifesim/index.html` 仍缺失，唯一已核实 Web 导出是 V0.18。  
-> 这是具有对应 SHA 与工件证据的快照，不是实时仪表板；后续接班必须重新查询最新 PR、Issue、CI 与验收状态。
+> **最新候选：V0.36 草稿 [PR #50](https://github.com/ruabie/moci-cet4/pull/50)**，head `564164aa7ceb4093eeca13f3b2a944acee8758a7`，base V0.35 #49，open/draft/未合并/未发布。三种固定哈希 CC0 来源立面，经构建时 Meshopt 解压+去量化，已在真实 Godot 4.7.2 OpenGL3 截图里正确显示；4 张 1280×720 同机位对照和 3/3 外立面通道地面物理探针 **技术 PASS**。但场景色调明显不一致，后墙空白、可用室内缺失，整体美术 **FAIL**。截至本快照，同 SHA 完整 Godot CI #45017894739 仍运行中；旧 main HTML S0–S5 不变，只有 V0.18 隔离 Web 导出确认存在。  
+> 交接不是实时仪表板；下轮必须重新核对最新 head、CI、PR、Issue 与真实游戏视觉证据。
+
+## 最新一轮：V0.36 真实授权现代住宅立面与 Godot 导入失败复核（2026-11-22）
+
+- **本轮真实提交：** [草稿 PR #50](https://github.com/ruabie/moci-cet4/pull/50) 从 V0.35 实验分支继承。新增 `credits/TEVY_V36_SOURCE.json` 记录第三方 tevy 的 3 个源版本、许可声明 CC0-1.0、原文件字节数和 SHA256（共 **8,444,096 字节**），`tools/fetch_v36_cc0.py` 在 CI 拉取时必须逐个核查来源哈希、GLB 头和实际几何/材质；新 `scripts/urban_facade_v36.gd`、`tests/visual_v36_cc0_facade.gd`、`tools/audit_v36_facade.py`、专用免费 `.github/workflows/lifesim-v036-facade-art-qa.yml`。V0.32 `planned_district_v32.gd` 仅为 `west_homes_a` 地块接入 QA 开关 `application/config/v36_pinned_facade_preview`，**默认人物、经济、保存、旧 10 栋楼以及 V0.18 Web 均不变**。
+- **第一轮失败证据：** 初始 head `8a6798c23b32cd6e6e62b078b9e2be551186938d` 的 [focused push #45017645155](https://github.com/ruabie/moci-cet4/actions/runs/45017645155) / [PR #45017672087](https://github.com/ruabie/moci-cet4/actions/runs/45017672087) 在真实 Godot 导入时报错：原 GLB 带 `EXT_meshopt_compression`、`KHR_mesh_quantization` 必需扩展，Godot 4.7.2 不支持，尽管**原文件哈希通过**。失败现场原始 artifact [#14752740753](https://github.com/ruabie/moci-cet4/actions/runs/45017645155/artifacts/14752740753) 保留，不掩盖为通过。
+- **有限修正 1/2：** 精确诊断后 [`564164aa7ceb4093eeca13f3b2a944acee8758a7`](https://github.com/ruabie/moci-cet4/commit/564164aa7ceb4093eeca13f3b2a944acee8758a7) 仅在 CI **先对原始来源做 SHA-256 校验**，再通过固定版 `@gltf-transform/cli@4.5.0` 解压 Meshopt 与去量化，并二次检查 Godot 不支持的 `extensionsRequired` 已移除。**这是经过真实数据处理的转换，不是仅删扩展名、关闭哈希或用盒子代替模型；游戏运行时不需互联网。** 转换后的资源目前只在 CI 构建产物中，裸 Git checkout 未自带第三方大文件，且 CI 产物将到期。
+- **同最终 SHA CI：** [V0.36 专项 Push #45017890677](https://github.com/ruabie/moci-cet4/actions/runs/45017890677)、[专项 PR #45017894727](https://github.com/ruabie/moci-cet4/actions/runs/45017894727)、[旧 V0.34 街景回归 #45017894735](https://github.com/ruabie/moci-cet4/actions/runs/45017894735)、[V0.35 住宅/图书馆回归 #45017894774](https://github.com/ruabie/moci-cet4/actions/runs/45017894774)、[免费监工 #45017894724](https://github.com/ruabie/moci-cet4/actions/runs/45017894724) 均为 `completed/success`。同 SHA **完整 Godot 引擎 CI #45017894739** 在记录时为 `in_progress`，不得称通过。
+- **原始 Godot 截图和数值：** 已从 [专项 Push artifact #14752462358](https://github.com/ruabie/moci-cet4/actions/runs/45017890677/artifacts/14752462358) 下载并实际查看 4 张 `1280×720` PNG、实测 JSON。住宅原有固体碰撞和门前步行路网保留；**3/3** 外部公共入口地面采样通过；11 个原规划地块保留。单栋住宅采用 3 种原始 CC0 GLB 共 **18 个真实实例**，附着 6 层、18m 立面，开窗/空调/阳台/底商有显著建模细节；同机位 RGB 差值 >25 像素比例：正面 **56.894%**，斜视 **16.786%**。注意这仅证明渲染变化，不代表画质优良。
+- **人工审核：美术 FAIL。** 相较 V0.35 盒子，真实窗户、阳台、外置空调及底商纹理明显变得丰富，但模型为偏暗、霓虹、赛博朋克感住宅，**与整体偏浅、低精度、空旷的日间街道明显割裂**；住宅后墙无细节、店铺无法进入（保留 V0.32 建筑足迹碰撞）、未验证连续玩家实走、真实 Chrome WebGL / Windows RTX3060 性能。不可按此版本批量替换城市建筑，更不可宣称用户期待的开放世界已可交付。
+- **下一唯一优先开发项：** 先**确定整条可步行街段统一的现代生活建筑风格与材质曝光基线**，选择授权明确且能组成正立面/侧立面/背立面/真实门槛的同一系列模型，组成 1–2 个相邻地块而非单个暗色贴面；结合合法的 PBR 表面材质及店铺室内/真正通行入口，先用真实双机位及连续输入证据复核，再考虑扩地图、LOD、批量替换。另需解决 Quaternius Base 模型目前依赖即将过期旧 CI 工件的问题。坚持零新增费用、不自动合并发布，不动危险的 V0.18 自动推送分支。
+
+---
 
 ## 最新一轮：V0.35 两种建筑类型的真实替换及视觉复核（2026-11-22）
 
