@@ -52,7 +52,7 @@
       "supervisorCI": 45013578896,
       "supervisorStatus": "completed_success",
       "fullGodotPrCI": 45013578952,
-      "fullGodotStatus": "in_progress_at_handoff_write",
+      "fullGodotStatus": "completed_success",
       "realSameCameraGodotABPairs": 4,
       "realScreenshotCount": 8,
       "realFrameArtifactId": 14751206543,
@@ -918,9 +918,11 @@
         "authoredFrontages": 11,
         "newPublicInteriors": 0,
         "newProductionGameplayChanges": 0,
-        "fullGodotCIAtInitialHandoff": "in_progress",
+        "fullGodotCIAtInitialHandoff": "completed_success",
         "fullProjectChromeWebGLVerified": false,
-        "realWindowsGpuFPSVerified": false
+        "realWindowsGpuFPSVerified": false,
+        "fullPrRun": 45013578952,
+        "exactHeadAllFourCiCompletedSuccess": true
       }
     }
   },
@@ -932,8 +934,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "focused_pass_full_ci_in_progress",
-      "why": "V0.34 PR #48 SHA 361e269 focused genuine Godot 4.7.2 8 real screenshot A/B push #45013555198 and PR #45013578930 PASS, supervisor #45013578896 PASS. Full Godot historic regression #45013578952 still in progress at first snapshot. V0.32 full same-head CI PASS. Default production map is not expanded."
+      "state": "passed_current_sha_engine_and_qa_only_art",
+      "why": "V0.34 PR #48 exact head 361e269: full old gameplay/scene/Godot PR #45013578952 SUCCESS, focused real Godot OpenGL3 four camera before/after PR #45013578930 and Push #45013555198 SUCCESS, supervisor #45013578896 SUCCESS. QA-only v32/v33 map geometry and lights; no production Web/user play/Windows FPS validation."
     },
     {
       "id": "WebGL-browser",
@@ -972,9 +974,9 @@
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-22 independently verified PR #48 head, CI focused push #45013555198 and PR #45013578930/supervisor #45013578896 successes, downloaded artifact #14751206543 and manually opened 8 authentic PNGs; full PR Godot #45013578952 still running at this snapshot.",
+    "freshness": "2026-11-22 independently verified PR #48 exact head and all four completed-success CIs (full PR #45013578952, focused PR #45013578930, focused push #45013555198, supervisor #45013578896); inspected original image artifact #14751206543. Art still failed, no integration.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.32 physical north extension 33,998m2, 11 authored zoning lots and 20 ground collision samples technical PASS but visually blocky. V0.33 built 11 fronts+24 Kenney CC0 props, recovered deleted binary mirrors, QA harness failed. V0.34 PR #48 exact 361e269, 4 real same-camera V0.32/V0.34 screenshot pairs focused CI and supervisor PASS, ground highlights reduced, but human art still FAIL and no production map/Web update."
+    "latestRound": "V0.32 physical north extension 33,998m2, 11 authored zoning lots and 20 ground collision samples technical PASS but visually blocky. V0.33 built 11 fronts+24 Kenney CC0 props, recovered deleted binary mirrors, QA harness failed. V0.34 PR #48 exact 361e269, 4 real same-camera V0.32/V0.34 screenshot pairs focused CI and supervisor PASS, ground highlights reduced, but human art still FAIL and no production map/Web update. Same SHA full Godot PR #45013578952 completed/success."
   }
 }
