@@ -1,8 +1,18 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
-> **交接快照：2026-11-22（Asia/Singapore）**  
-> **最新候选：V0.36 草稿 [PR #50](https://github.com/ruabie/moci-cet4/pull/50)**，head `564164aa7ceb4093eeca13f3b2a944acee8758a7`，base V0.35 #49，open/draft/未合并/未发布。三种固定哈希 CC0 来源立面，经构建时 Meshopt 解压+去量化，已在真实 Godot 4.7.2 OpenGL3 截图里正确显示；4 张 1280×720 同机位对照和 3/3 外立面通道地面物理探针 **技术 PASS**。但场景色调明显不一致，后墙空白、可用室内缺失，整体美术 **FAIL**。此后已复核，同 SHA 完整 Godot CI #45017894739 为 `completed/success`；旧 main HTML S0–S5 不变，只有 V0.18 隔离 Web 导出确认存在。  
-> 交接不是实时仪表板；下轮必须重新核对最新 head、CI、PR、Issue 与真实游戏视觉证据。
+> **最新经独立核实的开发候选：V0.37 [草稿 PR #51](https://github.com/ruabie/moci-cet4/pull/51)**，head `27c616a35e2cf515d02ddfd627f2f2cdd4b0e930`，base V0.36 #50；**open / draft / unmerged / unpublished**。2026-11-22（Asia/Singapore）真实 Godot 4.7.2 专项 CI 完成 success，5 张实渲截图、从原街道到店内的物理代理移动 **9m / 50 步零阻挡**，但**整体美术 FAIL**、**实际 CityPlayer 操控/消费 FAIL-UNVERIFIED**，现有 Web 构建仍只核实 V0.18。完整引擎 CI #45018780942 在本快照仍进行中，不可因专门测试通过就判定整个分支正式合格。  
+> 文件是带 SHA 的历史快照，接班必须再读取最新 PR、CI、Issue、素材与原始截图。
+
+## 最新一轮：V0.37 实体店铺门洞/街道连续通行 QA（2026-11-22）
+
+- **实际提交：** [V0.37 草稿 PR #51](https://github.com/ruabie/moci-cet4/pull/51) 从 V0.36 #50 派生；最终实查 head `27c616a35e2cf515d02ddfd627f2f2cdd4b0e930`。新增 `scripts/walkable_shop_v37.gd`、`tests/visual_v37_walkable_shop.gd`、`tools/audit_v37_walkable_shop.py`、专门免费的 `.github/workflows/lifesim-v037-walkable-shop-qa.yml`；修改 `scripts/planned_district_v32.gd` 仅当 `application/config/v37_walkable_shop_preview` 显式启用且地块为 `west_homes_a` 时替换旧全实心建筑足迹碰撞。
+- **实质问题解决：** 原 V0.36 商店门面实际前方有不间断整楼 `StaticBody3D`，**不能进入**。V0.37 在同一固定 20×22m 地块，保留原 11/11 地块、原路径、17 件原厂固定哈希/构建期转换的真实 Tevy GLB 外观，重新建上层实心和底层隔墙，提供宽 **2.9m**、净高 **2.75m** 的无实体遮挡门洞、约 **7.6×6m** 有收银台/货架、分区真实碰撞的零售小室，店铺内部没有假装接通真实货币、任务或 POI。
+- **真实物理证据：** Godot 4.7.2 原场景 V0.36/V0.37 前后开关对照。旧版中心入口有实墙碰撞，新版中央入口水平射线无阻挡，边缘和店铺后墙保留碰撞；**3/3** 门前/店内地面射线通过；真实引擎 `CharacterBody3D.move_and_collide` 代理由世界 x=-14.0 向店内移动到 -23.000015，连续 **50 步 / 9.000015m，0 次阻挡**。这是对代理实体的真实物理测试，**不是正式 CityPlayer 输入连续性、腿部脚底接地或真人游玩**。
+- **实际截图和精确数据：** [专项 Push Godot CI #45018764238](https://github.com/ruabie/moci-cet4/actions/runs/45018764238) 及 [PR CI #45018781050](https://github.com/ruabie/moci-cet4/actions/runs/45018781050) 同最终 SHA `completed/success`。已下载并检查 [Artifact #14752648713](https://github.com/ruabie/moci-cet4/actions/runs/45018764238/artifacts/14752648713)：**5 张实际 1280×720 PNG**（街景/门口前后及室内）、物理 JSON、图像 A/B；同机位像素变化 >25 RGB：街景 191,899 / 921,600 (**20.822%**)，门口 884,670 / 921,600 (**95.993%**)；这不是美学评分。**同 SHA 旧 V0.34 回归 #45018780975、V0.35 #45018781039、V0.36 #45018780992、免费监工 #45018781029 也 completed/success**；完整 Godot CI #45018780942 截至记录为 `in_progress`。
+- **独立视觉审核：仍 FAIL。** 虽然原来封死的商铺门洞真的被打开且真实引擎代理可走进去，实际渲染室内货架、商品和照明依然廉价、空洞，楼上暗色赛博街面与周边偏浅城市不一致。真实 `CityPlayer` 无连续输入证据，生产购物/工作/存档未集成；Windows RTX3060 FPS、Chrome WebGL 与完整城市街区美术均未验收。这轮技术门槛 PASS 不等于美术/可玩交付。
+- **下一最高优先级：** 在现有**同一条步行路径和同一房间**内，使用正式 `CityPlayer` 的真实输入、镜头/碰撞/脚底接地做连续街道→门洞→室内→退出运动证据（无传送），验证失败先修逻辑，再提升室内陈设和统一建筑色彩；不能复制 11 栋或宣称完成 Web 发布。零新增费用；不自动合并发布，不向含不安全自动发布工作流的 V0.18 旧分支推送。#10/#12/#15/#18 继续开放。
+  
+---
 
 ## 最新一轮：V0.36 真实授权现代住宅立面与 Godot 导入失败复核（2026-11-22）
 
