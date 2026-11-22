@@ -2,7 +2,7 @@ name: LifeSim V0.35 focused two-building architectural silhouettes QA
 on:
   push:
     paths:
-      - '.github/workflows/lifesim-v034-art-qa.yml'
+      - '.github/workflows/lifesim-v035-architecture-qa.yml'
       - 'lifesim/godot/tests/visual_v35_architecture.gd'
       - 'lifesim/godot/scripts/streetscape_details_v33.gd'
       - 'lifesim/godot/scripts/architectural_slice_v35.gd'
@@ -12,7 +12,7 @@ on:
       - 'lifesim/godot/tools/audit_architecture_v35.py'
   pull_request:
     paths:
-      - '.github/workflows/lifesim-v034-art-qa.yml'
+      - '.github/workflows/lifesim-v035-architecture-qa.yml'
       - 'lifesim/godot/tests/visual_v35_architecture.gd'
       - 'lifesim/godot/scripts/streetscape_details_v33.gd'
       - 'lifesim/godot/scripts/architectural_slice_v35.gd'
@@ -100,7 +100,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lifesim-v034-street-art-raw-or-failure
+          name: lifesim-v035-architecture-raw-or-failure
           path: |
             v35-real-import.log
             v35-actual-art.log
