@@ -154,6 +154,14 @@ func _create_world() -> void:
     env.fog_light_color = Color("#859395")
     env.fog_density = 0.00185
     env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+    # V33 lighting is an explicitly gated, experimental urban-art exposure.
+    # It cannot modify the production city or existing Web V0.18 preview.
+    if bool(ProjectSettings.get_setting("application/config/v32_spatial_preview", false)) \
+            and bool(ProjectSettings.get_setting("application/config/v33_streetscape_preview", false)):
+        env.tonemap_exposure = 0.74
+        env.ambient_light_energy = 0.12
+        env.fog_density = 0.00115
+        sky_material.sky_horizon_color = Color("#9daeb2")
     ambient_env.environment = env
     add_child(ambient_env)
     sun = DirectionalLight3D.new()
