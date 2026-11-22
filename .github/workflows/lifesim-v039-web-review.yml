@@ -208,44 +208,44 @@ jobs:
           if grep -E 'SCRIPT ERROR|Parse Error|ERROR:.*Parse|ERROR: Cannot export' v039-web-export.log; then exit 1; fi
           cp "$PROJECT_DIR/tools/v039_isolated_web_server.py" "$EXPORT_DIR/serve_preview.py"
           cat > "$EXPORT_DIR/start_preview_windows.bat" <<'BAT'
-@echo off
-cd /d "%~dp0"
-where py >nul 2>&1
-if not errorlevel 1 (
-  start "" "http://127.0.0.1:8765/?qa=1"
-  py -3 serve_preview.py
-  pause
-  exit /b
-)
-where python >nul 2>&1
-if not errorlevel 1 (
-  start "" "http://127.0.0.1:8765/?qa=1"
-  python serve_preview.py
-  pause
-  exit /b
-)
-echo Python 3 was not found. Install Python 3 or run this folder using any static localhost HTTP server that supports WebAssembly and COOP/COEP headers.
-pause
-BAT
+          @echo off
+          cd /d "%~dp0"
+          where py >nul 2>&1
+          if not errorlevel 1 (
+            start "" "http://127.0.0.1:8765/?qa=1"
+            py -3 serve_preview.py
+            pause
+            exit /b
+          )
+          where python >nul 2>&1
+          if not errorlevel 1 (
+            start "" "http://127.0.0.1:8765/?qa=1"
+            python serve_preview.py
+            pause
+            exit /b
+          )
+          echo Python 3 was not found. Install Python 3 or run this folder using any static localhost HTTP server that supports WebAssembly and COOP/COEP headers.
+          pause
+          BAT
           cat > "$EXPORT_DIR/READ_THIS_FIRST.txt" <<'TEXT'
-LifeSim / 同频之城 — V0.39 ISOLATED diagnostic Web preview (NOT RELEASED)
-SOURCE: ruabie/moci-cet4, based on exact V0.39 PR #53 plus an isolated Web-build workflow.
-CHECK build-info.json for the exact full commit.
-This build deliberately activates QA-only V32 north district, V35/V36 CC0 facade,
-V37 physically walkable storefront and V38 initial street spawn next to shop.
-Controls: W/A/S/D to walk; click within game for mouse look; Shift run;
-Esc frees cursor. Device time/saving are from the original game.
-This preview may contain game defects: near-wall camera backs into avatar hair,
-the store interior is visually sparse, and other gameplay areas are unfinished.
-Do NOT treat this as a shipped game, tested RTX3060 performance or an art signoff.
-No public website deployed. To try it on Windows:
-  (1) Unzip all files into ONE folder; do NOT open index.html via file://.
-  (2) Double-click start_preview_windows.bat (requires Python 3) then open
-      http://127.0.0.1:8765/?qa=1 in Chrome or Edge.
-  (3) Close the command window or press Ctrl+C to stop the server.
-No cloud payments, account logins or public publishing involved.
-Font: Noto Sans CJK SC, SIL Open Font License — see fonts-OFL-LICENSE.txt.
-TEXT
+          LifeSim / 同频之城 — V0.39 ISOLATED diagnostic Web preview (NOT RELEASED)
+          SOURCE: ruabie/moci-cet4, based on exact V0.39 PR #53 plus an isolated Web-build workflow.
+          CHECK build-info.json for the exact full commit.
+          This build deliberately activates QA-only V32 north district, V35/V36 CC0 facade,
+          V37 physically walkable storefront and V38 initial street spawn next to shop.
+          Controls: W/A/S/D to walk; click within game for mouse look; Shift run;
+          Esc frees cursor. Device time/saving are from the original game.
+          This preview may contain game defects: near-wall camera backs into avatar hair,
+          the store interior is visually sparse, and other gameplay areas are unfinished.
+          Do NOT treat this as a shipped game, tested RTX3060 performance or an art signoff.
+          No public website deployed. To try it on Windows:
+            (1) Unzip all files into ONE folder; do NOT open index.html via file://.
+            (2) Double-click start_preview_windows.bat (requires Python 3) then open
+                http://127.0.0.1:8765/?qa=1 in Chrome or Edge.
+            (3) Close the command window or press Ctrl+C to stop the server.
+          No cloud payments, account logins or public publishing involved.
+          Font: Noto Sans CJK SC, SIL Open Font License — see fonts-OFL-LICENSE.txt.
+          TEXT
           cp "$PROJECT_DIR/art/fonts/OFL-LICENSE.txt" "$EXPORT_DIR/fonts-OFL-LICENSE.txt"
           python3 - <<'PY'
           import os,json,hashlib
