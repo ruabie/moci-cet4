@@ -1,7 +1,19 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
-> **当前验证的最新候选：V0.38 [草稿 PR #52](https://github.com/ruabie/moci-cet4/pull/52)**（head `3ebd8acea9616be295cb8ef56ebb2f9f8a73ab86`，base V0.37 #51，open/draft/unmerged/unpublished）。2026-11-22 实测：真实游戏内 `CityPlayer` 经 W/A/D/S 事件从街道走进店内、停下、转向后走出，专项 Godot 4.7.2 PR/Push CI 均 PASS；**最重要的实际修复是去掉卡住真正贴地角色的实心 12cm 门槛**。但 **正式美术 FAIL**（空室内、缺字 HUD）、**摄像机贴墙避障未证明**（本线路 camera_collision_activations=0）、**鞋底 IK/真实 Windows/Chrome 未验收**。同 SHA [完整 Godot 引擎 CI #45023106727](https://github.com/ruabie/moci-cet4/actions/runs/45023106727) 已于 2026-11-22T12:40:52Z 核实为 `completed/success`；现有 Web 仅 V0.18 隔离导出，main `lifesim/index.html` 不存在。
-> 本文与 JSON 是已核实 SHA 快照，而非实时运行态；后续必须重新查询 GitHub PR/CI/截图/Issue。
+> **最新 V0.39 草稿 [PR #53](https://github.com/ruabie/moci-cet4/pull/53)**，确切 head `0925394389eedacf4c1ce1c028922182ed60e5b1`、base V0.38 #52，open/draft/unmerged/unpublished。2026-11-22（Asia/Singapore）[真实 Godot 摄像机专项 Push #45025977376](https://github.com/ruabie/moci-cet4/actions/runs/45025977376)、[PR #45025983015](https://github.com/ruabie/moci-cet4/actions/runs/45025983015) 均已 `completed/success`。真实场景与真实 `CityPlayer.ThirdPersonCamera` 对店铺后墙发生 **42 次正向避障收缩 / 相机碰撞球与实体墙重叠 0 次**，离墙回到 4.70m。**重大负面视觉发现：相机贴墙退到仅 0.098m，真人物头发几乎遮住整张画面，摄像机可用性 FAIL**。中文 HUD 缺字/原始 CJK 字体缺席、室内粗糙、美术、Web/Windows 均未验收。同 SHA 完整 Godot 引擎 CI #45025983134 最后复核时仍 `in_progress`，不可提前写成完成。main HTML S0–S5 `pending`，只有隔离 V0.18 Web 导出核实存在。
+> **交接是 SHA 快照不是实时仪表板；新轮仍需实际读取最新 GitHub PR/CI/源码/Issue。**
+
+## 最新一轮：V0.39 实体后墙摄像机防穿墙与观感审查（2026-11-22）
+
+- **实际新候选：** 从 V0.38 #52 派生 [V0.39 草稿 PR #53](https://github.com/ruabie/moci-cet4/pull/53)，最终确切 head `0925394389eedacf4c1ce1c028922182ed60e5b1`。新增 `tests/visual_v39_real_camera_occlusion.gd`、`tools/audit_v39_real_camera.py`、独立免费 `.github/workflows/lifesim-v039-camera-occlusion-qa.yml`，在**同一个游戏原始主场景、真实北区地块和正式 `CityPlayer` 摄像机**上走 W 进店、以 QA 姿态让镜头明确朝向真实后墙、验证物理防穿墙、改回方向后镜头恢复，S 走出；5 张真实角色第三人称相机视角原始 `1280×720` PNG。只有**镜头角度**由诊断设置，不冒充人手鼠标输入；初始 QA 角色位置后无传送/坐标赋值。
+- **先失败、后定位：** 最初 `96ab7b5a...` 在 [专项 Push #45025521030](https://github.com/ruabie/moci-cet4/actions/runs/45025521030)、PR #45025542096 **FAIL**，虽然目标相机位置被原有球体扫掠避障，但旧代码从历史相机位置**插值平滑到目标时没有复测中间位置**，有真实帧与实体墙产生碰撞球重叠。[失败原始工件 #14755194459](https://github.com/ruabie/moci-cet4/actions/runs/45025521030/artifacts/14755194459) 保留。
+- **受限修复 1/2 `d091df0a`：** 修改 `scripts/player.gd` 中 `CityPlayer._update_camera`：在原本受保护的目标镜头计算**之后**，再对**实际平滑后的最终位置**沿角色 pivot 执行带半径的碰撞扫掠，必要时留出缓冲并回缩，保证过渡帧不穿墙；没有删场景碰撞，也不修改角色行走物理。该版真实 Godot 已输出 42 次避障、零重叠、5 张 PNG，但 Python 审核因错误要求 `wall_distance_m>0.35` 失败，而真实距离为 **0.3393297m**，属于不恰当的检测下限，不是游戏物理缺陷。该失败保留于 [Push #45025756124](https://github.com/ruabie/moci-cet4/actions/runs/45025756124) / [工件 #14755638448](https://github.com/ruabie/moci-cet4/actions/runs/45025756124/artifacts/14755638448)。
+- **受限修复 2/2 `09253943...`：** 仅将上述无关安全的审核下限从 `0.35m` 修正为 `0.20m`；**原有真实墙名、阳性遮挡、镜头必须回缩、碰撞球逐帧 0 重叠、解除遮挡后恢复、5 PNG 渲染检查全部保留**。修复额用尽，不允许在该轮不断盲改。
+- **同最终 SHA 真实性能之外的真实渲染技术 PASS：** [Push CI #45025977376](https://github.com/ruabie/moci-cet4/actions/runs/45025977376) 和 [PR CI #45025983015](https://github.com/ruabie/moci-cet4/actions/runs/45025983015) 均 `completed/success`，已下载并人工打开 [原始 Godot 工件 #14756015186](https://github.com/ruabie/moci-cet4/actions/runs/45025977376/artifacts/14756015186)：真实 collider `Solid_rear_retail_wall` 距 pivot **0.3393297m**；不避障目标镜头半径 4.69815m；**42 次**真实避障触发，28 帧监测 **0 次摄像机碰撞球重叠**，最短镜头 pivot 半径 **0.0983215m**；撤开障碍后回复到 **4.696666m**。原 `CityPlayer` 物理 W 键约 **124 帧**进入原店，S 键实际行走退出，仍保持 V0.32 11 地块和 V0.37 实体店铺碰撞。5 张原始 `1280×720` PNG，室内无遮挡 vs 有墙镜头变动像素 **52.4137%**，该数并非美术质量评分。同 SHA 完整引擎 #45025983134 最后复核尚 `in_progress`，必须另查，不能将 focused CI 冒充全部 CI。
+- **独立视觉审核强制 FAIL：** 真正贴墙时相机接近 pivot 仅 0.10 米，**原始 PNG 中角色头部和头发巨大遮挡店内视野**；虽物理不穿墙但游戏镜头不能用。打开门口、回到街上时视野正常，关店/直接传送等旁路均未使用。原始 UI 画面里中文有**方块乱码**；仓库树无 `art/fonts/NotoSansCJKsc-Regular.otf` 实体，`main.gd` 只能退回 Linux 系统字体，缺字源头待实际字体资源/授权检查与截图复验。店内陈设仍薄弱，住宅立面暗色与城市整体不一致。没有 V0.39 专用真实鼠标硬件、头部透明处理、鞋底 IK、Windows RTX3060 FPS、Chrome WebGL、工作/购物/存档闭环，也没有发布。
+- **下一唯一优先任务：** V0.40 针对**相机回缩小于约 0.7m 时的角色头部遮挡**设计有美术合理性的近景过渡模式（如仅针对本机头发/头部暂时淡出，避免隐藏整个身体或第一人称硬跳），同时保留并重新证明实体球体 0 穿墙；用原视角和真实移动连续截图/视频验收，再对中文字体做独立许可核验与可复现字体打包。技术安全并不等于可用性，不能宣布“已解决镜头体验”。继续零新增费用、不自动合并/发布，不扩大低精度街区，#10/#12/#15/#18 开放，旧 V0.18 Web 自动推送分支禁止操作。
+
+---
 
 ## 最新一轮：V0.38 真实游戏人物 WASD 店铺往返（2026-11-22）
 
