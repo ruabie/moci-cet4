@@ -68,7 +68,7 @@
       "supervisorCI": 45023106656,
       "supervisorStatus": "completed_success",
       "fullGodotCI": 45023106727,
-      "fullGodotStatus": "in_progress_at_snapshot",
+      "fullGodotStatus": "completed_success",
       "realGodotArtifactId": 14754294365,
       "realScreenshotCount": 5,
       "actualAvatarClass": "CityPlayer extends CharacterBody3D; genuine original skinned avatar + ThirdPersonCamera",
@@ -112,7 +112,8 @@
       "productionWorkOrPurchaseConnected": false,
       "chromeBrowserVerified": false,
       "windowsRtx3060Verified": false,
-      "releaseReady": false
+      "releaseReady": false,
+      "fullGodotCompletedAt": "2026-11-22T12:40:52Z"
     },
     "issues": [
       {
@@ -1186,8 +1187,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "pending_full_engine_exact_sha",
-      "why": "V0.38 exact head 3ebd8acea... focused actual CityPlayer physical W/A/D/S, original Godot render PR #45023106654 and Push #45023100693 success; same SHA V0.34 #45023106644, V0.35 #45023106611, V0.36 #45023106626, V0.37 #45023106629 and supervisor #45023106656 success. Full Godot engine #45023106727 in_progress at snapshot. Technical integration only."
+      "state": "passed_current_sha_full_engine_qa_only",
+      "why": "At exact V0.38 SHA 3ebd8acea9616be295cb8ef56ebb2f9f8a73ab86, full Godot engine #45023106727 completed/success at 2026-11-22T12:40:52Z; focused original CityPlayer action-input render Push #45023100693, PR #45023106654, V0.34–V0.37 regressions and supervisor all completed/success. No art, camera obstacle, Chrome, hardware or commerce signoff."
     },
     {
       "id": "WebGL-browser",
@@ -1207,7 +1208,7 @@
     {
       "id": "Release",
       "state": "not_ready",
-      "why": "V0.38 #52 open draft unmerged QA-only; physical input now works but visually poor, camera obstacle not proven, no real store economy, Windows or Chrome evidence. Exact full engine CI #45023106727 pending at snapshot; main HTML S0-S5 pending, only V0.18 isolated Web."
+      "why": "V0.38 #52 draft/unmerged/QA-only: full Godot+focused CI PASS but HUD missing CJK glyphs, sparse interiors, camera sweep obstacle encounter not verified, shoe-sole IK unverified. No production POI/job/payment, Chrome WebGL or Windows RTX3060 hardware evidence. Main HTML S0–S5 pending, only V0.18 isolated Web stored. Not ready."
     },
     {
       "id": "Workflow-no-automatic-publication",
@@ -1238,7 +1239,6 @@
   "nextActions": [
     "NEXT: Prove/repair actual CityPlayer third-person camera sphere-sweep retraction on a deliberately obstructed interior/door-camera line, with true same-tick Godot images and measurable wall avoidance; cameraCollisionActivations=0 on V0.38 route provides NO positive occlusion evidence.",
     "Repair visibly missing Chinese HUD glyphs in actual original Godot CI screenshots; verify bundled font license/presence and independent rendered text screenshot, not a font existence claim. Improve modern daytime unified storefront/interior art only after evidence.",
-    "Check exact V0.38 full Godot engine CI #45023106727 on SHA 3ebd8acea before updating full-engine gate; focused W/A/D/S success is not full engine signoff.",
     "After real camera + HUD, connect one actual walkable shop POI and real earned/spent currency with idempotent transactions and save; avoid copying low-quality structures or adding map area before user aesthetic approval.",
     "Preserve fixed source digests/zero fee, avoid runtime downloads and soon-expiring old CI-only Quaternius Base GLB; never auto merge/release, never push V0.18 unsafe auto-deploy branch.",
     "Main lifesim/index.html absent, S0–S5 pending; only V0.18 Web artifacts verified; Windows RTX3060 and Chrome WebGL still unverified. #10/#12/#15/#18 remain open."
@@ -1247,9 +1247,9 @@
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-22 exact V0.38 draft PR#52 SHA 3ebd8acea focused genuine CityPlayer W/A/D/S PR #45023106654 Push #45023100693 and 0.34–0.37 regressions + supervisor all completed/success. Downloaded artifact #14754294365 and independently inspected five real original 1280x720 PNGs. First blocker x=-17.036 fixed via bounded repair1 12cm sill, repair2 input A/D event separation. Full engine #45023106727 in_progress at snapshot. Artistic/HUD/camera/shoe/Windows/Chrome/commerce not approved.",
+    "freshness": "2026-11-22 verified exact V0.38 PR#52 SHA 3ebd8acea... focused PR #45023106654 Push #45023100693, V0.34/35/36/37 regressions, supervisor, AND full Godot #45023106727 all completed/success. Full Godot completed at 2026-11-22T12:40:52Z. Five actual player camera screenshots and input JSON independently inspected; art/HUD/camera-occlusion and Windows/Chrome still blocked.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.38 #52: actual production CityPlayer W=123 frames grounded, 119 weighted gait frames, 9.046m into QA shop, stop, A turn=1.30793 radians, physical D observed, S=136 frames exits, no position writes after initial QA spawn; 616 actual player physics frames. Original 5 Godot player-camera PNGs and JSON available. Real first-fail #45022580037 x=-17.036 at decorative sill; two bounded fixes used. Complete engine #45023106727 still in progress at snapshot. Camera collision activation=0 NOT occlusion proof; Chinese HUD glyphs and empty art FAIL."
+    "latestRound": "V0.38 #52: actual production CityPlayer W=123 frames grounded, 119 weighted gait frames, 9.046m into QA shop, stop, A turn=1.30793 radians, physical D observed, S=136 frames exits, no position writes after initial QA spawn; 616 actual player physics frames. Original 5 Godot player-camera PNGs and JSON available. Real first-fail #45022580037 x=-17.036 at decorative sill; two bounded fixes used. Complete engine #45023106727 now completed/success at exact SHA (verified 2026-11-22T12:40:52Z), no art/Windows/Chrome/retail release signoff. Camera collision activation=0 NOT occlusion proof; Chinese HUD glyphs and empty art FAIL."
   }
 }
