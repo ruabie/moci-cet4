@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "provider": "tevy",
+  "providerUrl": "https://tevy.dev/",
+  "license": "CC0-1.0",
+  "licenseEvidence": "https://tevy.dev/models/housing-facade-window",
+  "sourceCatalog": "https://tevy.dev/models.json",
+  "checkedOn": "2026-11-22",
+  "purpose": "QA-only LifeSim one-lot housing frontage; fixed model releases; original GLBs fetched at CI build time; no runtime requests",
+  "models": [
+    {
+      "slug": "housing-facade-shop",
+      "version": 1,
+      "dimensionsMetres": [
+        6,
+        3.029,
+        2.325
+      ],
+      "source": "https://tevy.dev/models/housing-facade-shop/v1/lod0.glb",
+      "bytes": 2550216,
+      "sha256": "3e0a00d36a418c7163458047a23f024c37d25f399d0851415f5321b4f40fe66c",
+      "triangles": 1800
+    },
+    {
+      "slug": "housing-facade-window",
+      "version": 1,
+      "dimensionsMetres": [
+        6,
+        3.25,
+        0.96
+      ],
+      "source": "https://tevy.dev/models/housing-facade-window/v1/lod0.glb",
+      "bytes": 3487508,
+      "sha256": "3fc43ea87ddca8b5f62c15e61e44e0ee3235314a71c9e6b22d9ff93fe33952d7",
+      "triangles": 1808
+    },
+    {
+      "slug": "housing-facade-balcony",
+      "version": 1,
+      "dimensionsMetres": [
+        6,
+        3.36,
+        1.62
+      ],
+      "source": "https://tevy.dev/models/housing-facade-balcony/v1/lod0.glb",
+      "bytes": 2406372,
+      "sha256": "5d063334e099661877ac991a0f70d2da51109229a503bfd95931c718349f7fea",
+      "triangles": 2456
+    }
+  ],
+  "notes": [
+    "CC0 asserted by source metadata; this is a source-license declaration, not an independent chain-of-title guarantee.",
+    "Models are façade shells, not traversable interiors.",
+    "If upstream unavailable or digest changes, fail closed; do not silently replace assets."
+  ]
+}
