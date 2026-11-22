@@ -230,6 +230,14 @@ func _create_player() -> void:
         player.position = Vector3(0, 0.2, 14)
     if in_home:
         player.position = Vector3(0, 0.2, 154)
+    # The normal save spawn rule intentionally remains unchanged. Only the
+    # opt-in V0.38 QA branch starts the REAL CityPlayer in front of the
+    # V0.37 storefront for a reproducible WASD/turn/exit review.
+    if bool(ProjectSettings.get_setting("application/config/v38_real_player_route_qa", false)) \
+            and bool(ProjectSettings.get_setting("application/config/v37_walkable_shop_preview", false)):
+        player.position = Vector3(-13.75, 0.22, 116.0)
+        player.camera_yaw = PI * .5
+        player.camera_distance = 3.3
     add_child(player)
 
 func _hud_card(panel: PanelContainer) -> void:
