@@ -55,7 +55,17 @@ Page({
     this.refreshHome();
   },
   openLesson(e){this.prepare('lesson',String(e.currentTarget.dataset.id));},
-  openKind(e){this.prepare(String(e.currentTarget.dataset.kind||'all'),null);},
+  openKind(e){
+    const kind=String(e.currentTarget.dataset.kind||'all');
+    if(kind==='random'){
+      const selected=C.shuffled(this.library).slice(0,Math.min(10,this.library.length));
+      if(!selected.length){notify('词库为空');return;}
+      this.session={queue:selected.map(x=>x.jp),unique:selected.map(x=>x.jp),index:0,
+        visited:new Set(),kind:'random',lesson:null,batchQty:10};
+      this.quiz=null;this.setData({screen:'choice'});return;
+    }
+    this.prepare(kind,null);
+  },
   prepare(kind,lesson){
     if(kind==='due'&&C.getPool(this.library,this.db,'due').length===0){
       if(C.getPool(this.library,this.db,'weak').length)kind='weak';
