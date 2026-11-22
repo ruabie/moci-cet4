@@ -1,10 +1,22 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
-> **交接快照：2026-11-20（Asia/Singapore）**  
-> **最新开发候选：V0.31 草稿 PR #45（65 骨骼配套人物的真实 CC0 模块服装蒙皮与走跑渲染试验；未合并、未发布）。5 条同 SHA CI 通过，3 件衣物分别 65/65 骨骼与层级匹配，10 张 Godot 对照图证明衣服随动作变形，但奇幻乡村衣着不符合现代城市，美术仍 BLOCKED。当前唯一已核实保存的 Web 构建仍是 V0.18。**  
+> **交接快照：2026-11-22（Asia/Singapore）**  
+> **最新开发候选：V0.34 草稿 PR #48（北区 V0.32 规划后新增街面 CC0 模型、临街门面和阴天曝光 A/B，未合并、未发布）。四组同机位、八张真实 Godot 截图及独立快速 CI 已通过，证明亮部改善与设施可见，但建筑仍然明显盒状，美术最终 FAIL；默认市区/最新版网页均未更新。唯一已核实 Web 构建仍是 V0.18。**  
 > 这是一次有证据的历史快照，不是实时仪表板。每次接班仍需独立查最新 GitHub PR/SHA/CI/Issue。
 
-## 最新一轮：V0.30–V0.31 模块服装真实蒙皮试验与现有 Web 体验核对（2026-11-20）
+## 最新一轮：V0.32–V0.34 真实扩展地图、设施布局及城市美术复核（2026-11-22）
+
+- 用户反馈：地图太小、精细度差、设施布局不合理。实际核查 `city_builder.gd`：旧版可碰撞地面 **180×180m**，只有两条十字主干路，外围相当数量建筑是无碰撞的远景背景；住宅/便利店/咖啡馆和公交设施分散硬编码，缺少统一规划。**扩图不是同义词：不能复制低精度盒子冒充新城市。**
+- **V0.32 [草稿 PR #46](https://github.com/ruabie/moci-cet4/pull/46)**，最终 head `7906f65b3eede2b3974b9fe74c50a88d87bbd435`：新增仅在 `application/config/v32_spatial_preview` QA 开关下启用的 **178×191m / 33,998m²** 北部地面，与原主干道真实接缝相连（总地面约 66,398m²，未减去接缝）。`data/v32_north_district.json` 单一规划包含 **11 栋分住宅、诊所、图书馆、零售等不同用途的建筑外观**、公园、公交车站、共享单车点、两个步行联络通道及过街标线；不是可进入的新室内。`audit_north_district_v32.py` 实查建筑最小间距 **16.5m**、**11/11** 入口通道；实际 Godot **20/20** 道路碰撞光线采样、**407** 处窗细节、**14** 棵建模树、五视角真实 PNG。移除进入新步行范围的旧无碰撞“幽灵背景”。[Godot PR CI #44754432959](https://github.com/ruabie/moci-cet4/actions/runs/44754432959)、[Push #44754419556](https://github.com/ruabie/moci-cet4/actions/runs/44754419556)、[监工 #44754432914](https://github.com/ruabie/moci-cet4/actions/runs/44754432914) 均同 head 完成 success；**美术仍 FAIL**：街区虽变大却依然大块盒体、空地和曝光泛白。
+- **V0.33 [草稿 PR #47](https://github.com/ruabie/moci-cet4/pull/47)**，最终 head `24eaa7ed6fb7097cddc1424d20325c0c642aa579`：在独立 `v33_streetscape_preview` QA 开关下，为 11 栋底层加上有区别的门面、遮棚、围墙及 **24 件真实 Kenney CC0 花箱/垃圾设施 GLB**，并试验降低过曝。构建时发现原先镜像仓库 `Barbatos6669/elderforge` 已 404；UAL 原始库改从 `WaviestSun/atelier-packs` `characters-1` 发布资源获得，**原始 7,618,436 字节、Git Blob SHA1 `473e5908…` 与 SHA256 `69591853…` 全部复核通过**。原角色基础模型暂从本项目过往已验收 [run #44754419556](https://github.com/ruabie/moci-cet4/actions/runs/44754419556) 的 artifact 恢复，校验原始 1,085,752 字节及双 SHA；**该 CI 工件会过期，不能作为长期稳定素材来源**。V0.33 [完整 CI #45013127444](https://github.com/ruabie/moci-cet4/actions/runs/45013127444) 完成旧版引擎及动作回归，但新 A/B 预览脚本错误地按名称取 `WorldEnvironment` 而非 `main.gd` 的 `ambient_env`，因此没有可认证的 V0.33 A/B 图片，测试 FAIL；两轮受限修正后不继续盲改。
+- **V0.34 [草稿 PR #48](https://github.com/ruabie/moci-cet4/pull/48)**，head `361e269805dc00e7d12510f66fe507eb585c6b6f`：只修复上述场景对象的**真实成员引用**，新增独立免费的真实 Godot 4.7.2 OpenGL3 四机位 A/B 检验。已重新下载并人工打开 [集中截图证据 artifact #14751206543](https://github.com/ruabie/moci-cet4/actions/runs/45013555198/artifacts/14751206543) 的 8 张原始 PNG：主道路、十字路口、公园、商铺临街面。**同机位真实渲染 Push CI #45013555198 与 PR CI #45013578930 均成功**，监工 #45013578896 成功；完整历史 Godot PR #45013578952 在写入初版交接时仍进行中，不能预先宣告通过。
+- 四视角**地面/地块高亮像素（平均 RGB >222）比例**，旧 V0.32 → V0.34：道路 `33.33%→14.22%`，路口 `14.04%→6.66%`，公园 `37.06%→4.78%`，门面 `21.90%→1.84%`。新设施实际可见，11 个临街面、24 件固定来源 GLB 符合最低技术门槛，旧公共道路 14 点碰撞保留。**数字只证明亮部及图像差异，不等于城市建筑美术好看。**
+- **人工美术审核 FAIL：** 现有建筑体量/窗墙关系仍明显近似方盒子，空地过大，街面底商缺乏真正完整的建筑细节/室内，缺少车行、行人空间及生活密度。下一任务应**先替换建筑资产与街面结构设计方法，在 1–2 个建筑地块做高质量切片并验证**，不再继续复制面积或堆砌低价值花箱。
+- 安全边界：所有 V0.32/33/34 城市扩展仍 QA-only，默认 `CityPlayer`、存档、经济、旧 V0.18 网页没有改变；PR 链 draft/open/unmerged，**无真实 Chrome/WebGL 试玩、用户 Windows RTX3060 性能或连续长距离漫游证据**。原始 main `lifesim/index.html` 仍未接入且 HTML S0–S5 未验收。#10/#12/#15/#18 继续开放，零新增费用，不合并或发布，不推送旧 V0.18 危险 auto-deploy 分支。
+
+---
+
+## 历史里程碑：V0.30–V0.31 模块服装真实蒙皮试验与现有 Web 体验核对（2026-11-20）
 
 - **最新候选：** [V0.31 草稿 PR #45](https://github.com/ruabie/moci-cet4/pull/45)，head `5af61bc80df3633292b6077e2fa62aa32ea7f2db`，base V0.30；open/draft/未合并、未发布。原主角 `CityPlayer`、玩法和网页构建未修改。
 - 用户要求查看网页版后已再次查询 **main**：`lifesim/index.html` **404**，`lifesim/project.json` 的 HTML S0–S5 仍 pending/sourceState=not_connected。唯一确认存在的隔离版是 [`lifesim/play-v18/`](https://github.com/ruabie/moci-cet4/tree/main/lifesim/play-v18)，真实 `build-info.json` 记载 **V0.18**、源 commit `c288af7b7cd75fd8baa9d3369610d9f8b178b0dc`。已从 [Web Actions #43909332249](https://github.com/ruabie/moci-cet4/actions/runs/43909332249) 下载 artifact `#14245624663`，核实 index.html/index.js/index.pck/index.wasm 均齐全，并在该聊天中另制作 Windows 本地 PowerShell localhost 一键启动 ZIP（仅会话文件，未写入仓库），但 **无法确认 GitHub Pages 网址真实在线可玩或 Windows 浏览器已经通过测试**。V0.31 未发布到网页。
@@ -161,14 +173,14 @@ GitHub 开放阻断项：[Issue #10 浏览器原型](https://github.com/ruabie/m
 
 ## 4. 下一步最优先任务
 
-1. **下一独立美术候选以真正现代服装为准，而不是在 V0.31 的奇幻衣服上反复修色：** 保留经实际 Godot 验证的 CC0 65 骨骼通用人物/55 旋转+髋部平移/三件服装蒙皮路线，找或制作现实日常衬衫、卫衣、裤子、鞋和自然头发，确定授权并看实际 Godot 3D 蒙皮截图。质量不合格就不集成。
-2. 审核真实城市内的输入驱动连续 Idle/Walk/Stop/Turn/Jog 以及鞋底蒙皮接地、脚滑、膝盖和镜头，不能以 5 个源片段相位推导可玩画质。
-3. 当前仅有已确认的 **V0.18 Web 构建** 存于 main `lifesim/play-v18/`。在线 GitHub Pages 是否可访问无法证实；浏览器 Chrome/Windows 真正操作与 FPS 未通过，canonical main HTML S0–S5 仍 pending。应在许可和技术成熟后单独审核更新网页版，不自动公开发布。
-4. V0.31 PR #45 仅保持 draft，#10/#12/#15/#18 不关闭；不推送带 push-to-main 自动发布风险的 V0.18 旧分支，不改变其他项目或开启付费服务。
+1. **V0.35 应先做高质量现实都市建筑/街面“切片”，不要再扩大城域面积。** 选择有明确 CC0/兼容授权的现代建筑/门面及地面材料（或者制作真实透视比例、分层屋顶与底商的原创模块），先仅在原 V0.32 已连接的 1–2 个地块替换盒状外墙。要求可辨识的底层门廊与真正对应的门、窗台/屋檐、转角/背面、合理机动车与步行动线；取得同镜头原始 Godot PNG、空间碰撞和人眼审美检验，假高精度/空室内不得交付。
+2. **保留 V0.32 可碰撞的两倍地面和 V0.34 四视角技术证据，但不要将草稿当正式可玩地图。** 要实现玩家连续步行、进出新门面和动态 LOD/绘制开销验证，且在 Windows RTX3060 1080p FPS 合格后才考虑集成/扩围。
+3. **修素材可持续获取：** 原 Elderforge 镜像 404，UAL1 已有 SHA 双校验发布源；65 骨骼 Base 目前靠自身过往 CI 工件暂存，工件过期后会失效，应建立合法稳定的离线/版本固定资源备份。不可关闭 SHA 检查绕过。
+4. 人物质量仍有单独阻断：Quaternius 动画与 65 骨骼适配技术 PASS，但都市衣物、鞋底接地、连续互动未通过。网页只有真实存档的 V0.18 Web 导出；在线 Chrome/Windows 未验收，main HTML S0–S5 仍 pending。所有新 PR 继续 draft，无付费、无自动合并发布，#10/#12/#15/#18 保持开放，不触碰旧 V0.18 自动部署分支。
 
 ## 5. 下次新聊天直接复制
 
-> 继续《游戏计划书／同频之城》开发。先读取 GitHub `ruabie/moci-cet4` main 的 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md`，再独立核实最新 PR/SHA/CI/Issue。最新开发 V0.31 草稿 PR #45 head `5af61bc80df3633292b6077e2fa62aa32ea7f2db`；5 条同 SHA CI PASS，真正 Godot 5 组穿衣前后图验证原有 Quaternius 65 骨骼基础模型+CC0 上衣/裤装/鞋均兼容，55 条旋转+1 pelvis 平移保留，但这批衣服是 Peasant 奇幻风，不符合现代城市市民审美，**美术仍 FAIL**。当前 main 仅存在 `lifesim/play-v18/` V0.18 旧 Web 导出；已下载 ZIP，本聊天另做 Windows localhost 启动包但 Windows/Chrome 未实测，公开在线 GitHub Pages URL 未验证可访问。下一阶段研究真正都市风 CC0 衣着/发型，实际蒙皮和连续输入接地，完成前不自动合并发布、不花钱、不推送危险旧 V0.18 分支。结束时按协议更新两份 main 交接文件和实际 SHA。
+> 继续《游戏计划书／同频之城》。先从连接的 GitHub 仓库 `ruabie/moci-cet4` main 读取 `lifesim/HANDOFF.md`、`HANDOFF_STATE.json`、`HANDOFF_PROTOCOL.md` 并独立核实最新 PR/head/CI/Issue/main HTML。最新 V0.34 草稿 PR #48 head `361e269805dc00e7d12510f66fe507eb585c6b6f`，base V0.33 PR #47，未合并未发布。V0.32 仅 QA 开关的北区 33,998 m² 新地面、11 栋不同规划建筑、20/20 地面碰撞点通过，原地面 32,400 m²；V0.34 新增 11 处临街细节和 24 件 Kenney CC0 实际 GLB，用 4 个相同相机拍 8 张真实 Godot 截图，降低道路与公园过曝，focused push #45013555198、PR #45013578930、supervisor #45013578896 PASS，但建筑仍非常方盒子，人工美术 FAIL。完整 Godot PR #45013578952 初版交接仍进行中，需查实时最终结论。先做 1–2 个街区“建筑资产升级+底层真实门店结构”审美切片，不再无脑扩图或堆小装饰。原 elderforge 模型镜像 404；UAL1 已移至带 SHA256 的 live release，Base 仍从 CI 工件恢复，工件会过期。现有 V0.18 Web 导出没有这些改造，Chrome/Windows 实机未通过；保持零新增费用、不合并发布、不推动危险旧 V0.18 分支或其他项目。完成后更新两份 main 交接及真实 SHA。
 
 ## 6. 交接文件和监工
 
