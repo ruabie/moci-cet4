@@ -21,12 +21,18 @@ MANIFEST = PROJECT / "tests" / "v21_ual_manifest.json"
 
 # Exact third-party mirror commit and Git blob. License independently verified
 # against Quaternius official pack: https://quaternius.itch.io/universal-animation-library
-SOURCE_COMMIT = "bb2ce469f0ab2ccfc487faef55550ba07fae2483"
+# The former pinned elderforge mirror disappeared (HTTP 404, 2026-11-22).
+# Mirror WaviestSun/atelier-packs publishes a release asset explicitly
+# byte-for-byte equal to Quaternius' official original, independently pinned
+# by BOTH Git blob SHA-1 and SHA-256, so release tag retargeting is harmless.
+SOURCE_REPOSITORY = "WaviestSun/atelier-packs"
+SOURCE_RELEASE = "characters-1"
 SOURCE_BLOB = "473e59080288428d0b6da826ba19324d07b191f0"
+SOURCE_SHA256 = "69591853d817488edaa8fd9bf8fc1d821eaeaf789f8627b3cd23b41c4ed67997"
 SOURCE_SIZE = 7618436
 SOURCE_URL = (
-    "https://raw.githubusercontent.com/Barbatos6669/elderforge/"
-    f"{SOURCE_COMMIT}/assets/animations/universal_animation_library_1/UAL1_Standard.glb"
+    "https://github.com/WaviestSun/atelier-packs/releases/download/"
+    "characters-1/UAL1_Standard.glb"
 )
 
 def git_blob_sha(data: bytes) -> str:
@@ -39,6 +45,9 @@ def validate(data: bytes) -> dict:
     actual = git_blob_sha(data)
     if actual != SOURCE_BLOB:
         raise ValueError(f"CC0 source Git blob mismatch: {actual} != {SOURCE_BLOB}")
+    digest = hashlib.sha256(data).hexdigest()
+    if digest != SOURCE_SHA256:
+        raise ValueError(f"CC0 source SHA256 mismatch: {digest} != {SOURCE_SHA256}")
     if data[:4] != b"glTF":
         raise ValueError("not a glTF binary")
     version, total = struct.unpack_from("<II", data, 4)
@@ -69,7 +78,9 @@ def validate(data: bytes) -> dict:
         "license": "CC0-1.0",
         "author": "Quaternius",
         "upstream_official": "https://quaternius.itch.io/universal-animation-library",
-        "source_mirror_commit": SOURCE_COMMIT,
+        "source_mirror_repository": SOURCE_REPOSITORY,
+        "source_mirror_release_tag": SOURCE_RELEASE,
+        "historical_source_mirror_commit": "bb2ce469f0ab2ccfc487faef55550ba07fae2483",
         "source_git_blob": SOURCE_BLOB,
         "sha256": hashlib.sha256(data).hexdigest(),
         "size_bytes": len(data),
