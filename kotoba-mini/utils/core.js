@@ -90,6 +90,18 @@ function safeState(input){
       state.coverage[key]=Array.from(new Set(input.coverage[key].filter(x=>typeof x==='string'&&x.length<=180))).slice(-5000);
     }
   }
+  // Older V4 exports may not contain coverage. Reconstruct what was already introduced.
+  if(!Object.keys(state.coverage).length&&Object.keys(state.progress).length){
+    const restored=buildLibrary(state.custom);
+    for(const w of restored){
+      if(!(state.progress[w.jp]&&state.progress[w.jp].seen>0))continue;
+      (state.coverage.all||(state.coverage.all=[])).push(w.jp);
+      for(const lesson of w.lessons){
+        const key=lesson==='extra'?'extra':'lesson:'+lesson;
+        (state.coverage[key]||(state.coverage[key]=[])).push(w.jp);
+      }
+    }
+  }
   state.logs=Array.isArray(input.logs)?input.logs.slice(-500):[];
   state.settings.qty=Math.max(1,Math.min(5000,Math.floor(Number(input.settings&&input.settings.qty)||10)));
   return state;
