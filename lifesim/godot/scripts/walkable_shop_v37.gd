@@ -186,9 +186,16 @@ func build_lot(lot: Dictionary) -> void:
         Vector3(.24,.50,3.18),"#71796f",true)
     _block("door_canopy",Vector3(10.48,3.45,0),
         Vector3(1.58,.17,6.40),"#737c79",false)
-    _block("sill_stone",Vector3(10.1,.075,0),
-        Vector3(1.22,.09,2.92),"#a3a098",true)
-    _block("retail_floor",Vector3(7.10,.075,0),
+    # V38 real CityPlayer revealed a previously hidden blocker: the 12cm
+    # solid decorative sill and raised room slab trap a grounded capsule.
+    # A proxy that floats at y=1.17m crossed it, but the real capsule did NOT.
+    # Visual sill remains, without making a fake 12cm impassable barrier.
+    _block("sill_stone",Vector3(10.1,.055,0),
+        Vector3(1.22,.08,2.92),"#a3a098",false)
+    # A floor below the sidewalk's 0.09m top avoids an unmodelled step-up.
+    # The WHOLE floor stays a real collision object; back/side walls and
+    # all counter/shelf collision volumes remain solid.
+    _block("retail_floor",Vector3(7.10,-.03,0),
         Vector3(5.78,.13,7.55),"#afa9a0",true)
     _block("retail_ceiling",Vector3(7.00,3.29,0),
         Vector3(6.05,.14,7.76),"#bcb9ac",false)
