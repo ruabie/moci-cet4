@@ -37,33 +37,49 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.34 optional human-scale streetscape/lighting actual Godot A-B, geometry technical PASS, final architecture art FAIL",
-      "pr": 48,
-      "url": "https://github.com/ruabie/moci-cet4/pull/48",
+      "version": "V0.35 two distinct QA-only architectural profile replacements; geometry/render technical PASS, urban art still FAIL",
+      "pr": 49,
+      "url": "https://github.com/ruabie/moci-cet4/pull/49",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v034-verified-street-art-ab",
-      "headSha": "361e269805dc00e7d12510f66fe507eb585c6b6f",
-      "baseBranch": "lifesim-v033-streetscape-human-scale-lighting",
-      "focusedPushCI": 45013555198,
-      "focusedPrCI": 45013578930,
+      "headBranch": "lifesim-v035-architecture-slice-qa",
+      "headSha": "0e4d2066b5541ee52cbe28f6bcb61209fd74eb13",
+      "baseBranch": "lifesim-v034-verified-street-art-ab",
+      "focusedPrCI": 45016938846,
+      "focusedPushCI": 45016923394,
       "focusedStatus": "completed_success",
-      "supervisorCI": 45013578896,
+      "v034RegressionCI": 45016938799,
+      "v034RegressionStatus": "completed_success",
+      "supervisorCI": 45016938797,
       "supervisorStatus": "completed_success",
-      "fullGodotPrCI": 45013578952,
-      "fullGodotStatus": "completed_success",
-      "realSameCameraGodotABPairs": 4,
-      "realScreenshotCount": 8,
-      "realFrameArtifactId": 14751206543,
-      "newStreetFrontages": 11,
-      "verifiedExistingKenneyCC0Fixtures": 24,
-      "preservedPublicGroundRaySamples": 14,
+      "fullGodotPrCI": 45016938779,
+      "fullGodotStatus": "in_progress_at_snapshot",
+      "artifactId": 14752211518,
+      "realSameCameraGodotABPairs": 2,
+      "realScreenshotCount": 4,
+      "architecturalPilots": 2,
+      "allExistingLots": 11,
+      "existingDoorsPhysicsRayChecks": 2,
+      "housing": {
+        "meshes": 81,
+        "balconies": 10,
+        "windowBays": 15,
+        "pixelFractionChanged": 0.49503
+      },
+      "library": {
+        "meshes": 49,
+        "verticalFins": 7,
+        "windowBays": 15,
+        "pixelFractionChanged": 0.29875
+      },
+      "actualScreenshotIndependentlyInspected": true,
+      "visualAssessment": "Two styles noticeably differentiated but low-poly mesh-and-box materials, weak ground-floor realism and empty broader district; professional urban art FAIL.",
       "productionCityPlayerChanged": false,
       "productionWebUpdated": false,
-      "finalArchitectureArtApproved": false,
       "chromeVerified": false,
       "windowsPerformanceVerified": false,
+      "finalArchitectureArtApproved": false,
       "releaseReady": false
     },
     "issues": [
@@ -924,6 +940,36 @@
         "fullPrRun": 45013578952,
         "exactHeadAllFourCiCompletedSuccess": true
       }
+    },
+    "previousCandidateV034": {
+      "version": "V0.34 optional human-scale streetscape/lighting actual Godot A-B, geometry technical PASS, final architecture art FAIL",
+      "pr": 48,
+      "url": "https://github.com/ruabie/moci-cet4/pull/48",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v034-verified-street-art-ab",
+      "headSha": "361e269805dc00e7d12510f66fe507eb585c6b6f",
+      "baseBranch": "lifesim-v033-streetscape-human-scale-lighting",
+      "focusedPushCI": 45013555198,
+      "focusedPrCI": 45013578930,
+      "focusedStatus": "completed_success",
+      "supervisorCI": 45013578896,
+      "supervisorStatus": "completed_success",
+      "fullGodotPrCI": 45013578952,
+      "fullGodotStatus": "completed_success",
+      "realSameCameraGodotABPairs": 4,
+      "realScreenshotCount": 8,
+      "realFrameArtifactId": 14751206543,
+      "newStreetFrontages": 11,
+      "verifiedExistingKenneyCC0Fixtures": 24,
+      "preservedPublicGroundRaySamples": 14,
+      "productionCityPlayerChanged": false,
+      "productionWebUpdated": false,
+      "finalArchitectureArtApproved": false,
+      "chromeVerified": false,
+      "windowsPerformanceVerified": false,
+      "releaseReady": false
     }
   },
   "gates": [
@@ -934,8 +980,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "passed_current_sha_engine_and_qa_only_art",
-      "why": "V0.34 PR #48 exact head 361e269: full old gameplay/scene/Godot PR #45013578952 SUCCESS, focused real Godot OpenGL3 four camera before/after PR #45013578930 and Push #45013555198 SUCCESS, supervisor #45013578896 SUCCESS. QA-only v32/v33 map geometry and lights; no production Web/user play/Windows FPS validation."
+      "state": "pending",
+      "why": "V0.35 #49 SHA 0e4d206 focused Godot 4.7.2 OpenGL3 PR #45016938846 and push #45016923394 passed; V0.34 visual regression #45016938799 and supervisor #45016938797 passed. Complete Godot smoke #45016938779 was in_progress when snapshot was written; do not claim full current-sha functional regression passed yet. V0.34 historical full engine passed separately."
     },
     {
       "id": "WebGL-browser",
@@ -945,7 +991,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "V0.34 four real same-camera V32/V34 screenshots demonstrate reduced washed-out ground and 24 extra Kenney CC0 fixtures but boxy city facades and broad empty lots remain clearly inadequate. Legacy V0.31 clothing not urban. Human art approval FAIL."
+      "why": "V0.35 two real before/after Godot comparisons, physically retained doors and 81/49 mesh silhouettes are verified; visual screenshots independently inspected and human art review still FAIL: procedural geometry, low detail, no connected life-density, interiors incomplete. Character clothing/continuous animation, ground shoe contact still not approved."
     },
     {
       "id": "Windows-RTX3060",
@@ -955,16 +1001,22 @@
     {
       "id": "Release",
       "state": "not_ready",
-      "why": "V0.34 optional, unmerged draft map art QA; production map remains V0.31 and only verified compiled Web package V0.18. Real input, modern facades, usable building interiors, Chrome and RTX3060 not approved."
+      "why": "V0.35 #49 is QA-only unmerged draft, not published; full Godot regression pending and visual art fail. Main browser S0–S5 pending, only isolated V0.18 Web files verified. No user browser/Windows GPU evidence."
     },
     {
       "id": "Workflow-no-automatic-publication",
       "state": "fixed_in_stacked_drafts_only",
       "why": "V0.29 PR #43 remains unmerged draft on safe V0.19-descended branch. Old V0.18 branch still has unsafe push-to-main web deploy; do not push old branch."
+    },
+    {
+      "id": "V035-two-lot-architecture-qa",
+      "state": "passed",
+      "why": "Exact-head focused real Godot 4.7.2 PR/push QA complete success with 4 original 1280x720 PNGs and material difference verified; 2 paths Raycasts pass. This gate is geometry/screenshot DIFFERENCE only, not art approval."
     }
   ],
   "nextActions": [
-    "NEXT: Stop adding low-value decorative boxes/planters; find/author properly licensed realistic modern building and street-ground-floor modules with varied facades and actual coherent entrances/interior thresholds. Test ONE high-quality connected 1–2-block art slice under the same camera, not further overall map growth.",
+    "NEXT: V0.35 #49 proved real Godot two-typology geometry, but independent image inspection still FAIL for visual standard. Replace shape prototypes in one contiguous 1–2-lot strip with sourced/author-created modern realistic building architecture, proper entrances and coherent pavement/frontage, verify license & real same-camera Godot images before enlarging the district.",
+    "Before any integration, wait for or re-read current-sha complete Godot CI #45016938779; investigate failure if any. Never infer complete engine PASS from focused visual CI success. Reassess authentic 4 PNG artifact #14752211518 and keep V0.35 behind the QA flag.",
     "After authentic geometry passes human visual review, enforce pedestrian-access, door/collision, functional interiors and real walking/stop/turn path in city; keep old V0.32 ~2x QA geometry only. Add LOD/instancing/perf budgets and Windows RTX3060 1080p frame evidence before expansion.",
     "Stabilize asset acquisition: Quaternius animation file now has a live release SHA-pinned alternate mirror; compatible Base currently restored from project-owned prior CI artifact that expires. Preserve exact digests; do not rely on deleted elderforge mirror or disable SHA validation.",
     "Continue V0.29 65-bone compatible animation and civilian urban clothing constraints. No final character art or shoe sole/contact pass.",
@@ -974,9 +1026,9 @@
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-22 independently verified PR #48 exact head and all four completed-success CIs (full PR #45013578952, focused PR #45013578930, focused push #45013555198, supervisor #45013578896); inspected original image artifact #14751206543. Art still failed, no integration.",
+    "freshness": "2026-11-22 independently verified V0.35 PR #49 SHA 0e4d2066... focused Godot PR #45016938846, push #45016923394, old v34 visual regression #45016938799 and supervisor #45016938797 completed/success. Actual 4 Godot original PNGs from artifact #14752211518 downloaded and visually inspected; art quality still FAIL. Full engine #45016938779 in_progress at snapshot. Main canonical Web unchanged.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.32 physical north extension 33,998m2, 11 authored zoning lots and 20 ground collision samples technical PASS but visually blocky. V0.33 built 11 fronts+24 Kenney CC0 props, recovered deleted binary mirrors, QA harness failed. V0.34 PR #48 exact 361e269, 4 real same-camera V0.32/V0.34 screenshot pairs focused CI and supervisor PASS, ground highlights reduced, but human art still FAIL and no production map/Web update. Same SHA full Godot PR #45013578952 completed/success."
+    "latestRound": "V0.35 #49 QA-only two distinct architectural massings: terraced residence 81 meshes/10 balconies; civic library 49 meshes/7 fins. Real same-camera V0.33 vs V0.35 difference 49.503% / 29.875% of pixels; pedestrian access rays 2/2, original lots 11. Focused exact-sha CI pass, urban art FAIL, no published V0.35 Web or Windows performance. Same head full Godot workflow pending when snapshot saved."
   }
 }
