@@ -1,7 +1,18 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
-> **最新经独立核实的开发候选：V0.37 [草稿 PR #51](https://github.com/ruabie/moci-cet4/pull/51)**，head `27c616a35e2cf515d02ddfd627f2f2cdd4b0e930`，base V0.36 #50；**open / draft / unmerged / unpublished**。2026-11-22（Asia/Singapore）真实 Godot 4.7.2 专项 CI 完成 success，5 张实渲截图、从原街道到店内的物理代理移动 **9m / 50 步零阻挡**，但**整体美术 FAIL**、**实际 CityPlayer 操控/消费 FAIL-UNVERIFIED**，现有 Web 构建仍只核实 V0.18。完整引擎 CI #45018780942 在本快照仍进行中，不可因专门测试通过就判定整个分支正式合格。  
-> 文件是带 SHA 的历史快照，接班必须再读取最新 PR、CI、Issue、素材与原始截图。
+> **当前验证的最新候选：V0.38 [草稿 PR #52](https://github.com/ruabie/moci-cet4/pull/52)**（head `3ebd8acea9616be295cb8ef56ebb2f9f8a73ab86`，base V0.37 #51，open/draft/unmerged/unpublished）。2026-11-22 实测：真实游戏内 `CityPlayer` 经 W/A/D/S 事件从街道走进店内、停下、转向后走出，专项 Godot 4.7.2 PR/Push CI 均 PASS；**最重要的实际修复是去掉卡住真正贴地角色的实心 12cm 门槛**。但 **正式美术 FAIL**（空室内、缺字 HUD）、**摄像机贴墙避障未证明**（本线路 camera_collision_activations=0）、**鞋底 IK/真实 Windows/Chrome 未验收**。同 SHA 完整引擎 CI #45023106727 截至本快照仍运行中；现有 Web 仅 V0.18 隔离导出，main `lifesim/index.html` 不存在。
+> 本文与 JSON 是已核实 SHA 快照，而非实时运行态；后续必须重新查询 GitHub PR/CI/截图/Issue。
+
+## 最新一轮：V0.38 真实游戏人物 WASD 店铺往返（2026-11-22）
+
+- **实际代码：** 从 V0.37 #51 分支建立 [V0.38 草稿 PR #52](https://github.com/ruabie/moci-cet4/pull/52)，最终候选 head `3ebd8acea9616be295cb8ef56ebb2f9f8a73ab86`。仅在 `application/config/v38_real_player_route_qa` 开关开启时，正式 `CityPlayer` 初始生成于现有北区住宅底商门前；常规的保存/初始位置规则不改。新增 `tests/visual_v38_real_cityplayer_route.gd` 通过原始 `Input.parse_input_event(InputEventKey)` 发出物理 W/A/D/S 键，到游戏本来的 `InputMap`、`CityPlayer._physics_process` 和 `move_and_slide`；不再用上轮虚浮的代理，且生成场景后**无角色位置写入/传送**。还增加严格 JSON/原始 PNG 核查脚本 `tools/audit_v38_real_cityplayer.py` 和零费独立 CI `.github/workflows/lifesim-v038-real-player-qa.yml`。
+- **第一次真实失败很关键：** 首稿 `ff042c1f...` 的 [Godot Push #45022580037](https://github.com/ruabie/moci-cet4/actions/runs/45022580037) 和 PR #45022602439 均实际 FAIL：W 键输入正常，真实人物走 175 物理帧却卡在 **x=-17.036**（起点 -13.750），未进入店内。[原始失败工件 #14754248663](https://github.com/ruabie/moci-cet4/actions/runs/45022580037/artifacts/14754248663) 保留。证据定位是 V0.37 原有实心 **12cm 石门槛**及上抬地坪会阻挡接地胶囊角色；上一版悬空的胶囊代理完全漏报。
+- **受限修复 1/2 `cf8c3218`：** 只把装饰石门槛改为无碰撞网格，实体地板调整至街道路面高度以下；**地板本身、柜台、货架、侧墙、后墙和上层依旧为真实碰撞**，绝非关闭全店碰撞。下一轮真实 Godot 成功进店并停住，但 D 键输入状态立即断言失败。**修复 2/2 `3ebd8acea...`** 仅在测试脚本中保证相反横向键 A 释放后经过完整物理帧，观察 D 真实按键事件 14 帧，无 `Input.action_press` 假替代，也不再修改游戏运动代码；两次修复已用完。
+- **确切通过证据：** [同 SHA 专项 Push #45023100693](https://github.com/ruabie/moci-cet4/actions/runs/45023100693) / [专项 PR #45023106654](https://github.com/ruabie/moci-cet4/actions/runs/45023106654) 均 `completed/success`。已下载并人工打开 [真实 Godot Artifact #14754294365](https://github.com/ruabie/moci-cet4/actions/runs/45023100693/artifacts/14754294365)：**5 张来自角色自身 `ThirdPersonCamera` 的原始 1280×720 PNG**及 **14,879 字节真实位移/输入 JSON**、引擎和资源校验日志。W 持续 **123** 个物理帧，贴地 **123/123**，动画权重工作 **119** 帧，从 x=-13.750 到 -22.7962（进入约 **9.0463m**）；无输入停住；A 实际人物朝向改变 **1.30793 rad**，D 物理按键被捕获并记录 **0.75112m** 侧移；S 持续 **136** 物理帧重新到达外侧 x=-12.4131、z=117.0293。**共 616 帧真实人物物理处理**；原始脚踝相对 idle 高差峰值 ~**0.07037m**，不是鞋底/IK 完美接地证明。
+- **与美术/性能隔离：** 同最终 SHA V0.34 #45023106644、V0.35 #45023106611、V0.36 #45023106626、V0.37 #45023106629、监督 #45023106656 均 `completed/success`。完整 Godot 引擎 CI #45023106727 本次查看时尚在运行，不能升格。**实际 5 图人工质量审查 FAIL**：店内几乎空白墙、简单台架、日间街道与暗色门面不匹配，**中文 HUD 出现方块缺字**；本路线 `camera_collision_activations=0`，虽有 sphere-sweep 配置，却没有证明摄像机真正遇障后的回缩效果。没有 Windows RTX3060、Chrome WebGL、连续鞋底实测、真实人手操作、该店工作消费/保存闭环证据。
+- **下一项优先开发：** 修复/实测**第三人称镜头室内贴墙和出口回缩**、中文 HUD 字体缺失；在不增加地图、不混淆真假美术的情况下提升同一店铺内外材质与货架真实感，再单店铺接入可重复验收的经营/消费。QA 开关默认关闭，V0.38 不可自动合并/发布；免费、#10/#12/#15/#18 开放，绝不推 V0.18 不安全自动发布旧分支。
+
+---
 
 ## 最新一轮：V0.37 实体店铺门洞/街道连续通行 QA（2026-11-22）
 
