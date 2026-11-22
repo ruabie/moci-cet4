@@ -1238,6 +1238,55 @@
       "windowsRtx3060Verified": false,
       "releaseReady": false,
       "fullGodotCompletedAt": "2026-11-22T12:40:52Z"
+    },
+    "webExportPilotV039": {
+      "version": "V0.39 same-game real Web export build in isolated stacked draft; authentic Godot export completed, artifact delivery FAILED, Chromium SKIPPED",
+      "pr": 55,
+      "url": "https://github.com/ruabie/moci-cet4/pull/55",
+      "headBranch": "lifesim-v039-isolated-web-review",
+      "headSha": "9a3cc509c47575c2db7978532a2f0c5ebf342b91",
+      "baseBranch": "lifesim-v039-real-camera-occlusion-qa",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "publicPublished": false,
+      "noProductionCodeChanged": true,
+      "sourceTargetGameV039SHA": "0925394389eedacf4c1ce1c028922182ed60e5b1",
+      "sourceAssets": "original Quaternius rig UAL/Base SHA256 verified from original retained artifact; 3 CC0 Tevy source files SHA256 pinned and Meshopt decoded at build-time",
+      "chineseFontUpstreamImmutableCommit": "f8d157532fbfaeda587e826d4cd5b21a49186f7c",
+      "chineseFontBundling": "OFL NotoSansCJKsc-Regular.otf actually downloaded, license grep PASS and passed to Godot import at CI runtime; no Web browser screenshot to prove glyphs",
+      "qaBuildFlagsOnly": [
+        "v32_spatial_preview",
+        "v35_architecture_preview",
+        "v36_pinned_facade_preview",
+        "v37_walkable_shop_preview",
+        "v38_real_player_route_qa"
+      ],
+      "artifactsCreatedInsideEphemeralRunner": {
+        "htmlBytes": 5476,
+        "jsBytes": 279815,
+        "wasmBytes": 39514754,
+        "pckBytes": 41293700,
+        "wasmSha256": "fc74679e3b97f76878947fcd4fbe1268cbfa6188182a2e33bbc3f5dc9bfa57d0",
+        "pckSha256": "06d01ceb94047a00449680395eae04d9eda97a956f89da088f2c5705730e9dc2",
+        "wasmMagicChecked": true
+      },
+      "repairsUsed": 2,
+      "failedWorkflowParseRun1": 45035253273,
+      "repair1Sha": "e93f0411871207233ab0ac52e148f4c2ee13e0e6",
+      "failedWorkflowParseRun2": 45035358094,
+      "repair2Sha": "9a3cc509c47575c2db7978532a2f0c5ebf342b91",
+      "finalWebPushCI": 45035578919,
+      "finalWebPrCI": 45035583954,
+      "finalWebCiStatus": "completed_failure_both_despite_godot_export_pass",
+      "failure": "CI env.EXPORT_DIR=/tmp/lifesim-v039-web; upload-artifact with.path=${{ runner.temp }}/lifesim-v039-web resolves /home/runner/work/_temp/lifesim-v039-web. No files there; artifact upload fails, browser step skipped.",
+      "failureLogArtifactId": 14759102398,
+      "downloadableGameArtifactId": null,
+      "downloadableWebPreview": false,
+      "realChromiumWasExecuted": false,
+      "windowsRTX3060Tested": false,
+      "nextExactFix": "In next bounded implementation round change upload-artifact.path to /tmp/lifesim-v039-web/; re-run export, verify artifact, download and browser QA; no public publishing.",
+      "releaseReady": false
     }
   },
   "gates": [
@@ -1253,8 +1302,8 @@
     },
     {
       "id": "WebGL-browser",
-      "state": "unverified",
-      "why": "Verified main lifesim/play-v18/ old Godot 4.7.2 web export (HTML/JS/PCK/WASM) and downloaded zipped web build; live ruabie.github.io Pages URL not verified working. Local Windows launcher zip created in conversation but untested on Windows. Main canonical lifesim/index.html missing, S0-S5 pending. V0.31 draft animation/wardrobe is NOT in web."
+      "state": "blocked_no_downloadable_current_web_candidate",
+      "why": "At exact isolated V0.39 Web Pilot PR#55 SHA 9a3cc509, Godot 4.7.2 actual Web export successfully created original index.html/js/wasm/pck on ephemeral CI runner (wasm 39.5MB, pck 41.3MB). But upload-artifact path mismatched actual EXPORT_DIR, both Push #45035578919 and PR #45035583954 concluded failure, so NO downloadable current Web zip exists and real Chromium QA step was skipped. Only old main play-v18 Web artifacts are downloadable. No published V0.39 link; no Chrome or Windows hardware signoff."
     },
     {
       "id": "Art-and-animation",
@@ -1303,19 +1352,19 @@
     }
   ],
   "nextActions": [
-    "NEXT: A new bounded V0.40 QA-only art/camera candidate must handle avatar head/hair occlusion when camera's actual wall-safe distance drops below ~0.7m; avoid instant full avatar disappearance or disabling wall collision. Prove original in/out physical W/S, real same-scene camera sphere overlap 0 and genuinely usable inside-close-wall PNGs before any city expansion.",
-    "Fix deterministic Chinese HUD square glyphs: repo original tracked art/fonts/NotoSansCJKsc-Regular.otf absent despite main.gd loading it. Acquire verifiably licensed and pinned local CJK OTF/TTF (no network at runtime), physically bundle into engine/Web export and verify real rendered glyph screenshot; don't assume Linux system font fallback is viable.",
-    "Only after camera visual and CJK HUD successful, refine one coherent realistic modern shop interior and connect an actual POI and earned/spent balance with idempotent tests and save. No 11-lot low-quality replication.",
-    "Original GLB 3-source CC0 supplier assertion and SHA pin remain, old Quaternius Base restored from expiring CI artifact: stabilize free reproducible source without disabling validation or runtime downloads. Keep zero fee, no merge/release, never push dangerous V0.18 auto deployment branch.",
-    "Main lifesim/index.html still absent, main HTML S0–S5 pending and only isolated V0.18 Web verified; Chrome WebGL/Windows RTX3060 and actual human-mouse hardware unverified. Open issues #10/#12/#15/#18 retained."
+    "NEXT (bounded new round): Fix ONLY V0.39 Web pilot draft PR#55 .github/workflows/lifesim-v039-web-review.yml action upload-artifact path from `${{ runner.temp }}/lifesim-v039-web/` to actual `/tmp/lifesim-v039-web/`, then re-run exact SHA and confirm generated ZIP is downloadable, hash-verified with build-info.json, no unsupported upload assertions. Prior two fixes used in 2026-11-22 web round; no third fix in same round.",
+    "Then original standalone local preview source must pass genuine Playwright Chromium Godot WASM boot, canvas/COOP/COEP, W key original character movement and authentic browser screenshots. Output file presence/export success alone is not browser playability. Keep no automatic Pages publication, no merge, zero new expenses.",
+    "Original game still has severe authentic near-wall player hair/head occlusion at camera 0.098m despite V0.39 physically safe sweep, and interiors/art are poor. Make a separate V0.40 playable camera-near-wall visualization gate and independently judge user screenshot.",
+    "Although build-time Noto CJK OFL font successfully downloaded, require actual browser HUD Chinese glyph screenshot before claiming UI fixed. Keep original 11 lot/source SHA checks and physical shop collision.",
+    "Never publish or expand city art until evidence. Main lifesim/index.html absent, HTML milestones S0–S5 pending, original main play-v18 exists. No native RTX3060, actual human browser play or full commerce acceptance yet; Issues #10/#12/#15/#18 remain open."
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-22 V0.39 PR #53 exact head 09253943 same SHA focused Push #45025977376 and PR #45025983015 plus complete engine #45025983134 ALL completed/success (last verified 2026-11-22T13:14:28Z). 5 real original player camera 1280x720 PNGs inspected from artifact #14756015186; rear wall sphere-sweep 42 hits, 0 overlaps, camera retract to 0.098m, restore to 4.697m. Human camera visual QA FAIL (avatar hair blocks view). HUD CJK/font, sparse retail and Chrome/RTX3060/human mouse/IK/retail remain blocked; no auto merge/release.",
+    "freshness": "2026-11-22 latest isolated Web V039 draft PR #55 head 9a3cc509 final Push #45035578919 and PR #45035583954 both completed/failure. Actual Godot v4.7.2 Web export PASS generated 5476B html, 279815B JS, 39.5MB WASM and 41.3MB PCK, valid magic, and OFL CJK font/source assets verified. Upload-artifact path erroneously `/home/runner/work/_temp/...` while actual build `/tmp/...`; so no downloadable current web zip, real Chromium QA skipped. Two bounded repairs used; next only path fix in new round. Core V039 PR#53 exact head 09253943 still game engine QA pass/visual camera usability fail. Main HTML S0-S5 pending and V018 only playable web artifacts.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.39 one original rear-wall camera occlusion QA in real CityPlayer shop. Real source geometry preserved; 5 raw PNGs & metrics. First baseline failed transitional wall penetration. Final corrected two bounded fixes: candidate camera post-smoothing sphere cast + legitimate audit threshold correction. Focused Godot exact SHA success, camera retracted to 0.098m with zero physical overlap, then recovered to 4.697m. Human visual review strongly FAIL: camera behind head/hair, HUD CJK square boxes, empty shop. Full engine #45025983134 completed/success at exact head (confirmed 2026-11-22T13:14:28Z), no professional art, human mouse, Chrome/RTX3060 release approval. PR#53 remains draft unmerged and unpublished."
+    "latestRound": "V0.39 same game isolated Web export draft #55; original assets verified, immutable OFL font retrieved, real official Web templates, GDScript import/export passed; browser deployment and file delivery blocked by upload path mismatch. No current Web downloadable artifact. Two fixes in this round for YAML heredoc indentation and job-level runner.temp expression; no third under protocol. Workstream visual still blocked. GitHub handoff synced; no publication or merge."
   }
 }
