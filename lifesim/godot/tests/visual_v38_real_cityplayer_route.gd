@@ -175,19 +175,35 @@ func _run() -> void:
     for i in range(8):
         await physics_frame
     _key(KEY_A,false)
-    await physics_frame
+    # The physical-key event queue needs a clean release frame between
+    # opposing horizontal inputs in the software-rendered Xvfb harness.
+    # Require evidence for D rather than substituting Input.action_press().
+    for clean_release in range(3):
+        await physics_frame
     var turn_change:float=absf(wrapf(
         player.character_visual.rotation.y-old_facing,-PI,PI))
     if turn_change<.18:
         _fail("original avatar not responding to A strafe/turn input");return
     _trace(player,"turned_left",trace)
+    var mapped_d:bool=false
+    for event in InputMap.action_get_events("move_right"):
+        if event is InputEventKey and (event as InputEventKey).physical_keycode==KEY_D:
+            mapped_d=true
+    if not mapped_d:
+        _fail("D key was not present in actual game's move_right InputMap");return
+    var z_before_d:float=player.global_position.z
     _key(KEY_D,true)
-    await physics_frame
-    if not Input.is_action_pressed("move_right"):
-        _fail("D key did not reach original action input");return
-    for i in range(8):
+    var d_observed:bool=false
+    for d_tick in range(14):
         await physics_frame
+        d_observed=d_observed or Input.is_action_pressed("move_right")
     _key(KEY_D,false)
+    if not d_observed:
+        _fail("D physical key not registered across 14 ticks; InputMap mapped="+str(mapped_d)+
+            ", z_delta="+str(player.global_position.z-z_before_d)+
+            ", pressed="+str(Input.is_action_pressed("move_right")));return
+    evidence["D_key_input_observed"]=d_observed
+    evidence["D_strafe_displacement_m"]=player.global_position.z-z_before_d
     for i in range(12):
         await physics_frame
     _trace(player,"turn_recovered",trace)
