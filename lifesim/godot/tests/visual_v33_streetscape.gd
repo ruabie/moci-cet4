@@ -64,7 +64,9 @@ func _run() -> void:
     if int(north.statistics.get("buildings",0))!=11:
         _fail("original V32 construction is not preserved")
         return
-    var ambient:WorldEnvironment=scene.get_node_or_null("WorldEnvironment") as WorldEnvironment
+    # Main.gd creates this WorldEnvironment dynamically and exposes it as a
+    # script member. Dynamic Godot node names are NOT guaranteed "WorldEnvironment".
+    var ambient:WorldEnvironment=scene.get("ambient_env") as WorldEnvironment
     if ambient==null or ambient.environment==null:
         _fail("main scene world sky/environment unavailable")
         return
