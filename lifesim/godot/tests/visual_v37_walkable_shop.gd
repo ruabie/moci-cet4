@@ -137,7 +137,7 @@ func _run() -> void:
             # Test THREE grounded public route points at the actual north lot.
             for x in [-15.0,-18.6,-21.0]:
                 var ground:Dictionary=_ray(scene,
-                    Vector3(x,6,116),Vector3(x,-3,116))
+                    Vector3(x,.85,116),Vector3(x,-3,116))
                 if ground.is_empty() or absf(float(
                     (ground.get("position",Vector3(0,99,0)) as Vector3).y))>.28:
                     _fail("door to public street route has no grounded walk surface "+str(x));return
