@@ -37,58 +37,78 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.36 QA-only original supplier-claimed CC0 modern housing facade; engine visual technical PASS, holistic art FAIL",
-      "pr": 50,
-      "url": "https://github.com/ruabie/moci-cet4/pull/50",
+      "version": "V0.37 one real QA-only 2.9m walkable shop doorway and collidable 7.6x6m ground interior",
+      "pr": 51,
+      "url": "https://github.com/ruabie/moci-cet4/pull/51",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v036-pinned-cc0-urban-facade-pilot",
-      "headSha": "564164aa7ceb4093eeca13f3b2a944acee8758a7",
-      "baseBranch": "lifesim-v035-architecture-slice-qa",
-      "firstFailedHeadSha": "8a6798c23b32cd6e6e62b078b9e2be551186938d",
-      "firstFailedPushCi": 45017645155,
-      "firstFailedPrCi": 45017672087,
-      "firstFailure": "SHA256 originals pass, Godot import rejects EXT_meshopt_compression and KHR_mesh_quantization; fail artifacts #14752740753 and #14751683629",
-      "boundedRecoveryFixSha": "564164aa7ceb4093eeca13f3b2a944acee8758a7",
-      "repairsUsed": 1,
-      "recovery": "Exact source SHA256 validation then @gltf-transform/cli@4.5.0 build-time decode+dequantize; no extension-name stripping without decoding.",
-      "artifactId": 14752462358,
-      "focusedPrCI": 45017894727,
-      "focusedPushCI": 45017890677,
+      "headBranch": "lifesim-v037-walkable-shop-threshold-qa",
+      "headSha": "27c616a35e2cf515d02ddfd627f2f2cdd4b0e930",
+      "baseBranch": "lifesim-v036-pinned-cc0-urban-facade-pilot",
+      "flags": [
+        "application/config/v32_spatial_preview",
+        "application/config/v36_pinned_facade_preview",
+        "application/config/v37_walkable_shop_preview"
+      ],
+      "focusedPrCI": 45018781050,
+      "focusedPushCI": 45018764238,
       "focusedStatus": "completed_success",
-      "v034RegressionCI": 45017894735,
-      "v034RegressionStatus": "completed_success",
-      "v035RegressionCI": 45017894774,
-      "v035RegressionStatus": "completed_success",
-      "supervisorCI": 45017894724,
+      "v034RegressionCI": 45018780975,
+      "v035RegressionCI": 45018781039,
+      "v036RegressionCI": 45018780992,
+      "regressionStatus": "completed_success",
+      "supervisorCI": 45018781029,
       "supervisorStatus": "completed_success",
-      "fullGodotPrCI": 45017894739,
-      "fullGodotStatus": "completed_success",
-      "sourceModels": 3,
-      "sourceOriginalBytesVerified": 8444096,
-      "sourceManifest": "lifesim/godot/credits/TEVY_V36_SOURCE.json",
-      "sourceLicenseDeclared": "CC0-1.0 (supplier declared; no independent chain-of-title)",
-      "generatedFacadeGlbInstances": 18,
-      "realScreenshotCount": 4,
-      "sameCameraPairs": 2,
-      "totalExistingNorthLots": 11,
-      "realPublicFrontageGroundChecks": 3,
-      "groundChecksPassed": 3,
-      "pixelsChangedThreshold25": {
-        "front": 524334,
-        "frontRatio": 0.56894,
-        "oblique": 154699,
-        "obliqueRatio": 0.16786
+      "fullGodotCI": 45018780942,
+      "fullGodotStatus": "in_progress_at_snapshot",
+      "realGodotArtifactId": 14752648713,
+      "realScreenshotCount": 5,
+      "identicalCameraComparisons": 2,
+      "realOriginalGLBInstances": 17,
+      "originalLotsPreserved": 11,
+      "door": {
+        "clearWidthMetres": 2.9,
+        "clearHeightMetres": 2.75,
+        "spatialRoomDimensionsMetres": [
+          7.6,
+          6
+        ],
+        "oldFullFootprintBlocksEntrance": true,
+        "newCentreRayPasses": true,
+        "sideAndRearCollision": true,
+        "groundRaysPassed": 3
       },
-      "independentImageReview": "Actual 4 original Godot PNG inspected: clear real window/AC/balcony/storefront improvement, but dark neon/cyberpunk face is visually inconsistent with pale low-poly daytime district; rear wall blank; no accessible interior.",
-      "finalArchitectureArtApproved": false,
-      "productionCityPlayerChanged": false,
-      "productionWebUpdated": false,
-      "chromeVerified": false,
-      "windowsPerformanceVerified": false,
-      "releaseReady": false,
-      "fullGodotCompletedAt": "2026-11-22T11:38:21Z"
+      "physicsProof": {
+        "type": "Godot 4.7.2 CharacterBody3D.move_and_collide collision proxy (not CityPlayer)",
+        "movementSteps": 50,
+        "metresMoved": 9.00001525878906,
+        "collisions": 0,
+        "start": [
+          -14,
+          1.16999995708466,
+          116
+        ],
+        "end": [
+          -23.0000152587891,
+          1.16999995708466,
+          116
+        ]
+      },
+      "visuals": {
+        "streetPixelFractionChange": 0.20822,
+        "doorPixelFractionChange": 0.95993,
+        "originalPngIndependentlyInspected": true,
+        "cityWideArtApproved": false,
+        "subjectiveInspection": "Physically open shop door and modest shelving visually obvious, but weak interior design, empty product volume, pale lighting and mismatched dark original facade; FAIL"
+      },
+      "defaultProductionPlayerChanged": false,
+      "defaultEconomyChanged": false,
+      "activeRealPlayerWalkProven": false,
+      "productionRetailJobOrPurchaseConnected": false,
+      "browserVerified": false,
+      "windowsRtx3060Verified": false,
+      "releaseReady": false
     },
     "issues": [
       {
@@ -1024,6 +1044,60 @@
       "windowsPerformanceVerified": false,
       "finalArchitectureArtApproved": false,
       "releaseReady": false
+    },
+    "previousCandidateV036": {
+      "version": "V0.36 QA-only original supplier-claimed CC0 modern housing facade; engine visual technical PASS, holistic art FAIL",
+      "pr": 50,
+      "url": "https://github.com/ruabie/moci-cet4/pull/50",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v036-pinned-cc0-urban-facade-pilot",
+      "headSha": "564164aa7ceb4093eeca13f3b2a944acee8758a7",
+      "baseBranch": "lifesim-v035-architecture-slice-qa",
+      "firstFailedHeadSha": "8a6798c23b32cd6e6e62b078b9e2be551186938d",
+      "firstFailedPushCi": 45017645155,
+      "firstFailedPrCi": 45017672087,
+      "firstFailure": "SHA256 originals pass, Godot import rejects EXT_meshopt_compression and KHR_mesh_quantization; fail artifacts #14752740753 and #14751683629",
+      "boundedRecoveryFixSha": "564164aa7ceb4093eeca13f3b2a944acee8758a7",
+      "repairsUsed": 1,
+      "recovery": "Exact source SHA256 validation then @gltf-transform/cli@4.5.0 build-time decode+dequantize; no extension-name stripping without decoding.",
+      "artifactId": 14752462358,
+      "focusedPrCI": 45017894727,
+      "focusedPushCI": 45017890677,
+      "focusedStatus": "completed_success",
+      "v034RegressionCI": 45017894735,
+      "v034RegressionStatus": "completed_success",
+      "v035RegressionCI": 45017894774,
+      "v035RegressionStatus": "completed_success",
+      "supervisorCI": 45017894724,
+      "supervisorStatus": "completed_success",
+      "fullGodotPrCI": 45017894739,
+      "fullGodotStatus": "completed_success",
+      "sourceModels": 3,
+      "sourceOriginalBytesVerified": 8444096,
+      "sourceManifest": "lifesim/godot/credits/TEVY_V36_SOURCE.json",
+      "sourceLicenseDeclared": "CC0-1.0 (supplier declared; no independent chain-of-title)",
+      "generatedFacadeGlbInstances": 18,
+      "realScreenshotCount": 4,
+      "sameCameraPairs": 2,
+      "totalExistingNorthLots": 11,
+      "realPublicFrontageGroundChecks": 3,
+      "groundChecksPassed": 3,
+      "pixelsChangedThreshold25": {
+        "front": 524334,
+        "frontRatio": 0.56894,
+        "oblique": 154699,
+        "obliqueRatio": 0.16786
+      },
+      "independentImageReview": "Actual 4 original Godot PNG inspected: clear real window/AC/balcony/storefront improvement, but dark neon/cyberpunk face is visually inconsistent with pale low-poly daytime district; rear wall blank; no accessible interior.",
+      "finalArchitectureArtApproved": false,
+      "productionCityPlayerChanged": false,
+      "productionWebUpdated": false,
+      "chromeVerified": false,
+      "windowsPerformanceVerified": false,
+      "releaseReady": false,
+      "fullGodotCompletedAt": "2026-11-22T11:38:21Z"
     }
   },
   "gates": [
@@ -1034,8 +1108,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "passed_current_sha_engine_and_qa_only_art",
-      "why": "Exact V0.36 SHA 564164aa focused GLB-source/render PR #45017894727 and Push #45017890677, full Godot engine #45017894739, V0.34 #45017894735, V0.35 #45017894774, supervisor #45017894724 all completed/success. This is CI engine/scene QA only, NOT professional art, real Chrome browser or Windows RTX3060 benchmark."
+      "state": "pending",
+      "why": "V0.37 exact SHA 27c616a focused physics/real Godot render CI PR #45018781050 + Push #45018764238 completed/success, V0.34/0.35/0.36 regressions + supervisor same SHA success; full engine workflow #45018780942 still in_progress at snapshot. Do not claim complete full-engine gate passed until finish. Prior V0.36 full engine passed separately."
     },
     {
       "id": "WebGL-browser",
@@ -1045,7 +1119,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "V0.36 authentic 3 CC0-declared models/18 instances and two real same-camera Godot image pairs pass technical but human visual art FAIL: dark cyberpunk facade mismatches pale district, rear blank, building solid interior, no continuous walking/shoe contact. Old modern-clothing issue remains."
+      "why": "V0.37 open entrance and compact collision-backed ground-floor room technically PASS with independent 5 screenshots and 50-step proxy physics. Still low fidelity, visually sparse and old dark façade clashes with pale surroundings; old CityPlayer/animation/shoe contact, continuous real input, camera collision not tested. Human art FAIL."
     },
     {
       "id": "Windows-RTX3060",
@@ -1055,7 +1129,7 @@
     {
       "id": "Release",
       "state": "not_ready",
-      "why": "V0.36 #50 draft unmerged and QA-only; full engine and source-art focused CI passed, but professional architecture art FAIL, usable interiors/continuous navigation absent. Main HTML S0-S5 pending, only V0.18 isolated Web verified. Chrome/Windows unverified."
+      "why": "V0.37 #51 is draft unmerged and QA-only, with no full real-player input, commerce integration, or art approval. Main HTML S0-S5 pending, only V0.18 Web build isolated. Chrome/Windows unverified, full Godot workflow pending at snapshot."
     },
     {
       "id": "Workflow-no-automatic-publication",
@@ -1071,21 +1145,27 @@
       "id": "V036-pinned-source-and-Godot-art-qa",
       "state": "passed",
       "why": "Exact-head V0.36 #50 source byte/SHA256, Gltf-Transform build conversion, 3 real CC0 GLB source variants/18 Godot instances, 4 authentic PNGs, pixel difference & 3/3 public ground raycasts, focused PR and Push completed/success. TECHNICAL ONLY; no subjective art approval."
+    },
+    {
+      "id": "V037-real-physics-shop-entry",
+      "state": "passed",
+      "why": "At SHA 27c616a, real Godot scene ray negative-control V36 blocked, V37 central doorway clear/side and back solid, 3/3 walk-ground rays and 50 sequential CharacterBody3D.move_and_collide frames moved 9m without collision; 5 real PNG, focused PR/push CI success. This is proxy-only physics, NOT real CityPlayer or professional art."
     }
   ],
   "nextActions": [
-    "NEXT: Do NOT clone the dark V0.36 facade around the city. Select one coherent modern daytime urban visual direction and licensed complementary modules covering front, side, rear, ground-floor threshold and real traversable interiors; test coherent 1–2 adjoining lots, with real Godot images and continuous player approach before expansion.",
-    "Keep 18 Tevy asset instances QA-only, preserve exact source SHA and decoded conversion path. Build-time source/copy archival must be stabilized before reproducible long-term release; no network at runtime.",
-    "Continue V0.29 65-bone compatible animation and civilian urban clothing constraints. No final character art or shoe sole/contact pass.",
-    "Main lifesim/index.html still absent, HTML S0-S5 pending; only existing V0.18 Web export actually stored. Do not claim V0.34 published/interactive browser. Zero fee, no merge/release, #10/#12/#15/#18 open, do not push unsafe old V0.18 auto-deploy branch."
+    "NEXT: Integrate actual production CityPlayer WASD/turn/stop camera collision on the same north shop physical entry/exit QA, capture continuous movement and feet-floor evidence at exact SHA. Only then consider real retail/commerce connection. No teleport or input proxy accepted as production proof.",
+    "Replace empty demo shelves/lighting with genuine coherent compact retail composition and match building materials/sky to modern day district after route works; authored/verified CC0 only, do not add low-value boxes or expand more parcels.",
+    "Check exact-head full Godot engine smoke #45018780942, currently in_progress at handoff; upgrade engine gate only upon completed success. Keep V0.37 behind explicit QA flag, default CityPlayer/economy/Web unchanged.",
+    "Make imported Tevy GLBs and Quaternius Base durable under hash-pinned zero-fee artifact source (current old CI artifacts expire); no runtime download and no disabling SHA.",
+    "Main lifesim/index.html still missing, HTML S0-S5 pending; only V0.18 Web export verified. Do not claim V0.37 online playable. #10/#12/#15/#18 stay open; no auto merge/release or unsafe V0.18 branch push."
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-22 PR #50 exact V0.36 SHA 564164aa7ceb... full Godot engine #45017894739 now completed/success (confirmed 2026-11-22T11:38:21Z). Focused PR #45017894727, push #45017890677, V0.34 #45017894735, V0.35 #45017894774, supervisor #45017894724 likewise completed/success; 4 original Godot screenshots inspected. Daytime coherent architecture art still FAIL; Chrome/Web/Windows unverified.",
+    "freshness": "2026-11-22 independently inspected V0.37 PR#51 SHA 27c616a, real 5 PNGs from Godot artifact #14752648713, public ground 3/3, proxy physics 9m/50 samples no collisions, same-SHA PR #45018781050 Push #45018764238, V0.34 #45018780975, V0.35 #45018781039, V0.36 #45018780992, supervisor #45018781029 all success. Full Godot #45018780942 in_progress at snapshot; production CityPlayer/real Chrome/RTX3060/art still blocked.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.36 QA-only one housing 6-floor/18 GLB urban frontage pilot. First failed head 8a6798... had unsupported EXT_meshopt_compression and KHR_mesh_quantization in exact-SHA source. Bounded conversion commit 564164aa decodes/dequantizes build-time; focused PR/push real Godot renderer passes. Four raw screenshots show actual details but dark cyberpunk facade mismatches pale city; exterior-only, no live browser, Windows RTX3060, or production release. Draft PR#50 open. Subsequently, the same-SHA complete Godot engine CI #45017894739 completed/success; gameplay production art and release gates remain blocked."
+    "latestRound": "V0.37 QA-only west_homes_a ground-floor carved-out 2.9m door/7.6x6m collidable shop. Proven V0.36 old full footprint blocked, V0.37 new centre open, side and rear colliders active; 50 real CharacterBody3D Godot physics steps walked 9.000015m with no collision. 5 genuine screenshots inspected, but shop art too empty and production CityPlayer/commerce still not tested. Draft PR #51 open; no merge/release."
   }
 }
