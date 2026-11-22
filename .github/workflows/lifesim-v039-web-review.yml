@@ -29,7 +29,7 @@ jobs:
     timeout-minutes: 33
     env:
       PROJECT_DIR: lifesim/godot
-      EXPORT_DIR: ${{ runner.temp }}/lifesim-v039-web
+      EXPORT_DIR: /tmp/lifesim-v039-web
       PLAYWRIGHT_ROOT: /tmp/lifesim-browser
       PREVIEW_EVIDENCE: v039-web-browser-evidence
       PREVIEW_URL: http://127.0.0.1:8765/?qa=1
