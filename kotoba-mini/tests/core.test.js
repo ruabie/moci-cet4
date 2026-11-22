@@ -45,3 +45,14 @@ test('browser schema4 backup merges without deleting current progress',()=>{
   assert.equal(n.progress.a.seen,3);assert.equal(n.progress.b.seen,1);
   assert.equal(n.custom[0].jp,'テスト');
 });
+
+test('progress-only schema 4 export retains learned coverage after import',()=>{
+  const prior=C.blankState();
+  prior.progress['異なる']={streak:2,lapses:0,seen:3,dueAt:1700000000000,lastAt:1699000000000,lastGrade:'good'};
+  delete prior.coverage;
+  const migrated=C.safeState(prior);
+  assert.ok(migrated.coverage.all.includes('異なる'));
+  assert.ok(migrated.coverage['lesson:4'].includes('異なる'));
+  const w=C.getPool(C.buildLibrary([]),migrated,'lesson','4');
+  assert.ok(!C.remaining(w,migrated,'lesson','4').some(x=>x.jp==='異なる'));
+});
