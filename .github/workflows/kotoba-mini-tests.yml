@@ -1,0 +1,30 @@
+name: Kotoba WeChat Mini Program — core checks
+on:
+  push:
+    paths:
+      - 'kotoba-mini/**'
+      - '.github/workflows/kotoba-mini-tests.yml'
+  pull_request:
+    paths:
+      - 'kotoba-mini/**'
+      - '.github/workflows/kotoba-mini-tests.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check kotoba-mini/utils/core.js
+          node --check kotoba-mini/data/words.js
+          node --check kotoba-mini/pages/index/index.js
+          node --check kotoba-mini/app.js
+      - name: Offline curriculum and SRS tests
+        working-directory: kotoba-mini
+        run: node --test tests/core.test.js
