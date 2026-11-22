@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "snapshotDate": "2026-11-17",
+  "snapshotDate": "2026-11-22",
   "project": {
     "id": "lifesim",
     "name": "同频之城｜游戏计划书",
@@ -37,32 +37,34 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.31 CC0 65-bone modular garment actual skinning/render proof; final urban art blocked",
-      "pr": 45,
-      "url": "https://github.com/ruabie/moci-cet4/pull/45",
+      "version": "V0.34 optional human-scale streetscape/lighting actual Godot A-B, geometry technical PASS, final architecture art FAIL",
+      "pr": 48,
+      "url": "https://github.com/ruabie/moci-cet4/pull/48",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v031-verified-clothing-manifest-render",
-      "headSha": "5af61bc80df3633292b6077e2fa62aa32ea7f2db",
-      "baseBranch": "lifesim-v030-compatible-civilian-outfit-trial",
-      "baseSha": "1a8bc678a91dbeaf097cbc6ce1968545170b23e5",
-      "focusedPrRun": 44747482726,
-      "focusedPushRun": 44747428071,
-      "fullGodotPrRun": 44747482752,
-      "fullGodotPushRun": 44747428072,
-      "supervisorPrRun": 44747482682,
-      "allSameShaCI": "completed_success",
-      "rigidJointClothingSourceVerified": true,
-      "allClothing65BoneParentMatches": true,
-      "actualClothingSkeletalMotionRendered": true,
-      "actualClothingPosePairs": 5,
-      "finalUrbanArtApproved": false,
-      "productionCityPlayerUpdated": false,
-      "browserV029Published": false,
+      "headBranch": "lifesim-v034-verified-street-art-ab",
+      "headSha": "361e269805dc00e7d12510f66fe507eb585c6b6f",
+      "baseBranch": "lifesim-v033-streetscape-human-scale-lighting",
+      "focusedPushCI": 45013555198,
+      "focusedPrCI": 45013578930,
+      "focusedStatus": "completed_success",
+      "supervisorCI": 45013578896,
+      "supervisorStatus": "completed_success",
+      "fullGodotPrCI": 45013578952,
+      "fullGodotStatus": "in_progress_at_handoff_write",
+      "realSameCameraGodotABPairs": 4,
+      "realScreenshotCount": 8,
+      "realFrameArtifactId": 14751206543,
+      "newStreetFrontages": 11,
+      "verifiedExistingKenneyCC0Fixtures": 24,
+      "preservedPublicGroundRaySamples": 14,
+      "productionCityPlayerChanged": false,
+      "productionWebUpdated": false,
+      "finalArchitectureArtApproved": false,
       "chromeVerified": false,
       "windowsPerformanceVerified": false,
-      "finalRelease": false
+      "releaseReady": false
     },
     "issues": [
       {
@@ -821,6 +823,105 @@
       "browserChromeStartedAndTested": false,
       "locallyPackagedWindowsPreview": "A session download package with PowerShell localhost HTTP script was created and ZIP verified; not committed, not Windows-tested, not publicly hosted.",
       "canonicalMainHtml": "lifesim/index.html still 404; original S0-S5 stage pending"
+    },
+    "previousCandidateV031": {
+      "version": "V0.31 CC0 65-bone modular garment actual skinning/render proof; final urban art blocked",
+      "pr": 45,
+      "url": "https://github.com/ruabie/moci-cet4/pull/45",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v031-verified-clothing-manifest-render",
+      "headSha": "5af61bc80df3633292b6077e2fa62aa32ea7f2db",
+      "baseBranch": "lifesim-v030-compatible-civilian-outfit-trial",
+      "baseSha": "1a8bc678a91dbeaf097cbc6ce1968545170b23e5",
+      "focusedPrRun": 44747482726,
+      "focusedPushRun": 44747428071,
+      "fullGodotPrRun": 44747482752,
+      "fullGodotPushRun": 44747428072,
+      "supervisorPrRun": 44747482682,
+      "allSameShaCI": "completed_success",
+      "rigidJointClothingSourceVerified": true,
+      "allClothing65BoneParentMatches": true,
+      "actualClothingSkeletalMotionRendered": true,
+      "actualClothingPosePairs": 5,
+      "finalUrbanArtApproved": false,
+      "productionCityPlayerUpdated": false,
+      "browserV029Published": false,
+      "chromeVerified": false,
+      "windowsPerformanceVerified": false,
+      "finalRelease": false
+    },
+    "v032_033_034Review": {
+      "v032": {
+        "pr": 46,
+        "head": "7906f65b3eede2b3974b9fe74c50a88d87bbd435",
+        "prGodotCI": 44754432959,
+        "pushGodotCI": 44754419556,
+        "supervisorCI": 44754432914,
+        "allThreeSameShaCompletedSuccess": true,
+        "productionMapChanged": false,
+        "qaFlag": "application/config/v32_spatial_preview",
+        "newGroundAreaSqM": 33998,
+        "oldGroundAreaSqM": 32400,
+        "newBuildingExteriors": 11,
+        "plannedEntrancesPass": 11,
+        "publicCollisionSamplesPass": 20,
+        "minBuildingFootprintGapM": 16.5,
+        "facadeWindowBays": 407,
+        "actualGLBTrees": 14,
+        "actualGodotScreenshots": 5,
+        "humanArt": "FAIL: cuboid building massing, blank lots and too bright lighting, not suitable for final city."
+      },
+      "v033": {
+        "pr": 47,
+        "head": "24eaa7ed6fb7097cddc1424d20325c0c642aa579",
+        "status": "Open draft; first/second bounded infrastructure repairs and new QA screenshot harness failed.",
+        "failedPrRun": 45013127444,
+        "sourceUALRecovery": "Former Barbatos6669/elderforge mirror became 404; replace build URL with WaviestSun/atelier-packs characters-1 original Quaternius GLB exact SHA256 69591853d817488edaa8fd9bf8fc1d821eaeaf789f8627b3cd23b41c4ed67997, original Git Blob SHA1 473e59080288428d0b6da826ba19324d07b191f0, 7,618,436 bytes.",
+        "baseRecovery": "Former elderforge mirror also 404; use own previous full tested run #44754419556 verified project source archive; original Base exact SHA256 2d6792e77f337cf6fac3a81e1caf92798b898401140485b55307c9f14785ec25, Git blob 59c4044d5146146170f1c6d5e765985a73bc7875, 1,085,752 bytes. CI artifact will expire; temporary recovery, not permanent hosting.",
+        "failure": "visual_v33_streetscape.gd tested literal WorldEnvironment child name, but main script variable is ambient_env. No trustworthy V033 A/B images on this head.",
+        "repairAttemptsUsed": 2
+      },
+      "v034": {
+        "pr": 48,
+        "head": "361e269805dc00e7d12510f66fe507eb585c6b6f",
+        "scope": "Separate evidence-driven QA test fix: use scene.get('ambient_env') as WorldEnvironment. Focused no-fee test with exact archived binary SHA verification; all world and prop modifications still gated behind v32 and v33 QA flags.",
+        "focusedPushRun": 45013555198,
+        "focusedPrRun": 45013578930,
+        "supervisorRun": 45013578896,
+        "focusedAndSupervisorStatus": "completed_success",
+        "focusedArtifactId": 14751206543,
+        "actualGodotOriginalPngs": 8,
+        "sameCameraPairs": 4,
+        "seenVisualStatus": "PASS for technically less over-bright ground and visible storefront props; FAIL for professional architectural/visual art.",
+        "brightGroundRatioByView": {
+          "road": {
+            "v32": 0.3333,
+            "v33": 0.1422
+          },
+          "cross": {
+            "v32": 0.1404,
+            "v33": 0.0666
+          },
+          "park": {
+            "v32": 0.3706,
+            "v33": 0.0478
+          },
+          "facades": {
+            "v32": 0.219,
+            "v33": 0.0184
+          }
+        },
+        "groundCollisionRays": 14,
+        "realLicensedProps": 24,
+        "authoredFrontages": 11,
+        "newPublicInteriors": 0,
+        "newProductionGameplayChanges": 0,
+        "fullGodotCIAtInitialHandoff": "in_progress",
+        "fullProjectChromeWebGLVerified": false,
+        "realWindowsGpuFPSVerified": false
+      }
     }
   },
   "gates": [
@@ -831,8 +932,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "passed_current_sha_engine_and_wearable_render_only",
-      "why": "PR #45 SHA 5af61bc: focused authentic CC0 65-joint clothing source/5-pose rendered pairs PR CI #44747482726, push #44747428071, full Godot game PR #44747482752, push #44747428072, supervisor #44747482682 all completed/success. This is not production game/visual acceptance."
+      "state": "focused_pass_full_ci_in_progress",
+      "why": "V0.34 PR #48 SHA 361e269 focused genuine Godot 4.7.2 8 real screenshot A/B push #45013555198 and PR #45013578930 PASS, supervisor #45013578896 PASS. Full Godot historic regression #45013578952 still in progress at first snapshot. V0.32 full same-head CI PASS. Default production map is not expanded."
     },
     {
       "id": "WebGL-browser",
@@ -842,7 +943,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "V0.31 10 real Godot outfit screenshots prove separately skinned compatible shirt/trousers/shoes move with 65-joint UAL full-body animation, but peasant fantasy outfit is incompatible with desired modern urban civilian appearance, potential intersections and shoe contacts unverified. Do not promote candidate to player."
+      "why": "V0.34 four real same-camera V32/V34 screenshots demonstrate reduced washed-out ground and 24 extra Kenney CC0 fixtures but boxy city facades and broad empty lots remain clearly inadequate. Legacy V0.31 clothing not urban. Human art approval FAIL."
     },
     {
       "id": "Windows-RTX3060",
@@ -852,7 +953,7 @@
     {
       "id": "Release",
       "state": "not_ready",
-      "why": "Only old V0.18 isolated Web export and technical draft V0.31 wardrobe. Required actual browser/real input, modern clothing art, foot contact and Windows GPU gates remain open."
+      "why": "V0.34 optional, unmerged draft map art QA; production map remains V0.31 and only verified compiled Web package V0.18. Real input, modern facades, usable building interiors, Chrome and RTX3060 not approved."
     },
     {
       "id": "Workflow-no-automatic-publication",
@@ -861,19 +962,19 @@
     }
   ],
   "nextActions": [
-    "Choose/author actually contemporary CC0 daily clothing, shoes, hair on proven 65-bone compatible universal rig; do not reuse fantasy/peasant V0.31 outfit as final art. Preserve pinned source/65-joint parent audit, UAL rotation and pelvis translation, produce real render and inspect penetration & silhouette.",
-    "Run game-state-safe isolated CityPlayer preview with real input-driven Idle/Walk/Turn/Stop/Jog, blend and grounded skinned shoe sole trajectories, then assess camera, interaction and scene lighting on continuous video. Do not integrate unapproved costume into production.",
-    "User can inspect/download verified current V0.18 Web build from main lifesim/play-v18/ or conversation-local Windows localhost launcher. Public GitHub Pages live URL and Chrome gameplay remain unverified; do not claim online playable V0.31. Canonical main HTML S0-S5 pending.",
-    "Keep PR #45 draft, all art/issues #10/#12/#15/#18 open, no auto merge/publish/fee, no changes to other projects. Never push old V0.18 branch containing push-to-main Web auto-publication.",
-    "Windows RTX3060 1080p FPS/input latency/collision and real Chrome browser control, local clock/economy/save must pass before releasing a playable updated version."
+    "NEXT: Stop adding low-value decorative boxes/planters; find/author properly licensed realistic modern building and street-ground-floor modules with varied facades and actual coherent entrances/interior thresholds. Test ONE high-quality connected 1–2-block art slice under the same camera, not further overall map growth.",
+    "After authentic geometry passes human visual review, enforce pedestrian-access, door/collision, functional interiors and real walking/stop/turn path in city; keep old V0.32 ~2x QA geometry only. Add LOD/instancing/perf budgets and Windows RTX3060 1080p frame evidence before expansion.",
+    "Stabilize asset acquisition: Quaternius animation file now has a live release SHA-pinned alternate mirror; compatible Base currently restored from project-owned prior CI artifact that expires. Preserve exact digests; do not rely on deleted elderforge mirror or disable SHA validation.",
+    "Continue V0.29 65-bone compatible animation and civilian urban clothing constraints. No final character art or shoe sole/contact pass.",
+    "Main lifesim/index.html still absent, HTML S0-S5 pending; only existing V0.18 Web export actually stored. Do not claim V0.34 published/interactive browser. Zero fee, no merge/release, #10/#12/#15/#18 open, do not push unsafe old V0.18 auto-deploy branch."
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-20 independently read main Web build-info, PR #45 head, all 5 same-SHA CI completions, downloaded artifact #14633412999 and viewed real 5x2 outfit contact sheet; main handoff updated with exact evidence.",
+    "freshness": "2026-11-22 independently verified PR #48 head, CI focused push #45013555198 and PR #45013578930/supervisor #45013578896 successes, downloaded artifact #14751206543 and manually opened 8 authentic PNGs; full PR Godot #45013578952 still running at this snapshot.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "2026-11-20 V0.31 PR #45 SHA 5af61bc: five CI runs PASS; 9 pinned CC0 source inputs checked, 3 outfit mesh skins have 65/65 bone hierarchy; 10 actual Godot base/outfit frames reviewed. Technical clothing motion PASS, urban civilian art FAIL. V0.18 web files/zip verified but public Pages online playback and Windows launcher unverified. No production update/merge/publish."
+    "latestRound": "V0.32 physical north extension 33,998m2, 11 authored zoning lots and 20 ground collision samples technical PASS but visually blocky. V0.33 built 11 fronts+24 Kenney CC0 props, recovered deleted binary mirrors, QA harness failed. V0.34 PR #48 exact 361e269, 4 real same-camera V0.32/V0.34 screenshot pairs focused CI and supervisor PASS, ground highlights reduced, but human art still FAIL and no production map/Web update."
   }
 }
