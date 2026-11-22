@@ -37,83 +37,64 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.38 exact real CityPlayer actual physical W/A/D/S input from north sidewalk into V0.37 shop and back; QA-only",
-      "pr": 52,
-      "url": "https://github.com/ruabie/moci-cet4/pull/52",
+      "version": "V0.39 genuine original third-person CityPlayer camera rear-wall collision safety QA; PHYSICS PASS, visual usability FAIL",
+      "pr": 53,
+      "url": "https://github.com/ruabie/moci-cet4/pull/53",
       "state": "open",
       "draft": true,
       "merged": false,
-      "headBranch": "lifesim-v038-real-cityplayer-shop-input-qa",
-      "headSha": "3ebd8acea9616be295cb8ef56ebb2f9f8a73ab86",
-      "baseBranch": "lifesim-v037-walkable-shop-threshold-qa",
-      "qaFlag": "application/config/v38_real_player_route_qa",
-      "firstFailedHead": "ff042c1fb3cfa83ef2add6cc99ec8c3a6a0d2850",
-      "firstFailedPushCI": 45022580037,
-      "firstFailedPrCI": 45022602439,
-      "firstFailedArtifact": 14754248663,
-      "firstFailure": "Real ground-hugging CityPlayer blocked at x=-17.036 (from -13.750) after 175 physical W-key ticks by V0.37 solid 12cm decorative sill and raised interior floor; prior floating physics proxy missed it.",
-      "boundedRepair1": "cf8c321839c69cbb08019625c10f488a5108112c",
-      "repair1": "Decorative sill visible but non-collidable; real interior floor collision remains and top lowered below public pavement; all shelving/counter/walls colliders retained.",
-      "boundedRepair2": "3ebd8acea9616be295cb8ef56ebb2f9f8a73ab86",
-      "repair2": "Test-only A-release input queue separation and 14-frame D physical key verification (no Input.action_press fallback); earlier D immediate-assertion failure recorded",
+      "headBranch": "lifesim-v039-real-camera-occlusion-qa",
+      "headSha": "0925394389eedacf4c1ce1c028922182ed60e5b1",
+      "baseBranch": "lifesim-v038-real-cityplayer-shop-input-qa",
+      "firstFailedHeadSha": "96ab7b5aa70d3e807e82fcb34a0304a66fe58dfd",
+      "firstFailedFocusedPushCI": 45025521030,
+      "firstFailedArtifactId": 14755194459,
+      "firstFailure": "Original camera target sphere cast passed but smooth interpolation to aim penetrated real shop rear wall in transitional frames; actual camera collider overlap >0 at old exact SHA.",
+      "repair1Sha": "d091df0a251e5171d9b3edf7524ce167f62653f1",
+      "repair1": "The original physical camera sweep now additionally checks final SMOOTHED camera candidate from pivot, clamps safely before rendering; all scene collisions remain real.",
+      "repair1FocusedPushCI": 45025756124,
+      "repair1ArtifactId": 14755638448,
+      "repair1AuditFailure": "Godot passed true 42 camera occlusion activations and 0 overlaps but Python incorrectly required wall_distance>0.35m; actual wall at 0.3393m. Original raw renders archived.",
+      "repair2Sha": "0925394389eedacf4c1ce1c028922182ed60e5b1",
+      "repair2": "Audit corrects non-safety lower obstacle-distance bound to 0.20m. Retains named authentic solid rear wall, collision activations, 0 sampled overlap, radius recovery and 5 true screenshot checks.",
       "repairsUsed": 2,
-      "focusedPushCI": 45023100693,
-      "focusedPrCI": 45023106654,
+      "focusedPushCI": 45025977376,
+      "focusedPrCI": 45025983015,
       "focusedStatus": "completed_success",
-      "v034RegressionCI": 45023106644,
-      "v035RegressionCI": 45023106611,
-      "v036RegressionCI": 45023106626,
-      "v037RegressionCI": 45023106629,
-      "regressionStatus": "completed_success",
-      "supervisorCI": 45023106656,
+      "fullGodotCI": 45025983134,
+      "fullGodotStatus": "in_progress_at_snapshot",
+      "supervisorCI": 45025983032,
       "supervisorStatus": "completed_success",
-      "fullGodotCI": 45023106727,
-      "fullGodotStatus": "completed_success",
-      "realGodotArtifactId": 14754294365,
+      "realGodotArtifactId": 14756015186,
       "realScreenshotCount": 5,
-      "actualAvatarClass": "CityPlayer extends CharacterBody3D; genuine original skinned avatar + ThirdPersonCamera",
-      "actualInputPath": "Input.parse_input_event physical KEY_W/A/D/S -> existing InputMap -> CityPlayer._physics_process / move_and_slide (no direct position edits after QA initial spawn)",
-      "actualPlayerMeasured": {
-        "streetStart": [
-          -13.75,
-          0.0002,
-          116
-        ],
-        "inside": [
-          -22.7962,
-          0.0351,
-          116
-        ],
-        "streetReturn": [
-          -12.4131,
-          0.0008,
-          117.0293
-        ],
-        "forwardWFrames": 123,
-        "returnSFrames": 136,
-        "groundedForwardFrames": 123,
-        "weightedAnimationForwardFrames": 119,
-        "originalPlayerTotalPhysicsFrames": 616,
-        "actualForwardMetres": 9.04630565643311,
-        "AChangedFacingRadians": 1.30793452262878,
-        "DObserved": true,
-        "DStrafeMetres": 0.751121520996094,
-        "maxAnkleReferenceVsIdleMetres": 0.0703715083003044,
-        "cameraCollisionActivations": 0,
-        "initialQaSpawnOnly": true,
-        "avatarPositionWrittenAfterSpawn": false
+      "originalNorthLots": 11,
+      "actualCharacterClass": "CityPlayer; original ThirdPersonCamera, original W/S key route",
+      "cameraWallEvidence": {
+        "realWorldCollider": "Solid_rear_retail_wall",
+        "rearWallDistanceFromPivotM": 0.339329719543457,
+        "unobstructedRequestedCameraDistanceM": 4.69815349578857,
+        "physicalSphereSweepCollisionActivations": 42,
+        "numberOfSampledCollisionOverlaps": 0,
+        "actualOccludedCameraDistanceM": 0.0983215421438217,
+        "actualRecoveredCameraDistanceM": 4.69666576385498,
+        "unchangedSameScenePlayerWFrames": 124,
+        "physicsCharacterWalkedInsideAndBackOut": true,
+        "beforeAfterRealImageFractionChanged": 0.524137,
+        "cameraYawDirectlySetByDiagnosticHarness": true,
+        "humanMouseHardwareUntested": true
       },
-      "sourceGLBOriginLicense": "Supplier-claimed CC0 3 original source modules hash-pinned, build-time Godot conversion only",
-      "original11NorthLotsPreserved": true,
-      "finalVisualAssessment": "FAIL: actual Godot screenshots show mostly blank shop interior, sparse flat retail, incongruent dark original facade, Chinese HUD missing glyphs.",
-      "fullCameraObstacleReactionProven": false,
-      "fullShoeSoleContactOrIKProven": false,
-      "fullUserKeyboardHardwarePlaythrough": false,
-      "productionWorkOrPurchaseConnected": false,
-      "chromeBrowserVerified": false,
-      "windowsRtx3060Verified": false,
-      "releaseReady": false,
-      "fullGodotCompletedAt": "2026-11-22T12:40:52Z"
+      "actualIndependentHumanImageReview": "FAIL. At close rear wall camera radius about 0.10m causes gigantic avatar hair/head to occlude most of viewport; no physical wall penetration but camera experience unusable. Original other PNGs show blank shop, dark/pale city mismatch and Chinese HUD square glyphs.",
+      "actualChineseFontFilePresentInSourceTree": false,
+      "actualMissingFontPath": "res://art/fonts/NotoSansCJKsc-Regular.otf",
+      "productionPlayerChanged": "Only camera post-smoothing collision safety; default motion unchanged.",
+      "originalHumanHardwareValidated": false,
+      "chromeWebGLValidated": false,
+      "windowsRtx3060PerformanceValidated": false,
+      "professionalArtApproved": false,
+      "cameraVisualUsabilityApproved": false,
+      "fullAvatarMeshSoleIKApproved": false,
+      "shopCommerceConnected": false,
+      "releaseReady": false
     },
     "issues": [
       {
@@ -1177,6 +1158,85 @@
       "browserVerified": false,
       "windowsRtx3060Verified": false,
       "releaseReady": false
+    },
+    "previousCandidateV038": {
+      "version": "V0.38 exact real CityPlayer actual physical W/A/D/S input from north sidewalk into V0.37 shop and back; QA-only",
+      "pr": 52,
+      "url": "https://github.com/ruabie/moci-cet4/pull/52",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "headBranch": "lifesim-v038-real-cityplayer-shop-input-qa",
+      "headSha": "3ebd8acea9616be295cb8ef56ebb2f9f8a73ab86",
+      "baseBranch": "lifesim-v037-walkable-shop-threshold-qa",
+      "qaFlag": "application/config/v38_real_player_route_qa",
+      "firstFailedHead": "ff042c1fb3cfa83ef2add6cc99ec8c3a6a0d2850",
+      "firstFailedPushCI": 45022580037,
+      "firstFailedPrCI": 45022602439,
+      "firstFailedArtifact": 14754248663,
+      "firstFailure": "Real ground-hugging CityPlayer blocked at x=-17.036 (from -13.750) after 175 physical W-key ticks by V0.37 solid 12cm decorative sill and raised interior floor; prior floating physics proxy missed it.",
+      "boundedRepair1": "cf8c321839c69cbb08019625c10f488a5108112c",
+      "repair1": "Decorative sill visible but non-collidable; real interior floor collision remains and top lowered below public pavement; all shelving/counter/walls colliders retained.",
+      "boundedRepair2": "3ebd8acea9616be295cb8ef56ebb2f9f8a73ab86",
+      "repair2": "Test-only A-release input queue separation and 14-frame D physical key verification (no Input.action_press fallback); earlier D immediate-assertion failure recorded",
+      "repairsUsed": 2,
+      "focusedPushCI": 45023100693,
+      "focusedPrCI": 45023106654,
+      "focusedStatus": "completed_success",
+      "v034RegressionCI": 45023106644,
+      "v035RegressionCI": 45023106611,
+      "v036RegressionCI": 45023106626,
+      "v037RegressionCI": 45023106629,
+      "regressionStatus": "completed_success",
+      "supervisorCI": 45023106656,
+      "supervisorStatus": "completed_success",
+      "fullGodotCI": 45023106727,
+      "fullGodotStatus": "completed_success",
+      "realGodotArtifactId": 14754294365,
+      "realScreenshotCount": 5,
+      "actualAvatarClass": "CityPlayer extends CharacterBody3D; genuine original skinned avatar + ThirdPersonCamera",
+      "actualInputPath": "Input.parse_input_event physical KEY_W/A/D/S -> existing InputMap -> CityPlayer._physics_process / move_and_slide (no direct position edits after QA initial spawn)",
+      "actualPlayerMeasured": {
+        "streetStart": [
+          -13.75,
+          0.0002,
+          116
+        ],
+        "inside": [
+          -22.7962,
+          0.0351,
+          116
+        ],
+        "streetReturn": [
+          -12.4131,
+          0.0008,
+          117.0293
+        ],
+        "forwardWFrames": 123,
+        "returnSFrames": 136,
+        "groundedForwardFrames": 123,
+        "weightedAnimationForwardFrames": 119,
+        "originalPlayerTotalPhysicsFrames": 616,
+        "actualForwardMetres": 9.04630565643311,
+        "AChangedFacingRadians": 1.30793452262878,
+        "DObserved": true,
+        "DStrafeMetres": 0.751121520996094,
+        "maxAnkleReferenceVsIdleMetres": 0.0703715083003044,
+        "cameraCollisionActivations": 0,
+        "initialQaSpawnOnly": true,
+        "avatarPositionWrittenAfterSpawn": false
+      },
+      "sourceGLBOriginLicense": "Supplier-claimed CC0 3 original source modules hash-pinned, build-time Godot conversion only",
+      "original11NorthLotsPreserved": true,
+      "finalVisualAssessment": "FAIL: actual Godot screenshots show mostly blank shop interior, sparse flat retail, incongruent dark original facade, Chinese HUD missing glyphs.",
+      "fullCameraObstacleReactionProven": false,
+      "fullShoeSoleContactOrIKProven": false,
+      "fullUserKeyboardHardwarePlaythrough": false,
+      "productionWorkOrPurchaseConnected": false,
+      "chromeBrowserVerified": false,
+      "windowsRtx3060Verified": false,
+      "releaseReady": false,
+      "fullGodotCompletedAt": "2026-11-22T12:40:52Z"
     }
   },
   "gates": [
@@ -1187,8 +1247,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "passed_current_sha_full_engine_qa_only",
-      "why": "At exact V0.38 SHA 3ebd8acea9616be295cb8ef56ebb2f9f8a73ab86, full Godot engine #45023106727 completed/success at 2026-11-22T12:40:52Z; focused original CityPlayer action-input render Push #45023100693, PR #45023106654, V0.34–V0.37 regressions and supervisor all completed/success. No art, camera obstacle, Chrome, hardware or commerce signoff."
+      "state": "pending_current_sha_full_engine",
+      "why": "Exact V0.39 SHA 09253943 focused real camera original Godot PR #45025983015 and Push #45025977376 completed/success; full Godot smoke #45025983134 in_progress at snapshot. Do not assert complete engine gate until finished. Historical V0.38 full Godot #45023106727 passed at previous SHA."
     },
     {
       "id": "WebGL-browser",
@@ -1198,7 +1258,7 @@
     {
       "id": "Art-and-animation",
       "state": "blocked_pending_review",
-      "why": "Real CityPlayer 123-tick W and 136-tick S shop roundtrip at original Godot scene PASS, 5 authentic original player camera PNG. But Chinese HUD missing glyphs and hollow room, inconsistent dark facade, animated sole contact/IK and camera obstacle retraction NOT verified (0 activations). Professional art FAIL."
+      "why": "V0.39 realistic camera sphere collision technically no-wall-overlap PASS (42 activations / 0 overlaps) with real 5 original scene PNGs, but original occlusion frame at camera radius 0.098m shows avatar head/hair blocking most of view; camera usability FAIL. Missing tracked CJK bundled font causes box glyphs in actual screenshots; shop art still sparse; sole IK unproven."
     },
     {
       "id": "Windows-RTX3060",
@@ -1208,7 +1268,7 @@
     {
       "id": "Release",
       "state": "not_ready",
-      "why": "V0.38 #52 draft/unmerged/QA-only: full Godot+focused CI PASS but HUD missing CJK glyphs, sparse interiors, camera sweep obstacle encounter not verified, shoe-sole IK unverified. No production POI/job/payment, Chrome WebGL or Windows RTX3060 hardware evidence. Main HTML S0–S5 pending, only V0.18 isolated Web stored. Not ready."
+      "why": "V0.39 draft PR #53 unmerged, QA-only, free focused technical physics PASS but camera perceptual FAIL, missing CJK HUD and weak interiors; exact full engine #45025983134 pending. Original HTML S0–S5 pending, V0.18 only isolated Web, no Chrome/Windows RTX3060 or real commerce/IK proof. No auto merge or publish."
     },
     {
       "id": "Workflow-no-automatic-publication",
@@ -1234,22 +1294,28 @@
       "id": "V038-actual-cityplayer-wasd-route-qa",
       "state": "passed_input_path_only",
       "why": "Exact focused PR #45023106654 and Push #45023100693 completed/success at head 3ebd8acea. 5 real original Godot CityPlayer camera PNGs and 14,879-byte input/position trace show physical W 123 ticks traversed 9.0463m into original shop, natural stop, A turn 1.3079 radians, physical D observed, S 136 ticks walked back out without changing position after initial QA spawn. Not human Windows/Chrome, camera occlusion or art acceptance."
+    },
+    {
+      "id": "V039-real-original-camera-rear-wall-sphere-sweep",
+      "state": "passed_physics_only_visual_fail",
+      "why": "At exact SHA 09253943 Godot full original scene CityPlayer camera rear wall collider Solid_rear_retail_wall verified with ray at 0.3393m; 42 sphere-sweep hits/0 overlap across obstruction, pulled to 0.0983m, restored to 4.6967m, 5 actual player camera PNGs, focused PR #45025983015/Push #45025977376 completed success. Visual usability FAIL: huge clipped avatar hair blocks interior at 0.098m."
     }
   ],
   "nextActions": [
-    "NEXT: Prove/repair actual CityPlayer third-person camera sphere-sweep retraction on a deliberately obstructed interior/door-camera line, with true same-tick Godot images and measurable wall avoidance; cameraCollisionActivations=0 on V0.38 route provides NO positive occlusion evidence.",
-    "Repair visibly missing Chinese HUD glyphs in actual original Godot CI screenshots; verify bundled font license/presence and independent rendered text screenshot, not a font existence claim. Improve modern daytime unified storefront/interior art only after evidence.",
-    "After real camera + HUD, connect one actual walkable shop POI and real earned/spent currency with idempotent transactions and save; avoid copying low-quality structures or adding map area before user aesthetic approval.",
-    "Preserve fixed source digests/zero fee, avoid runtime downloads and soon-expiring old CI-only Quaternius Base GLB; never auto merge/release, never push V0.18 unsafe auto-deploy branch.",
-    "Main lifesim/index.html absent, S0–S5 pending; only V0.18 Web artifacts verified; Windows RTX3060 and Chrome WebGL still unverified. #10/#12/#15/#18 remain open."
+    "NEXT: A new bounded V0.40 QA-only art/camera candidate must handle avatar head/hair occlusion when camera's actual wall-safe distance drops below ~0.7m; avoid instant full avatar disappearance or disabling wall collision. Prove original in/out physical W/S, real same-scene camera sphere overlap 0 and genuinely usable inside-close-wall PNGs before any city expansion.",
+    "Fix deterministic Chinese HUD square glyphs: repo original tracked art/fonts/NotoSansCJKsc-Regular.otf absent despite main.gd loading it. Acquire verifiably licensed and pinned local CJK OTF/TTF (no network at runtime), physically bundle into engine/Web export and verify real rendered glyph screenshot; don't assume Linux system font fallback is viable.",
+    "Check exact V0.39 SHA 09253943 full Godot engine smoke #45025983134 when completed; focused camera CI passed but full engine remains pending at this recorded snapshot.",
+    "Only after camera visual and CJK HUD successful, refine one coherent realistic modern shop interior and connect an actual POI and earned/spent balance with idempotent tests and save. No 11-lot low-quality replication.",
+    "Original GLB 3-source CC0 supplier assertion and SHA pin remain, old Quaternius Base restored from expiring CI artifact: stabilize free reproducible source without disabling validation or runtime downloads. Keep zero fee, no merge/release, never push dangerous V0.18 auto deployment branch.",
+    "Main lifesim/index.html still absent, main HTML S0–S5 pending and only isolated V0.18 Web verified; Chrome WebGL/Windows RTX3060 and actual human-mouse hardware unverified. Open issues #10/#12/#15/#18 retained."
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-22 verified exact V0.38 PR#52 SHA 3ebd8acea... focused PR #45023106654 Push #45023100693, V0.34/35/36/37 regressions, supervisor, AND full Godot #45023106727 all completed/success. Full Godot completed at 2026-11-22T12:40:52Z. Five actual player camera screenshots and input JSON independently inspected; art/HUD/camera-occlusion and Windows/Chrome still blocked.",
+    "freshness": "2026-11-22 latest V0.39 QA PR#53 exact SHA 09253943, real Godot 4.7.2 focused Push #45025977376 and PR #45025983015 completed/success. Downloaded artifact #14756015186 and actually opened 5 authentic 1280x720 camera frames. One failed negative first head 96ab7b... with wall penetration #45025521030; bounded camera fix d091df0a and audit cutoff repair 09253943. 42 real sphere sweeps, 0 overlap but camera at 0.098m causes visually unacceptable giant avatar hair. Missing tracked CJK font. Full smoke #45025983134 still in_progress at snapshot; no Web/Windows/art/commerce release.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.38 #52: actual production CityPlayer W=123 frames grounded, 119 weighted gait frames, 9.046m into QA shop, stop, A turn=1.30793 radians, physical D observed, S=136 frames exits, no position writes after initial QA spawn; 616 actual player physics frames. Original 5 Godot player-camera PNGs and JSON available. Real first-fail #45022580037 x=-17.036 at decorative sill; two bounded fixes used. Complete engine #45023106727 now completed/success at exact SHA (verified 2026-11-22T12:40:52Z), no art/Windows/Chrome/retail release signoff. Camera collision activation=0 NOT occlusion proof; Chinese HUD glyphs and empty art FAIL."
+    "latestRound": "V0.39 one original rear-wall camera occlusion QA in real CityPlayer shop. Real source geometry preserved; 5 raw PNGs & metrics. First baseline failed transitional wall penetration. Final corrected two bounded fixes: candidate camera post-smoothing sphere cast + legitimate audit threshold correction. Focused Godot exact SHA success, camera retracted to 0.098m with zero physical overlap, then recovered to 4.697m. Human visual review strongly FAIL: camera behind head/hair, HUD CJK square boxes, empty shop. Full engine #45025983134 running at snapshot. PR#53 remains draft unmerged and unpublished."
   }
 }
