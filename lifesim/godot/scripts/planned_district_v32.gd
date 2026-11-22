@@ -154,6 +154,24 @@ func _building(lot: Dictionary) -> void:
     add_child(root)
     var w:float=float(lot["w"]);var d:float=float(lot["d"])
     var h:float=float(lot["h"]);var floors:int=int(lot["levels"])
+    # V37 QA-only carve-out: a genuinely traversable ground-floor room in
+    # one fixed parcel, not a fake open door painted over a solid collider.
+    # This branch takes precedence over V36 ONLY when both flags opt in.
+    if bool(ProjectSettings.get_setting("application/config/v37_walkable_shop_preview",false)) \
+            and name == "west_homes_a":
+        var room := WalkableShopV37.new()
+        room.name = "V37WalkableGroundRetail"
+        root.add_child(room)
+        room.build_lot(lot)
+        root.set_meta("ground_floor_walkable_qa",true)
+        root.set_meta("upper_floor_exterior_only",true)
+        # Collision is built as partitioned solids inside WalkableShopV37.
+        # NEVER add the old full-footprint box: it blocks the open doorway.
+        _entry_path(lot)
+        statistics["buildings"] = int(statistics.get("buildings",0))+1
+        statistics["v37_traversable_shop_pilots"] = int(statistics.get(
+            "v37_traversable_shop_pilots",0))+1
+        return
     # V36: only one selected lot, using exact-SHA external CC0 facade
     # modules fetched during QA build. Default gameplay remains untouched.
     if bool(ProjectSettings.get_setting("application/config/v36_pinned_facade_preview", false)) \
