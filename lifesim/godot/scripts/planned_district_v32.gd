@@ -154,6 +154,21 @@ func _building(lot: Dictionary) -> void:
     add_child(root)
     var w:float=float(lot["w"]);var d:float=float(lot["d"])
     var h:float=float(lot["h"]);var floors:int=int(lot["levels"])
+    # V35 is deliberately two parcels only. Original QA and all production
+    # geometry are byte-for-byte unchanged without this additional flag.
+    if bool(ProjectSettings.get_setting("application/config/v35_architecture_preview", false)) \
+            and name in ["west_homes_a", "east_library"]:
+        var pilot := ArchitecturalSliceV35.new()
+        pilot.name = "V35Architecture_" + name
+        root.add_child(pilot)
+        pilot.build_lot(lot)
+        # Keep verified V32 collision and actual access path; V35 neither
+        # opens a fake interior nor changes a public routing contract.
+        _collider(root,Vector3(0,h*.5,0),Vector3(w-.4,h,d-.4),name)
+        _entry_path(lot)
+        statistics["buildings"]=int(statistics.get("buildings",0))+1
+        statistics["v35_architecture_pilots"]=int(statistics.get("v35_architecture_pilots",0))+1
+        return
     # Existing sky/tonemap washes light base materials nearly white.
     # Darker, locally-authored wall pigment preserves material contrast in QA.
     var wall:String=Color(str(lot["facade"])).darkened(.17).to_html(false)
