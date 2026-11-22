@@ -373,6 +373,23 @@ jobs:
             test -s "$PROJECT_DIR/tests/v32_${f}.png"
           done
 
+      - name: V0.33 compare four real V32/V33 streetscape and lighting camera pairs
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=10s 150s \
+            xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v33_streetscape.gd 2>&1 | tee godot-v33-art-review.log
+          grep -F 'V33 REAL STREETSCAPE AB RENDER PASS:' godot-v33-art-review.log
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/assemble_v33_ab.py" | tee v33-real-pixel-audit.log
+          grep -F 'V33 SAME-CAMERA TRUE RENDER PIXEL GATE PASS:' v33-real-pixel-audit.log
+          test -s "$PROJECT_DIR/tests/v33_8_frame_AB_streetscape_review.jpg"
+          test -s "$PROJECT_DIR/tests/v33_actual_environment_metrics.json"
+
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
@@ -408,6 +425,11 @@ jobs:
             godot-v26-rig-review.log
             v32-plan-audit.log
             godot-v32-north-spatial.log
+            godot-v33-art-review.log
+            v33-real-pixel-audit.log
+            lifesim/godot/tests/v33_*.png
+            lifesim/godot/tests/v33_*.json
+            lifesim/godot/tests/v33_*.jpg
             lifesim/godot/tests/v32_*.png
             lifesim/godot/tests/v32_*.json
             godot-v27-track-inventory.log
