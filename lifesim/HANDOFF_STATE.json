@@ -62,7 +62,7 @@
       "focusedPrCI": 45025983015,
       "focusedStatus": "completed_success",
       "fullGodotCI": 45025983134,
-      "fullGodotStatus": "in_progress_at_snapshot",
+      "fullGodotStatus": "completed_success",
       "supervisorCI": 45025983032,
       "supervisorStatus": "completed_success",
       "realGodotArtifactId": 14756015186,
@@ -94,7 +94,8 @@
       "cameraVisualUsabilityApproved": false,
       "fullAvatarMeshSoleIKApproved": false,
       "shopCommerceConnected": false,
-      "releaseReady": false
+      "releaseReady": false,
+      "fullGodotCompletedAt": "2026-11-22T13:14:28Z"
     },
     "issues": [
       {
@@ -1247,8 +1248,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "pending_current_sha_full_engine",
-      "why": "Exact V0.39 SHA 09253943 focused real camera original Godot PR #45025983015 and Push #45025977376 completed/success; full Godot smoke #45025983134 in_progress at snapshot. Do not assert complete engine gate until finished. Historical V0.38 full Godot #45023106727 passed at previous SHA."
+      "state": "passed_current_sha_full_engine_qa_only",
+      "why": "At exact V0.39 head SHA 0925394389eedacf4c1ce1c028922182ed60e5b1, focused real camera original Godot PR #45025983015 and Push #45025977376 completed/success, and full Godot engine smoke #45025983134 completed/success at 2026-11-22T13:14:28Z. Godot technical QA only, camera near-avatar head visually unplayable, HUD missing glyphs and Windows/Chrome/human mouse unverified."
     },
     {
       "id": "WebGL-browser",
@@ -1268,7 +1269,7 @@
     {
       "id": "Release",
       "state": "not_ready",
-      "why": "V0.39 draft PR #53 unmerged, QA-only, free focused technical physics PASS but camera perceptual FAIL, missing CJK HUD and weak interiors; exact full engine #45025983134 pending. Original HTML S0–S5 pending, V0.18 only isolated Web, no Chrome/Windows RTX3060 or real commerce/IK proof. No auto merge or publish."
+      "why": "V0.39 #53 draft/unmerged QA-only, same SHA focused camera physics + full Godot engine CI completed/success, but camera near wall at 0.098m covers screen with avatar hair, HUD CJK squares, weak retail art. Source font absent, exact shoe-sole IK/Windows/Chrome/commerce unknown. HTML S0–S5 pending, V0.18 only isolated Web. Not ready."
     },
     {
       "id": "Workflow-no-automatic-publication",
@@ -1304,7 +1305,6 @@
   "nextActions": [
     "NEXT: A new bounded V0.40 QA-only art/camera candidate must handle avatar head/hair occlusion when camera's actual wall-safe distance drops below ~0.7m; avoid instant full avatar disappearance or disabling wall collision. Prove original in/out physical W/S, real same-scene camera sphere overlap 0 and genuinely usable inside-close-wall PNGs before any city expansion.",
     "Fix deterministic Chinese HUD square glyphs: repo original tracked art/fonts/NotoSansCJKsc-Regular.otf absent despite main.gd loading it. Acquire verifiably licensed and pinned local CJK OTF/TTF (no network at runtime), physically bundle into engine/Web export and verify real rendered glyph screenshot; don't assume Linux system font fallback is viable.",
-    "Check exact V0.39 SHA 09253943 full Godot engine smoke #45025983134 when completed; focused camera CI passed but full engine remains pending at this recorded snapshot.",
     "Only after camera visual and CJK HUD successful, refine one coherent realistic modern shop interior and connect an actual POI and earned/spent balance with idempotent tests and save. No 11-lot low-quality replication.",
     "Original GLB 3-source CC0 supplier assertion and SHA pin remain, old Quaternius Base restored from expiring CI artifact: stabilize free reproducible source without disabling validation or runtime downloads. Keep zero fee, no merge/release, never push dangerous V0.18 auto deployment branch.",
     "Main lifesim/index.html still absent, main HTML S0–S5 pending and only isolated V0.18 Web verified; Chrome WebGL/Windows RTX3060 and actual human-mouse hardware unverified. Open issues #10/#12/#15/#18 retained."
@@ -1313,9 +1313,9 @@
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-22 latest V0.39 QA PR#53 exact SHA 09253943, real Godot 4.7.2 focused Push #45025977376 and PR #45025983015 completed/success. Downloaded artifact #14756015186 and actually opened 5 authentic 1280x720 camera frames. One failed negative first head 96ab7b... with wall penetration #45025521030; bounded camera fix d091df0a and audit cutoff repair 09253943. 42 real sphere sweeps, 0 overlap but camera at 0.098m causes visually unacceptable giant avatar hair. Missing tracked CJK font. Full smoke #45025983134 still in_progress at snapshot; no Web/Windows/art/commerce release.",
+    "freshness": "2026-11-22 V0.39 PR #53 exact head 09253943 same SHA focused Push #45025977376 and PR #45025983015 plus complete engine #45025983134 ALL completed/success (last verified 2026-11-22T13:14:28Z). 5 real original player camera 1280x720 PNGs inspected from artifact #14756015186; rear wall sphere-sweep 42 hits, 0 overlaps, camera retract to 0.098m, restore to 4.697m. Human camera visual QA FAIL (avatar hair blocks view). HUD CJK/font, sparse retail and Chrome/RTX3060/human mouse/IK/retail remain blocked; no auto merge/release.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.39 one original rear-wall camera occlusion QA in real CityPlayer shop. Real source geometry preserved; 5 raw PNGs & metrics. First baseline failed transitional wall penetration. Final corrected two bounded fixes: candidate camera post-smoothing sphere cast + legitimate audit threshold correction. Focused Godot exact SHA success, camera retracted to 0.098m with zero physical overlap, then recovered to 4.697m. Human visual review strongly FAIL: camera behind head/hair, HUD CJK square boxes, empty shop. Full engine #45025983134 running at snapshot. PR#53 remains draft unmerged and unpublished."
+    "latestRound": "V0.39 one original rear-wall camera occlusion QA in real CityPlayer shop. Real source geometry preserved; 5 raw PNGs & metrics. First baseline failed transitional wall penetration. Final corrected two bounded fixes: candidate camera post-smoothing sphere cast + legitimate audit threshold correction. Focused Godot exact SHA success, camera retracted to 0.098m with zero physical overlap, then recovered to 4.697m. Human visual review strongly FAIL: camera behind head/hair, HUD CJK square boxes, empty shop. Full engine #45025983134 completed/success at exact head (confirmed 2026-11-22T13:14:28Z), no professional art, human mouse, Chrome/RTX3060 release approval. PR#53 remains draft unmerged and unpublished."
   }
 }
