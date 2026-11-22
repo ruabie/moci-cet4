@@ -64,7 +64,7 @@
       "supervisorCI": 45017894724,
       "supervisorStatus": "completed_success",
       "fullGodotPrCI": 45017894739,
-      "fullGodotStatus": "in_progress_at_snapshot",
+      "fullGodotStatus": "completed_success",
       "sourceModels": 3,
       "sourceOriginalBytesVerified": 8444096,
       "sourceManifest": "lifesim/godot/credits/TEVY_V36_SOURCE.json",
@@ -87,7 +87,8 @@
       "productionWebUpdated": false,
       "chromeVerified": false,
       "windowsPerformanceVerified": false,
-      "releaseReady": false
+      "releaseReady": false,
+      "fullGodotCompletedAt": "2026-11-22T11:38:21Z"
     },
     "issues": [
       {
@@ -1033,8 +1034,8 @@
     },
     {
       "id": "Godot-functional-QA",
-      "state": "pending",
-      "why": "V0.36 SHA 564164aa focused Godot import/render PR #45017894727 and Push #45017890677, V0.34 and V0.35 regression and supervisor pass. Full current-head Godot CI #45017894739 still in_progress at snapshot; cannot claim full regression PASS. Prior V0.35 #45016938779 completed/success."
+      "state": "passed_current_sha_engine_and_qa_only_art",
+      "why": "Exact V0.36 SHA 564164aa focused GLB-source/render PR #45017894727 and Push #45017890677, full Godot engine #45017894739, V0.34 #45017894735, V0.35 #45017894774, supervisor #45017894724 all completed/success. This is CI engine/scene QA only, NOT professional art, real Chrome browser or Windows RTX3060 benchmark."
     },
     {
       "id": "WebGL-browser",
@@ -1054,7 +1055,7 @@
     {
       "id": "Release",
       "state": "not_ready",
-      "why": "V0.36 #50 QA-only unmerged, only one experimental building, visual art fail and complete engine CI #45017894739 pending at snapshot. Main HTML entry missing and S0–S5 pending; only isolated V0.18 Web export known. Browser, Windows GPU and independent user walkthrough unverified."
+      "why": "V0.36 #50 draft unmerged and QA-only; full engine and source-art focused CI passed, but professional architecture art FAIL, usable interiors/continuous navigation absent. Main HTML S0-S5 pending, only V0.18 isolated Web verified. Chrome/Windows unverified."
     },
     {
       "id": "Workflow-no-automatic-publication",
@@ -1074,7 +1075,6 @@
   ],
   "nextActions": [
     "NEXT: Do NOT clone the dark V0.36 facade around the city. Select one coherent modern daytime urban visual direction and licensed complementary modules covering front, side, rear, ground-floor threshold and real traversable interiors; test coherent 1–2 adjoining lots, with real Godot images and continuous player approach before expansion.",
-    "Check exact current-head full Godot engine CI #45017894739 before upgrading overall engine gate. The V0.36 meshopt/quantization first failure (artifact #14752740753) and bounded successful repair are verified; no additional blind fixes or paid source.",
     "Keep 18 Tevy asset instances QA-only, preserve exact source SHA and decoded conversion path. Build-time source/copy archival must be stabilized before reproducible long-term release; no network at runtime.",
     "Continue V0.29 65-bone compatible animation and civilian urban clothing constraints. No final character art or shoe sole/contact pass.",
     "Main lifesim/index.html still absent, HTML S0-S5 pending; only existing V0.18 Web export actually stored. Do not claim V0.34 published/interactive browser. Zero fee, no merge/release, #10/#12/#15/#18 open, do not push unsafe old V0.18 auto-deploy branch."
@@ -1083,9 +1083,9 @@
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-22 V0.36 #50 exact head 564164aa... source integrity+conversion 3 CC0 originals, focused Godot PR #45017894727 Push #45017890677, prior V0.34 #45017894735 V0.35 #45017894774 and supervisor #45017894724 all completed/success. Original 4 PNG from artifact #14752462358 downloaded and manually inspected. Professional art FAIL. Full engine #45017894739 in_progress at snapshot.",
+    "freshness": "2026-11-22 PR #50 exact V0.36 SHA 564164aa7ceb... full Godot engine #45017894739 now completed/success (confirmed 2026-11-22T11:38:21Z). Focused PR #45017894727, push #45017890677, V0.34 #45017894735, V0.35 #45017894774, supervisor #45017894724 likewise completed/success; 4 original Godot screenshots inspected. Daytime coherent architecture art still FAIL; Chrome/Web/Windows unverified.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "V0.36 QA-only one housing 6-floor/18 GLB urban frontage pilot. First failed head 8a6798... had unsupported EXT_meshopt_compression and KHR_mesh_quantization in exact-SHA source. Bounded conversion commit 564164aa decodes/dequantizes build-time; focused PR/push real Godot renderer passes. Four raw screenshots show actual details but dark cyberpunk facade mismatches pale city; exterior-only, no live browser, Windows RTX3060, or production release. Draft PR#50 open."
+    "latestRound": "V0.36 QA-only one housing 6-floor/18 GLB urban frontage pilot. First failed head 8a6798... had unsupported EXT_meshopt_compression and KHR_mesh_quantization in exact-SHA source. Bounded conversion commit 564164aa decodes/dequantizes build-time; focused PR/push real Godot renderer passes. Four raw screenshots show actual details but dark cyberpunk facade mismatches pale city; exterior-only, no live browser, Windows RTX3060, or production release. Draft PR#50 open. Subsequently, the same-SHA complete Godot engine CI #45017894739 completed/success; gameplay production art and release gates remain blocked."
   }
 }
