@@ -1,0 +1,12 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#f5f2eb",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "ことば · 日语单词"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

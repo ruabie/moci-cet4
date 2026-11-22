@@ -1,0 +1,12 @@
+{
+  "appid": "touristappid",
+  "projectname": "kotoba-wechat-miniapp",
+  "miniprogramRoot": "./",
+  "compileType": "miniprogram",
+  "setting": {
+    "es6": true,
+    "minified": true,
+    "enhance": true,
+    "postcss": true
+  }
+}
