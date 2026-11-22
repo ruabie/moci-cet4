@@ -1,0 +1,159 @@
+name: LifeSim V0.36 pinned original CC0 urban facade Godot art QA
+on:
+  push:
+    paths:
+      - '.github/workflows/lifesim-v036-facade-art-qa.yml'
+      - 'lifesim/godot/tests/visual_v36_cc0_facade.gd'
+      - 'lifesim/godot/scripts/streetscape_details_v33.gd'
+      - 'lifesim/godot/scripts/urban_facade_v36.gd'
+      - 'lifesim/godot/credits/TEVY_V36_SOURCE.json'
+      - 'lifesim/godot/tools/fetch_v36_cc0.py'
+      - 'lifesim/godot/scripts/planned_district_v32.gd'
+      - 'lifesim/godot/scripts/city_builder.gd'
+      - 'lifesim/godot/scripts/main.gd'
+      - 'lifesim/godot/tools/audit_v36_facade.py'
+  pull_request:
+    paths:
+      - '.github/workflows/lifesim-v036-facade-art-qa.yml'
+      - 'lifesim/godot/tests/visual_v36_cc0_facade.gd'
+      - 'lifesim/godot/scripts/streetscape_details_v33.gd'
+      - 'lifesim/godot/scripts/urban_facade_v36.gd'
+      - 'lifesim/godot/credits/TEVY_V36_SOURCE.json'
+      - 'lifesim/godot/tools/fetch_v36_cc0.py'
+      - 'lifesim/godot/scripts/planned_district_v32.gd'
+      - 'lifesim/godot/scripts/city_builder.gd'
+      - 'lifesim/godot/scripts/main.gd'
+      - 'lifesim/godot/tools/audit_v36_facade.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  focused-real-art-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PROJECT_DIR: lifesim/godot
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore historically SHA-verified offline GLBs only (do not overwrite new source)
+        uses: actions/download-artifact@v4
+        with:
+          repository: ruabie/moci-cet4
+          run-id: 44754419556
+          name: lifesim-v018-godot-source-verified
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/lifesim-v32-verified-source
+      - name: Copy build-time verified original assets, check UAL and Base SHA digests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s /tmp/lifesim-v32-verified-source/art/animations/v21/ual1_inplace.glb
+          test -s /tmp/lifesim-v32-verified-source/art/characters/v26/base_character_compatible.glb
+          mkdir -p "$PROJECT_DIR/art"
+          cp -a /tmp/lifesim-v32-verified-source/art/. "$PROJECT_DIR/art/"
+          python3 - <<'PY'
+          import hashlib
+          from pathlib import Path
+          a=Path("lifesim/godot/art/animations/v21/ual1_inplace.glb").read_bytes()
+          b=Path("lifesim/godot/art/characters/v26/base_character_compatible.glb").read_bytes()
+          assert len(a)==7618436 and hashlib.sha256(a).hexdigest()=="69591853d817488edaa8fd9bf8fc1d821eaeaf789f8627b3cd23b41c4ed67997"
+          assert len(b)==1085752 and hashlib.sha256(b).hexdigest()=="2d6792e77f337cf6fac3a81e1caf92798b898401140485b55307c9f14785ec25"
+          print("V36 RESTORED ARCHIVE DIGEST PASS: pinned CC0 UAL + Base")
+          PY
+          python3 "$PROJECT_DIR/tools/audit_north_district_v32.py" | tee v36-spatial-plan.log
+      - name: Resolve and cryptographically verify all 3 original external CC0 GLBs (build-time only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/fetch_v36_cc0.py" | tee v36-asset-audit.log
+          grep -F 'V36 PINNED CC0 SOURCE AUDIT PASS:' v36-asset-audit.log
+      - name: Decode pinned Meshopt + dequantize for Godot 4.7.2 import (original digests still preserved)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Author-provided GLBs are EXT_meshopt_compression+KHR_mesh_quantization.
+          # Godot's importer rejects them. Never strip extension names
+          # without decoding actual data; convert with a maintained library.
+          npm install --prefix /tmp/v36-gltf-tool --no-audit --no-fund --ignore-scripts @gltf-transform/cli@4.5.0
+          mkdir -p /tmp/v36-original-pinned
+          for slug in housing-facade-shop housing-facade-window housing-facade-balcony; do
+            mv "$PROJECT_DIR/art/third_party/tevy_v36/$slug.glb" "/tmp/v36-original-pinned/$slug.glb"
+            /tmp/v36-gltf-tool/node_modules/.bin/gltf-transform dequantize \
+              "/tmp/v36-original-pinned/$slug.glb" \
+              "$PROJECT_DIR/art/third_party/tevy_v36/$slug.glb" | tee -a v36-conversion.log
+          done
+          python3 - <<'PY'
+          import json, struct
+          from pathlib import Path
+          root=Path("lifesim/godot/art/third_party/tevy_v36")
+          slugs=["housing-facade-shop","housing-facade-window","housing-facade-balcony"]
+          for slug in slugs:
+              data=(root/(slug+".glb")).read_bytes()
+              assert data[:4]==b"glTF" and struct.unpack_from("<I",data,4)[0]==2
+              length,tag=struct.unpack_from("<II",data,12)
+              assert tag==0x4e4f534a
+              obj=json.loads(data[20:20+length])
+              required=obj.get("extensionsRequired",[])
+              assert "EXT_meshopt_compression" not in required, (slug,required)
+              assert "KHR_mesh_quantization" not in required, (slug,required)
+              assert obj.get("meshes") and obj.get("materials"),slug
+              print("V36 CONVERTED GODOT GLB PASS",slug,"meshes",len(obj["meshes"]),"required",required)
+          PY
+      - name: Install official engine, Mesa and Pillow for genuine pixel audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri libgl1 libglu1-mesa
+          python3 -m venv /tmp/v36-art-python
+          /tmp/v36-art-python/bin/pip install --quiet 'pillow>=10,<12'
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip" \
+            -o /tmp/godot-v36.zip
+          mkdir -p /tmp/godot-v36
+          unzip -q /tmp/godot-v36.zip -d /tmp/godot-v36
+          chmod +x /tmp/godot-v36/Godot_v4.7.2-stable_linux.x86_64
+      - name: Parse current PR GDScript with Godot editor using restored original art
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          /tmp/godot-v36/Godot_v4.7.2-stable_linux.x86_64 --headless \
+            --editor --path "$PROJECT_DIR" --quit 2>&1 | tee v36-real-import.log
+          if grep -E 'SCRIPT ERROR|Parse Error' v36-real-import.log; then exit 1; fi
+      - name: Render original V35 and pinned V36 assets at two true identical cameras
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=10s 150s \
+            xvfb-run -a -s '-screen 0 1280x720x24' \
+            /tmp/godot-v36/Godot_v4.7.2-stable_linux.x86_64 \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v36_cc0_facade.gd 2>&1 | tee v36-actual-art.log
+          grep -F 'V36 REAL PINNED GLB RENDER PASS:' v36-actual-art.log
+          /tmp/v36-art-python/bin/python "$PROJECT_DIR/tools/audit_v36_facade.py" | tee v36-pixel-audit.log
+          grep -F 'V36 REAL GLB PIXEL GATE PASS:' v36-pixel-audit.log
+          test -s "$PROJECT_DIR/tests/v36_actual_source_façade_comparison.jpg"
+      - name: Archive all authentic screenshot data and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v036-pinned-facade-raw-or-failure
+          path: |
+            v36-real-import.log
+            v36-asset-audit.log
+            v36-conversion.log
+            v36-actual-art.log
+            v36-pixel-audit.log
+            v36-spatial-plan.log
+            lifesim/godot/tests/v32_spatial_audit.json
+            lifesim/godot/tests/v36_asset_source_audit.json
+            lifesim/godot/tests/v36_*.png
+            lifesim/godot/tests/v36_*.jpg
+            lifesim/godot/tests/v36_*.json
+          if-no-files-found: warn
+          retention-days: 14

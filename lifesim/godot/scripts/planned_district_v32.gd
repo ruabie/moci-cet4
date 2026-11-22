@@ -154,6 +154,20 @@ func _building(lot: Dictionary) -> void:
     add_child(root)
     var w:float=float(lot["w"]);var d:float=float(lot["d"])
     var h:float=float(lot["h"]);var floors:int=int(lot["levels"])
+    # V36: only one selected lot, using exact-SHA external CC0 facade
+    # modules fetched during QA build. Default gameplay remains untouched.
+    if bool(ProjectSettings.get_setting("application/config/v36_pinned_facade_preview", false)) \
+            and name == "west_homes_a":
+        var verified_front := UrbanFacadeV36.new()
+        verified_front.name = "V36VerifiedResidentialFront"
+        root.add_child(verified_front)
+        verified_front.build_lot(lot)
+        # Keep original solids and actual public access to the doorstep.
+        _collider(root, Vector3(0,h*.5,0), Vector3(w-.4,h,d-.4),name)
+        _entry_path(lot)
+        statistics["buildings"] = int(statistics.get("buildings",0))+1
+        statistics["v36_verified_facade_pilots"] = int(statistics.get("v36_verified_facade_pilots",0))+1
+        return
     # V35 is deliberately two parcels only. Original QA and all production
     # geometry are byte-for-byte unchanged without this additional flag.
     if bool(ProjectSettings.get_setting("application/config/v35_architecture_preview", false)) \
