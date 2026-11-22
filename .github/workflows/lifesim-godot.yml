@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   godot-import-and-qa:
@@ -51,6 +52,32 @@ jobs:
           python3 "$PROJECT_DIR/tools/acquire_ual_v21.py"
           test -s "$PROJECT_DIR/art/animations/v21/ual1_inplace.glb"
           test -s "$PROJECT_DIR/tests/v21_ual_manifest.json"
+      - name: Restore exact prior CI-verified BaseCharacter after historical CC0 mirror disappeared
+        uses: actions/download-artifact@v4
+        with:
+          repository: ruabie/moci-cet4
+          run-id: 44754419556
+          name: lifesim-v018-godot-source-verified
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/lifesim-v32-verified-source
+      - name: Install exact CI-archived CC0 BaseCharacter before existing SHA and skeleton gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s /tmp/lifesim-v32-verified-source/art/characters/v26/base_character_compatible.glb
+          mkdir -p "$PROJECT_DIR/art/characters/v26"
+          cp /tmp/lifesim-v32-verified-source/art/characters/v26/base_character_compatible.glb \
+             "$PROJECT_DIR/art/characters/v26/base_character_compatible.glb"
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p=Path("lifesim/godot/art/characters/v26/base_character_compatible.glb")
+          d=p.read_bytes()
+          assert len(d)==1085752
+          assert hashlib.sha1(f"blob {len(d)}\\0".encode().replace(b"\\0",b"\0")+d).hexdigest()=="59c4044d5146146170f1c6d5e765985a73bc7875"
+          assert hashlib.sha256(d).hexdigest()=="2d6792e77f337cf6fac3a81e1caf92798b898401140485b55307c9f14785ec25"
+          print("V33 ARCHIVED CC0 BASE SOURCE PASS: exact bytes and both digests")
+          PY
       - name: Acquire CC0 65-joint Universal Base trial and prove actual rest compatibility
         shell: bash
         run: |
@@ -373,6 +400,23 @@ jobs:
             test -s "$PROJECT_DIR/tests/v32_${f}.png"
           done
 
+      - name: V0.33 compare four real V32/V33 streetscape and lighting camera pairs
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=10s 150s \
+            xvfb-run -a -s "-screen 0 1280x720x24" \
+            "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v33_streetscape.gd 2>&1 | tee godot-v33-art-review.log
+          grep -F 'V33 REAL STREETSCAPE AB RENDER PASS:' godot-v33-art-review.log
+          /tmp/lifesim-v14-python/bin/python "$PROJECT_DIR/tools/assemble_v33_ab.py" | tee v33-real-pixel-audit.log
+          grep -F 'V33 SAME-CAMERA TRUE RENDER PIXEL GATE PASS:' v33-real-pixel-audit.log
+          test -s "$PROJECT_DIR/tests/v33_8_frame_AB_streetscape_review.jpg"
+          test -s "$PROJECT_DIR/tests/v33_actual_environment_metrics.json"
+
       - name: Archive this exact verified Godot project
         if: success()
         uses: actions/upload-artifact@v4
@@ -408,6 +452,11 @@ jobs:
             godot-v26-rig-review.log
             v32-plan-audit.log
             godot-v32-north-spatial.log
+            godot-v33-art-review.log
+            v33-real-pixel-audit.log
+            lifesim/godot/tests/v33_*.png
+            lifesim/godot/tests/v33_*.json
+            lifesim/godot/tests/v33_*.jpg
             lifesim/godot/tests/v32_*.png
             lifesim/godot/tests/v32_*.json
             godot-v27-track-inventory.log

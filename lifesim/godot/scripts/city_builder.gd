@@ -122,6 +122,10 @@ func create_city() -> void:
         var north := PlannedDistrictV32.new()
         north.name = "V32NorthWalkableDistrictPreview"
         add_child(north)
+        if bool(ProjectSettings.get_setting("application/config/v33_streetscape_preview", false)):
+            var details := StreetscapeDetailsV33.new()
+            details.name = "V33StreetLevelArtReview"
+            add_child(details)
 
 func _ground() -> void:
     _box(self, Vector3(0, -0.36, 0), Vector3(180, 0.6, 180), _color("#66736a"))
