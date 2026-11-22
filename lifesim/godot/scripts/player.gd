@@ -205,5 +205,19 @@ func _update_camera(delta: float) -> void:
     var current_radius: float = pivot.distance_to(camera.global_position)
     var desired_radius: float = pivot.distance_to(aim)
     var smoothing: float = minf(1.0, delta * (34.0 if desired_radius < current_radius else 5.5)) if delta > 0.0 else 1.0
-    camera.global_position = camera.global_position.lerp(aim, smoothing)
+    var candidate: Vector3 = camera.global_position.lerp(aim, smoothing)
+    if delta > 0.0:
+        # V39 real occlusion QA proved a transition-frame bug: although
+        # aim is collision-checked, smoothing FROM the previous camera
+        # point can sweep THROUGH a solid wall. Re-test the FINAL candidate
+        # from the unobstructed character pivot and clamp BEFORE display.
+        # No walls are hidden, and all original world collision stays on.
+        camera_sweep_query.transform = Transform3D(Basis(), pivot)
+        camera_sweep_query.motion = candidate - pivot
+        var final_safe: PackedFloat32Array = get_world_3d().direct_space_state.cast_motion(camera_sweep_query)
+        if final_safe.size() >= 2 and final_safe[0] < 0.999:
+            var safe_fraction: float = clampf(final_safe[0] - .045, 0.0, 1.0)
+            candidate = pivot.lerp(candidate, safe_fraction)
+            camera_collision_activations += 1
+    camera.global_position = candidate
     camera.look_at(pivot + Vector3.UP * .02)
