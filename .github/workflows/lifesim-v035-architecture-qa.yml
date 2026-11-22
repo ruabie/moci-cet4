@@ -1,0 +1,114 @@
+name: LifeSim V0.35 focused two-building architectural silhouettes QA
+on:
+  push:
+    paths:
+      - '.github/workflows/lifesim-v035-architecture-qa.yml'
+      - 'lifesim/godot/tests/visual_v35_architecture.gd'
+      - 'lifesim/godot/scripts/streetscape_details_v33.gd'
+      - 'lifesim/godot/scripts/architectural_slice_v35.gd'
+      - 'lifesim/godot/scripts/planned_district_v32.gd'
+      - 'lifesim/godot/scripts/city_builder.gd'
+      - 'lifesim/godot/scripts/main.gd'
+      - 'lifesim/godot/tools/audit_architecture_v35.py'
+  pull_request:
+    paths:
+      - '.github/workflows/lifesim-v035-architecture-qa.yml'
+      - 'lifesim/godot/tests/visual_v35_architecture.gd'
+      - 'lifesim/godot/scripts/streetscape_details_v33.gd'
+      - 'lifesim/godot/scripts/architectural_slice_v35.gd'
+      - 'lifesim/godot/scripts/planned_district_v32.gd'
+      - 'lifesim/godot/scripts/city_builder.gd'
+      - 'lifesim/godot/scripts/main.gd'
+      - 'lifesim/godot/tools/audit_architecture_v35.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  focused-real-art-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PROJECT_DIR: lifesim/godot
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore historically SHA-verified offline GLBs only (do not overwrite new source)
+        uses: actions/download-artifact@v4
+        with:
+          repository: ruabie/moci-cet4
+          run-id: 44754419556
+          name: lifesim-v018-godot-source-verified
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/lifesim-v32-verified-source
+      - name: Copy build-time verified original assets, check UAL and Base SHA digests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s /tmp/lifesim-v32-verified-source/art/animations/v21/ual1_inplace.glb
+          test -s /tmp/lifesim-v32-verified-source/art/characters/v26/base_character_compatible.glb
+          mkdir -p "$PROJECT_DIR/art"
+          cp -a /tmp/lifesim-v32-verified-source/art/. "$PROJECT_DIR/art/"
+          python3 - <<'PY'
+          import hashlib
+          from pathlib import Path
+          a=Path("lifesim/godot/art/animations/v21/ual1_inplace.glb").read_bytes()
+          b=Path("lifesim/godot/art/characters/v26/base_character_compatible.glb").read_bytes()
+          assert len(a)==7618436 and hashlib.sha256(a).hexdigest()=="69591853d817488edaa8fd9bf8fc1d821eaeaf789f8627b3cd23b41c4ed67997"
+          assert len(b)==1085752 and hashlib.sha256(b).hexdigest()=="2d6792e77f337cf6fac3a81e1caf92798b898401140485b55307c9f14785ec25"
+          print("V35 RESTORED ARCHIVE DIGEST PASS: pinned CC0 UAL + Base")
+          PY
+          python3 "$PROJECT_DIR/tools/audit_north_district_v32.py" | tee v35-spatial-plan.log
+      - name: Install official engine, Mesa and Pillow for genuine pixel audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri libgl1 libglu1-mesa
+          python3 -m venv /tmp/v35-art-python
+          /tmp/v35-art-python/bin/pip install --quiet 'pillow>=10,<12'
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip" \
+            -o /tmp/godot-v35.zip
+          mkdir -p /tmp/godot-v35
+          unzip -q /tmp/godot-v35.zip -d /tmp/godot-v35
+          chmod +x /tmp/godot-v35/Godot_v4.7.2-stable_linux.x86_64
+      - name: Parse current PR GDScript with Godot editor using restored original art
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          /tmp/godot-v35/Godot_v4.7.2-stable_linux.x86_64 --headless \
+            --editor --path "$PROJECT_DIR" --quit 2>&1 | tee v35-real-import.log
+          if grep -E 'SCRIPT ERROR|Parse Error' v35-real-import.log; then exit 1; fi
+      - name: Render two same-camera V33 vs V35 architecture pairs and compare real pixels
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=10s 150s \
+            xvfb-run -a -s '-screen 0 1280x720x24' \
+            /tmp/godot-v35/Godot_v4.7.2-stable_linux.x86_64 \
+            --rendering-driver opengl3 --path "$PROJECT_DIR" \
+            --script res://tests/visual_v35_architecture.gd 2>&1 | tee v35-actual-art.log
+          grep -F 'V35 REAL ARCHITECTURE RENDER PASS:' v35-actual-art.log
+          /tmp/v35-art-python/bin/python "$PROJECT_DIR/tools/audit_architecture_v35.py" | tee v35-pixel-audit.log
+          grep -F 'V35 ACTUAL GODOT ARCHITECTURE PIXEL GATE PASS:' v35-pixel-audit.log
+          test -s "$PROJECT_DIR/tests/v35_same_camera_architecture_comparison.jpg"
+      - name: Archive all authentic screenshot data and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v035-architecture-raw-or-failure
+          path: |
+            v35-real-import.log
+            v35-actual-art.log
+            v35-pixel-audit.log
+            v35-spatial-plan.log
+            lifesim/godot/tests/v32_spatial_audit.json
+            lifesim/godot/tests/v35_*.png
+            lifesim/godot/tests/v35_*.jpg
+            lifesim/godot/tests/v35_*.json
+          if-no-files-found: warn
+          retention-days: 14
