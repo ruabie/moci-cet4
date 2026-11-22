@@ -1,8 +1,19 @@
 # 游戏计划书｜同频之城｜跨对话交接入口
 
 > **交接快照：2026-11-22（Asia/Singapore）**  
-> **最新开发候选：V0.34 草稿 PR #48（北区 V0.32 规划后新增街面 CC0 模型、临街门面和阴天曝光 A/B，未合并、未发布）。四组同机位、八张真实 Godot 截图及独立快速 CI 已通过，证明亮部改善与设施可见，但建筑仍然明显盒状，美术最终 FAIL；默认市区/最新版网页均未更新。唯一已核实 Web 构建仍是 V0.18。**  
-> 这是一次有证据的历史快照，不是实时仪表板。每次接班仍需独立查最新 GitHub PR/SHA/CI/Issue。
+> **最新开发候选：V0.35 草稿 PR #49** (head `0e4d2066b5541ee52cbe28f6bcb61209fd74eb13`, base V0.34, open/draft/unmerged). 已完成**两栋不同建筑轮廓的真实 Godot QA 试验**，同 SHA 的 focused PR 与 push CI / V0.34 旧图回归 / 监工已成功；真实四张同机位截图已下载并检查，证明视觉有变化，但仍明显低多边形/程序化，**专业街区美术 FAIL**。完整 Godot engine CI 在本次复核时仍运行中；没有发布 V0.35 网页，不是正式交付。main `lifesim/index.html` 仍缺失，唯一已核实 Web 导出是 V0.18。  
+> 这是具有对应 SHA 与工件证据的快照，不是实时仪表板；后续接班必须重新查询最新 PR、Issue、CI 与验收状态。
+
+## 最新一轮：V0.35 两种建筑类型的真实替换及视觉复核（2026-11-22）
+
+- **[草稿 PR #49](https://github.com/ruabie/moci-cet4/pull/49)**：从未合并的 V0.34 #48 派生新隔离分支 `lifesim-v035-architecture-slice-qa`；最新实查 head `0e4d2066b5541ee52cbe28f6bcb61209fd74eb13`。增加 `scripts/architectural_slice_v35.gd`、`tests/visual_v35_architecture.gd`、`tools/audit_architecture_v35.py`、独立免费工作流 `.github/workflows/lifesim-v035-architecture-qa.yml`；`planned_district_v32.gd` 仅在 **`application/config/v35_architecture_preview` QA 开关**开启时切换指定 2 栋楼。旧 9 栋、原地块碰撞/入口路径、正常人物/经济/存档/Web 均未改。 
+- **真实新样板：** `west_homes_a` 原盒状住宅替换为有退台、10 处阳台、侧立面窗的住宅组合（81 个可渲染网格）；`east_library` 替换为明显横向的阅览建筑形体，含 7 道竖向外遮阳、15 组窗口构件（49 个可渲染网格）。二者仍**仅为外立面**，未声称有可进入的室内，原 11/11 规划地块仍存在；两个入口步行位置真实物理射线检查通过。
+- **[同 SHA 专项 PR CI #45016938846](https://github.com/ruabie/moci-cet4/actions/runs/45016938846) 与 [Push CI #45016923394](https://github.com/ruabie/moci-cet4/actions/runs/45016923394)** 都已 `completed/success`。从 [原始截图 Artifact #14752211518](https://github.com/ruabie/moci-cet4/actions/runs/45016923394/artifacts/14752211518) 实际下载并查看住宅和图书馆的各一组前后 1280×720 Godot 4.7.2 Mesa OpenGL3 对照；与 V0.33 同机位比较，变化像素（RGB 单通道最大差 >25）住宅 456,224/921,600（49.503%），图书馆 275,330/921,600（29.875%）。这些只是画面变化，不是精细度和 FPS 评分。
+- **[旧 V0.34 focused QA 回归 #45016938799](https://github.com/ruabie/moci-cet4/actions/runs/45016938799) 与 [免费监工 #45016938797](https://github.com/ruabie/moci-cet4/actions/runs/45016938797) 均同 SHA `completed/success`。**完整 Godot CI #45016938779** 截至本轮记录仍在运行中，未升格通过；Chrome WebGL、Windows RTX3060、连续走停转输入均未执行。
+- **人工美术验收仍 FAIL：** 住宅具有区分度但阳台重复、材质平、建筑缺少真实细部；图书馆轮廓改善但远看仍像简单组合模型。城市仍大范围低密度，街面没有可用室内与真实生活组织。**本轮证明可测试的两种形体方向，不代表已经解决用户提出的地图精细度或设施合理性问题。** 不在这一步推广 11 栋相同复制品。
+- **下一唯一优先项：** 为连续街面 **1–2 个地块**导入/创作真正具备许可核验的现代建筑模块（包括有真实比例的底商、墙窗立面、入口退让、门槛与交通动线），完成足够完整的美术样板，并用原始同机位真实截图重新由人审视；通过视觉门槛后再做可步行室内及真实输入连续验收。继续禁止扩大低精度面积，保持零新增费用、不合并、不发布；#10/#12/#15/#18 开放，绝不向旧 V0.18 自动部署分支推送。
+
+---
 
 ## 最新一轮：V0.32–V0.34 真实扩展地图、设施布局及城市美术复核（2026-11-22）
 
