@@ -47,7 +47,7 @@ for(const file of ['book-data.js','vocab-03-page08.js','vocab-04.js','vocab-05.j
 const storage=new Map();
 class MockElement{
   constructor(id=''){
-    this.id=id;this.value='';this.textContent='';this.dataset={};this.style={};this.disabled=false;this.children=[];this._html='';this._classes=new Set();
+    this.id=id;this.value='';this.textContent='';this.dataset={};this.style={};this.disabled=false;this.children=[];this.options=[];this._html='';this._classes=new Set();
     this.classList={
       add:x=>this._classes.add(x),remove:x=>this._classes.delete(x),
       toggle:(x,force)=>{const t=force===undefined?!this._classes.has(x):!!force;t?this._classes.add(x):this._classes.delete(x);return t},
@@ -56,6 +56,7 @@ class MockElement{
   }
   set innerHTML(v){
     this._html=String(v);
+    if(this.id==='libLesson')this.options=[...this._html.matchAll(/<option value="([^"]+)"/g)].map(m=>({value:m[1]}));
     if(this.id==='lessonList')this.children=[...this._html.matchAll(/data-lesson="([^"]+)"/g)].map(m=>{const e=new MockElement();e.dataset.lesson=m[1];return e});
   }
   get innerHTML(){return this._html}
