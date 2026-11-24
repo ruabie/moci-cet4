@@ -1,0 +1,52 @@
+name: Kotoba iOS Preview QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'kotoba-ios/**'
+      - '.github/tests/kotoba-ios-preview.test.cjs'
+      - '.github/workflows/kotoba-ios-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify all preview scripts and isolated learning behavior
+        shell: bash
+        run: |
+          set -eu
+          node --check kotoba-ios/app.js
+          node --check kotoba-ios/sw.js
+          node .github/tests/kotoba-ios-preview.test.cjs
+      - name: Verify both public URLs and preview resources
+        shell: bash
+        run: |
+          set -eu
+          preview="https://ruabie.github.io/moci-cet4/kotoba-ios/"
+          original="https://ruabie.github.io/moci-cet4/kotoba/"
+          for i in $(seq 1 30); do
+            code=$(curl -LsS --max-time 12 -o /tmp/ios-kotoba.html -w '%{http_code}' "$preview?ci=ios-v1" || echo 000)
+            orig=$(curl -LsS --max-time 12 -o /tmp/original-kotoba.html -w '%{http_code}' "$original?ci=ios-v1" || echo 000)
+            echo "Attempt $i: preview=$code original=$orig"
+            if [ "$code" = 200 ] && [ "$orig" = 200 ] &&
+               grep -q 'class="ios-tabbar"' /tmp/ios-kotoba.html &&
+               grep -q 'id="openLessons"' /tmp/original-kotoba.html; then
+              ok=1
+              for file in ios.css?v=1.0 app.js?v=1.0 sw.js manifest.webmanifest; do
+                status=$(curl -LsS --max-time 12 -o /tmp/ios-asset -w '%{http_code}' "$preview$file" || echo 000)
+                echo "$file => $status"
+                [ "$status" = 200 ] || ok=0
+              done
+              if [ "$ok" = 1 ]; then
+                echo "KOTOBA iOS PREVIEW LIVE VERIFIED; ORIGINAL LIVE VERIFIED"
+                exit 0
+              fi
+            fi
+            sleep 6
+          done
+          echo "Preview or original site is not publicly accessible with expected content"
+          exit 1
