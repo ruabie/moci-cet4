@@ -11,60 +11,103 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="../kotoba/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../kotoba/styles.css?v=7.1">
-<link rel="stylesheet" href="./ios.css?v=1.0">
-<title>ことば · iOS 风格预览</title>
+<link rel="stylesheet" href="./ios.css?v=2.0">
+<title>ことば · iPhone 原生风格实验版</title>
 </head>
 <body>
 <div id="shell" class="shell">
 <header class="masthead">
-  <button class="brand" type="button" data-nav="home" aria-label="返回首页"><span class="brand-jp">ことば。</span><span class="brand-sub">日语单词 · iOS 设计预览</span></button>
-  <a class="ios-original-link" href="../kotoba/" aria-label="返回原版日语单词网页">原版 <span aria-hidden="true">↗</span></a>
+  <button class="brand" type="button" data-nav="home" aria-label="返回首页">
+    <span class="brand-glyph" aria-hidden="true">こ</span><span class="brand-jp">ことば</span>
+  </button>
+  <div class="ios-toolbar">
+    <button type="button" class="ios-glass-tool" data-nav="library" aria-label="搜索词库">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 5 5"/></svg>
+    </button>
+    <a class="ios-original-link" href="../kotoba/" aria-label="返回原版">原版</a>
+  </div>
 </header>
 <main>
 <section id="home" class="view">
-  <div class="intro"><div class="eyebrow">TODAY · ことば</div><h1>让每一天，<br><em>多记住一个词。</em></h1><p>从一小组新词开始。学完再考核，让复习恰好发生在需要的时候。</p></div>
-  <div class="stats-strip"><div><span class="stat-n" id="totalWords">—</span><small>已收录词语</small></div><div><span class="stat-n" id="reviewCount">—</span><small>到期复习</small></div><div><span class="stat-n" id="weakCount">—</span><small>薄弱单词</small></div></div>
-  <div class="section-top"><h2>开始学习</h2><span>你的学习空间</span></div>
-  <div class="entry-list">
-    <button class="entry-card" id="openLessons"><span class="entry-mark" aria-hidden="true">本</span><span class="entry-body"><b>按课次学习</b><small>跟随教材，一课一课记住</small></span><span class="entry-arrow">↗</span></button>
-    <button class="entry-card" id="openExtra"><span class="entry-mark" aria-hidden="true">外</span><span class="entry-body"><b>课外词</b><small>聊天中查询的词语，自动归档</small></span><span class="entry-arrow">↗</span></button>
-    <button class="entry-card" id="openAll"><span class="entry-mark" aria-hidden="true">全</span><span class="entry-body"><b>总词汇库</b><small>课内＋课外，一起学习</small></span><span class="entry-arrow">↗</span></button>
-    <button class="entry-card" id="openRandom"><span class="entry-mark" aria-hidden="true">測</span><span class="entry-body"><b>随机抽查</b><small>从总词汇库随机出 10 词，直接默写</small></span><span class="entry-arrow">↗</span></button>
-    <button class="entry-card" id="openReview"><span class="entry-mark" aria-hidden="true">復</span><span class="entry-body"><b>间隔复习</b><small>优先记忆到期与遗忘的词</small></span><span class="entry-arrow">↗</span></button>
+  <div class="ios-large-header">
+    <span class="ios-kicker">日语学习</span>
+    <h1>词语</h1>
   </div>
-  <div class="secondary-links"><button data-nav="library">管理词库</button><span class="dot-sep">·</span><button data-nav="stats">学习记录</button><span class="dot-sep">·</span><button id="openGuide">记忆方法</button></div><details class="voice-options"><summary>日语朗读设置</summary><div><label for="voiceSelect">日语发音音色</label><select id="voiceSelect"><option value="">检测日语语音中…</option></select><p id="voiceNotice">朗读使用设备提供的日语系统语音，发音质量因设备与音色而异。</p><button id="testVoice" type="button">试听「こんにちは」 ↗</button></div></details>
+  <div class="ios-smart-grid" aria-label="学习概览">
+    <button id="openReview" type="button" class="ios-smart-tile ios-blue">
+      <span class="ios-tile-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M5 9a7.5 7.5 0 0 1 12.5-3L20 12M4 12l2.5 6A7.5 7.5 0 0 0 19 15"/></svg><span>今日复习</span></span>
+      <strong id="reviewCount">—</strong>
+      <span class="ios-tile-note">到期的词</span>
+    </button>
+    <button id="openRandom" type="button" class="ios-smart-tile ios-purple">
+      <span class="ios-tile-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M3 17c3.5 0 5.5-6 9-6 2 0 3.7 2 5 4l4 4"/><path d="m16 19 5 0v-5M3 7c4 0 6.5 10 10 10"/></svg><span>随机抽查</span></span>
+      <strong>10</strong>
+      <span class="ios-tile-note">词 / 每轮</span>
+    </button>
+    <div class="ios-smart-tile ios-dark">
+      <span class="ios-tile-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true"><path d="M12 5c-3.5-2-6-2-9-1v15c3-1 5.5-1 9 1 3.5-2 6-2 9-1V4c-3-1-5.5-1-9 1z"/><path d="M12 5v15"/></svg><span>词汇总数</span></span>
+      <strong id="totalWords">—</strong>
+      <span class="ios-tile-note">课内 · 课外</span>
+    </div>
+    <div class="ios-smart-tile ios-rose">
+      <span class="ios-tile-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 9 17H3L12 2z"/><path d="M12 9v4M12 16h.01"/></svg><span>薄弱词语</span></span>
+      <strong id="weakCount">—</strong>
+      <span class="ios-tile-note">需要巩固</span>
+    </div>
+  </div>
+  <div class="ios-section-heading"><h2>开始学习</h2><span>自由选择</span></div>
+  <div class="ios-inset-group">
+    <button class="ios-table-row" type="button" id="openLessons">
+      <span class="ios-app-icon ios-amber" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 6C9 4 6 4 3 5v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1z"/><path d="M12 6v14"/></svg></span>
+      <span class="ios-row-copy"><b>按课次学习</b><small>沿着教材，一课一课背</small></span><span class="ios-chevron">›</span>
+    </button>
+    <button class="ios-table-row" type="button" id="openAll">
+      <span class="ios-app-icon ios-mint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+      <span class="ios-row-copy"><b>总词汇库</b><small>所有词汇，不重复学习</small></span><span class="ios-chevron">›</span>
+    </button>
+    <button class="ios-table-row" type="button" id="openExtra">
+      <span class="ios-app-icon ios-lilac" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></span>
+      <span class="ios-row-copy"><b>课外词</b><small>聊天中收集的新单词</small></span><span class="ios-chevron">›</span>
+    </button>
+  </div>
+  <div class="ios-section-heading"><h2>更多</h2></div>
+  <div class="ios-inset-group ios-more-group">
+    <button class="ios-table-row" type="button" id="openGuide"><span class="ios-app-icon ios-gray" aria-hidden="true">?</span><span class="ios-row-copy"><b>记忆方法</b></span><span class="ios-chevron">›</span></button>
+    <details class="voice-options"><summary>日语朗读设置</summary><div><label for="voiceSelect">日语音色</label><select id="voiceSelect"><option value="">检测语音中…</option></select><p id="voiceNotice">朗读依赖设备上的日语语音，不保证与真人录音完全一致。</p><button id="testVoice" type="button">试听「こんにちは」</button></div></details>
+  </div>
+  <p class="ios-preview-notice">设计实验版 · 词库与原版一致，学习进度独立保存</p>
 </section>
 <section id="lessons" class="view hidden">
-  <button class="back" data-nav="home">← 返回首页</button><div class="page-intro"><span class="eyebrow">YOUR TEXTBOOK</span><h1>每一课，<br>都有自己的节奏。</h1><p>按第三册、第二册分别选择课程；各课的学习进度独立保留。</p></div>
+  <button class="back" data-nav="home">‹ 返回</button><div class="ios-large-header"><span class="ios-kicker">TEXTBOOK</span><h1>课程</h1><p>按教材分册学习。各课有独立的学习进度。</p></div>
   <div id="lessonList" class="lesson-list"></div>
   <button class="quiet-link" id="lessonToAll">或从完整词库学习 ↗</button>
 </section>
 <section id="setup" class="view hidden">
-  <button class="back" id="setupBack">← 返回</button><div class="page-intro"><span class="eyebrow" id="setupKicker">STUDY SESSION</span><h1 id="setupTitle">准备开始。</h1><p id="setupDesc">选择适合今天的学习量。</p></div>
+  <button class="back" id="setupBack">‹ 返回</button><div class="ios-large-header"><span class="ios-kicker" id="setupKicker">学习</span><h1 id="setupTitle">准备开始</h1><p id="setupDesc">选择今天要学习的单词数量。</p></div>
   <div class="setup-panel"><div class="setup-info"><span>可用词语</span><b id="poolSize">—</b></div><label for="qty" class="field-label">本轮学习数量</label><div class="quantity-row"><input id="qty" type="number" min="1" max="999" value="10" inputmode="numeric"><div class="qty-pills"><button data-qty="10">10</button><button data-qty="20">20</button><button id="allQty">全部</button></div></div><p class="micro">每天 10–20 个新词更便于及时复习。学得越多，后续到期复习也越多。</p><button class="primary-btn" id="startSession">开始翻页 <span>→</span></button></div>
 </section>
 <section id="choose" class="view hidden">
-  <button class="back" data-nav="summary">← 返回学习总结</button><div class="page-intro"><span class="eyebrow">ACTIVE RECALL</span><h1>来检验一下，<br>记得多少。</h1><p>不看释义，尝试从记忆中提取答案，比反复浏览更有效。</p></div>
+  <button class="back" data-nav="summary">‹ 返回</button><div class="ios-large-header"><span class="ios-kicker">ACTIVE RECALL</span><h1>选择考核方式</h1><p>完成学习后再进行主动回忆。</p></div>
   <div class="choice-list"><button class="choice" data-mode="cn-jp"><span class="choice-number">01</span><span><b>中文 → 日语</b><small>看到中文，填写日语词语或假名</small></span><span>↗</span></button><button class="choice" data-mode="jp-cn"><span class="choice-number">02</span><span><b>日语 → 中文</b><small>看到日语，填写中文意思</small></span><span>↗</span></button></div><p class="micro">中文含义有多种合理表达，自动判断不可能完全准确，可手动修正。</p>
 </section>
 <section id="summary" class="view hidden">
-  <div class="page-intro"><span class="eyebrow">STUDY COMPLETED</span><h1>先看过了，<br>再来检验。</h1><p>学习阶段只负责熟悉词汇，不作记忆能力判断。接下来通过主动回忆决定哪些单词需要再见。</p></div>
+  <div class="ios-large-header"><span class="ios-kicker">学习完成</span><h1>这一组学完了</h1><p>接下来用默写检验记忆，不提前标记“记得”或“不记得”。</p></div>
   <div class="summary-paper"><span class="eyebrow">TODAY'S WORDS</span><div class="summary-count" id="summaryCount">0<small>词</small></div><div class="summary-grid"><div><b id="summaryRemembered">0</b><span>浏览页数</span></div><div><b id="summaryForgot">0</b><span>本组词数</span></div><div><b id="summaryReappear">—</b><span>等待考核</span></div></div><p id="summaryText">现在用默写与记忆自评确定后续复习时间。</p></div>
   <div class="stack-actions"><button class="primary-btn" id="goTest">开始双向默写 <span>→</span></button><button class="outline-btn" id="repeatWeak">再看这组单词</button><button class="text-action" data-nav="home">返回首页</button></div>
 </section>
 <section id="done" class="view hidden">
-  <div class="page-intro"><span class="eyebrow">PRACTICE FINISHED</span><h1>比昨天，<br>又记住了一些。</h1><p>主动回忆完成。</p></div><div class="score-card"><span>默写正确率</span><strong id="score">—</strong><p id="scoreDetails"></p></div><div class="stack-actions"><button class="primary-btn" id="continueSession">继续学习 <span>→</span></button><p id="continueStatus" class="continue-caption" role="status"></p><button class="outline-btn" id="swapMode">换个方向再测</button><button class="outline-btn" id="doneReview">复习错词</button><button class="text-action" data-nav="home">返回首页</button></div>
+  <div class="ios-large-header"><span class="ios-kicker">考核结束</span><h1>完成本轮练习</h1><p>记忆结果已记录，可继续新词或复习薄弱词。</p></div><div class="score-card"><span>默写正确率</span><strong id="score">—</strong><p id="scoreDetails"></p></div><div class="stack-actions"><button class="primary-btn" id="continueSession">继续学习 <span>→</span></button><p id="continueStatus" class="continue-caption" role="status"></p><button class="outline-btn" id="swapMode">换个方向再测</button><button class="outline-btn" id="doneReview">复习错词</button><button class="text-action" data-nav="home">返回首页</button></div>
 </section>
 <section id="library" class="view hidden">
-  <button class="back" data-nav="home">← 返回首页</button><div class="page-intro"><span class="eyebrow">YOUR COLLECTION</span><h1>我的词库。</h1><p>教材词、旧词库与自定义词都在这里。可以搜索和备份。</p></div>
+  <div class="ios-large-header"><span class="ios-kicker">DICTIONARY</span><h1>词汇库</h1><p>课内、课外和自定义单词。</p></div>
   <input class="search-field" id="wordSearch" placeholder="查找日语、假名或中文…" autocomplete="off">
   <div class="library-toolbar"><span id="libCount">—</span><select id="libLesson" aria-label="按教材分册及课次筛选"><option value="all">总词汇库（全部）</option></select></div>
   <div class="word-list" id="wordList"></div>
   <details class="add-panel"><summary>＋ 添加自己的单词</summary><p>每行：日语 | 假名 | 中文释义 | 词性</p><textarea id="importText" rows="4" placeholder="例えば：経験 | けいけん | 经验 | 名词"></textarea><button class="outline-btn" id="importBtn">添加到词库</button><p class="micro" id="importStatus"></p></details>
   <div class="backup-row"><button id="exportBtn">导出学习备份 ↗</button><label class="file-label">导入备份 ↗<input id="restoreFile" type="file" accept=".json,application/json" hidden></label></div><p class="micro">记录保存在当前浏览器。清理网站数据或更换手机可能丢失，请定期导出备份。</p>
 </section>
-<section id="stats" class="view hidden"><button class="back" data-nav="home">← 返回首页</button><div class="page-intro"><span class="eyebrow">LEARNING LOG</span><h1>把努力，<br>留在时间里。</h1></div><div class="record-stats"><div><b id="attemptsCount">—</b><span>累计默写题数</span></div><div><b id="learnedCount">—</b><span>已开始记忆的词</span></div></div><div id="logsList" class="logs-list"></div></section>
-<section id="guide" class="view hidden"><button class="back" data-nav="home">← 返回首页</button><div class="page-intro"><span class="eyebrow">HOW TO LEARN</span><h1>先熟悉，再回忆。</h1><p>学习与考核分开。不直接套用一条固定遗忘曲线，而是根据每次考核表现安排下一次见面。</p></div><div class="guide-list"><div><span>01 / 学习</span><p>全屏一次只呈现一个日语词。点击查看假名与中文，左右翻页；可以点击音量按钮听日语系统语音。</p></div><div><span>02 / 考核</span><p>学完再进入中译日或日译中。先输入，核对答案后才选择“记得／不记得”，学习时不需要评分。</p></div><div><span>03 / 间隔复习</span><p>考核中标记“不记得”的词会隔几题重现，10 分钟后到期；记住的词逐步延长到约 1、3、7、14 天等。</p></div><div><span>04 / 发音</span><p>发音取决于设备提供的 ja-JP 日语语音。若没有日语语音，请安装日语语音或更换设备；它不能替代真人播音员的校验录音。</p></div></div></section>
+<section id="stats" class="view hidden"><div class="ios-large-header"><span class="ios-kicker">LEARNING LOG</span><h1>学习记录</h1></div><div class="record-stats"><div><b id="attemptsCount">—</b><span>累计默写题数</span></div><div><b id="learnedCount">—</b><span>已开始记忆的词</span></div></div><div id="logsList" class="logs-list"></div></section>
+<section id="guide" class="view hidden"><button class="back" data-nav="home">‹ 返回</button><div class="ios-large-header"><span class="ios-kicker">学习方法</span><h1>记住，而非看过</h1><p>学习与考核分开，复习间隔根据你的真实表现安排。</p></div><div class="guide-list"><div><span>01 / 学习</span><p>全屏一次只呈现一个日语词。点击查看假名与中文，左右翻页；可以点击音量按钮听日语系统语音。</p></div><div><span>02 / 考核</span><p>学完再进入中译日或日译中。先输入，核对答案后才选择“记得／不记得”，学习时不需要评分。</p></div><div><span>03 / 间隔复习</span><p>考核中标记“不记得”的词会隔几题重现，10 分钟后到期；记住的词逐步延长到约 1、3、7、14 天等。</p></div><div><span>04 / 发音</span><p>发音取决于设备提供的 ja-JP 日语语音。若没有日语语音，请安装日语语音或更换设备；它不能替代真人播音员的校验录音。</p></div></div></section>
 </main>
 <nav class="ios-tabbar" aria-label="主要导航">
   <button type="button" data-nav="home" data-tab="home" aria-label="首页">
@@ -117,5 +160,5 @@
   <div class="test-bottom" id="testCount">01 / 10</div><div id="testModeLabel" class="sr-only">中文 → 日语</div>
 </section>
 <div id="toast" class="toast hidden" role="status"></div>
-<script src="../kotoba/book-data.js?v=5.1"></script><script src="../kotoba/vocab-03-page08.js?v=7.0"></script><script src="../kotoba/vocab-04.js?v=7.0"></script><script src="../kotoba/vocab-05.js?v=7.0"></script><script src="../kotoba/vocab-13.js?v=6.0"></script><script src="../kotoba/vocab-14.js?v=6.0"></script><script src="../kotoba/vocab-15.js?v=6.0"></script><script src="../kotoba/vocab-16.js?v=6.0"></script><script src="../kotoba/extra-words.js?v=6.1"></script><script src="./app.js?v=1.0"></script>
+<script src="../kotoba/book-data.js?v=5.1"></script><script src="../kotoba/vocab-03-page08.js?v=7.0"></script><script src="../kotoba/vocab-04.js?v=7.0"></script><script src="../kotoba/vocab-05.js?v=7.0"></script><script src="../kotoba/vocab-13.js?v=6.0"></script><script src="../kotoba/vocab-14.js?v=6.0"></script><script src="../kotoba/vocab-15.js?v=6.0"></script><script src="../kotoba/vocab-16.js?v=6.0"></script><script src="../kotoba/extra-words.js?v=6.1"></script><script src="./app.js?v=2.0"></script>
 </body></html>
