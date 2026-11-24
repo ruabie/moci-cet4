@@ -1,0 +1,29 @@
+name: APDS Free coordinator safety checks
+
+on:
+  pull_request:
+    paths:
+      - 'apds-free/**'
+      - '.github/workflows/apds-free-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safety-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Check interpreter syntax
+        run: python -m py_compile apds-free/runner.py apds-free/tests/test_runner.py
+      - name: Run isolated coordinator tests (no model, no Godot)
+        run: python -m unittest discover -s apds-free/tests -v
+      - name: Inspect source readiness without false pass
+        run: python apds-free/runner.py --status

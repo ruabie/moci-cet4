@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "tasks": [
+    {
+      "id": "G0-source-present",
+      "kind": "file_exists",
+      "path": "lifesim/godot/project.godot",
+      "enabled": true,
+      "description": "Check real Godot source exists; not runtime verification"
+    }
+  ]
+}
