@@ -40,9 +40,9 @@ for(const script of [...html.matchAll(/<script src="([^"]+)"/g)].map(m=>m[1]).fi
 assert.ok(data.window.KOTOBA_BOOK?.words?.length>250,'Book data not loaded');
 assert.ok(data.window.KOTOBA_SUPPLEMENTS?.length>=500,'Supplementary lessons not loaded');
 class Elem{
- constructor(id=''){this.id=id;this.textContent='';this.value='';this.style={};this.dataset={};this.children=[];this.disabled=false;this._html='';this._set=new Set();this.classList={add:s=>this._set.add(s),remove:s=>this._set.delete(s),contains:s=>this._set.has(s),toggle:(s,force)=>{let on=force===undefined?!this._set.has(s):!!force;on?this._set.add(s):this._set.delete(s);return on}}}
+ constructor(id=''){this.id=id;this.textContent='';this.value='';this.style={};this.dataset={};this.children=[];this.options=[];this.disabled=false;this._html='';this._set=new Set();this.classList={add:s=>this._set.add(s),remove:s=>this._set.delete(s),contains:s=>this._set.has(s),toggle:(s,force)=>{let on=force===undefined?!this._set.has(s):!!force;on?this._set.add(s):this._set.delete(s);return on}}}
  addEventListener(){}setAttribute(){} appendChild(e){this.children.push(e)}
- set innerHTML(v){this._html=String(v);if(this.id==='lessonList'){this.children=[...this._html.matchAll(/data-lesson="([^"]+)"/g)].map(m=>{const e=new Elem();e.dataset.lesson=m[1];return e})}}
+ set innerHTML(v){this._html=String(v);if(this.id==='libLesson'){this.options=[...this._html.matchAll(/<option value="([^"]+)"/g)].map(m=>({value:m[1]}));}if(this.id==='lessonList'){this.children=[...this._html.matchAll(/data-lesson="([^"]+)"/g)].map(m=>{const e=new Elem();e.dataset.lesson=m[1];return e})}}
  get innerHTML(){return this._html}
  querySelectorAll(s){return s==='[data-lesson]'?this.children:[]}
 }
