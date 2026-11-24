@@ -11,20 +11,24 @@ const sw=fs.readFileSync('kotoba-ios/sw.js','utf8');
 const manifest=JSON.parse(fs.readFileSync('kotoba-ios/manifest.webmanifest','utf8'));
 const read=p=>fs.readFileSync(p,'utf8');
 assert.match(html,/class="ios-tabbar"/);
+assert.match(html,/class="ios-smart-grid"/);
+assert.match(html,/class="ios-inset-group"/);
+assert.doesNotMatch(html,/class="entry-card"/);
+assert.doesNotMatch(html,/SLOW LEARNING/);
 for(const tab of ['home','lessons','library','stats'])assert.match(html,new RegExp('data-tab="'+tab+'"'));
 assert.match(html,/href="\.\.\/kotoba\/"/);
-assert.match(html,/href="\.\/ios\.css\?v=1\.0"/);
+assert.match(html,/href="\.\/ios\.css\?v=2\.0"/);
 assert.match(html,/id="cardPos"/);
 assert.ok(!html.slice(html.indexOf('<section id="study"'),html.indexOf('<section id="test"')).includes('id="testForgot"'),'Study must not grade');
 assert.ok(html.slice(html.indexOf('<section id="test"')).includes('id="testForgot"'),'Test must keep grading');
 assert.match(app,/const KEY='kotoba_ios_preview_v1'/);
 assert.match(app,/original=STORAGE\.get\('kotoba_pwa_v4'\)/);
 assert.doesNotMatch(app,/const KEY='kotoba_pwa_v4'/);
-assert.match(sw,/ios-kotoba-preview-v1/);
+assert.match(sw,/ios-kotoba-preview-v2/);
 assert.doesNotMatch(sw,/key\.startsWith\('kotoba-'\)/);
 assert.equal(manifest.start_url,'./');
 assert.equal(manifest.scope,'./');
-for(const expected of ['.ios-tabbar','.stats-strip','.entry-card','.lesson-card','.word-stage','.test-immersion','.card-pos','env(safe-area-inset-bottom)'])
+for(const expected of ['.ios-tabbar','.ios-smart-grid','.ios-smart-tile','.ios-inset-group','.lesson-card','.word-stage','.test-immersion','.card-pos','prefers-color-scheme:dark','env(safe-area-inset-bottom)'])
  assert.ok(css.includes(expected),'iOS theme missing '+expected);
 const paths=[...html.matchAll(/<(?:link|script)[^>]+(?:href|src)="([^"]+)"/g)].map(m=>m[1]);
 for(const ref of paths){
