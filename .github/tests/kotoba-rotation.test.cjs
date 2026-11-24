@@ -8,8 +8,8 @@ const storage=new Map();
 function bootstrap(){
   const elems=new Map();
   class MockElement{
-    constructor(id=''){this.id=id;this.value='';this.textContent='';this.dataset={};this.style={};this.disabled=false;this.children=[];this._html='';this._classes=new Set();this.classList={add:(x)=>this._classes.add(x),remove:(x)=>this._classes.delete(x),toggle:(x,force)=>{const toAdd=force===undefined?!this._classes.has(x):!!force;toAdd?this._classes.add(x):this._classes.delete(x);return toAdd},contains:(x)=>this._classes.has(x)}}
-    set innerHTML(value){this._html=String(value);if(this.id==='lessonList'){this.children=[...this._html.matchAll(/data-lesson="([^"]+)"/g)].map(m=>{const e=new MockElement();e.dataset.lesson=m[1];return e})}}
+    constructor(id=''){this.id=id;this.value='';this.textContent='';this.dataset={};this.style={};this.disabled=false;this.children=[];this.options=[];this._html='';this._classes=new Set();this.classList={add:(x)=>this._classes.add(x),remove:(x)=>this._classes.delete(x),toggle:(x,force)=>{const toAdd=force===undefined?!this._classes.has(x):!!force;toAdd?this._classes.add(x):this._classes.delete(x);return toAdd},contains:(x)=>this._classes.has(x)}}
+    set innerHTML(value){this._html=String(value);if(this.id==='libLesson'){this.options=[...this._html.matchAll(/<option value="([^"]+)"/g)].map(m=>({value:m[1]}));}if(this.id==='lessonList'){this.children=[...this._html.matchAll(/data-lesson="([^"]+)"/g)].map(m=>{const e=new MockElement();e.dataset.lesson=m[1];return e})}}
     get innerHTML(){return this._html}
     addEventListener(){}
     appendChild(e){this.children.push(e)}
