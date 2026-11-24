@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "ことば · iOS 设计预览",
+  "short_name": "ことば UI",
+  "description": "ことば原生 iPhone 视觉预览版。与正式版独立保存学习进度。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f2f2f7",
+  "theme_color": "#f2f2f7",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "../kotoba/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
