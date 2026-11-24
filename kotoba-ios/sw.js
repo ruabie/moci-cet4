@@ -1,6 +1,6 @@
-const CACHE='ios-kotoba-preview-v1-20261124';
+const CACHE='ios-kotoba-preview-v2-20261124';
 const FILES=[
- './','./index.html','./ios.css?v=1.0','./app.js?v=1.0','./manifest.webmanifest',
+ './','./index.html','./ios.css?v=2.0','./app.js?v=2.0','./manifest.webmanifest',
  '../kotoba/icon.svg','../kotoba/styles.css?v=7.1','../kotoba/book-data.js?v=5.1',
  '../kotoba/vocab-03-page08.js?v=7.0','../kotoba/vocab-04.js?v=7.0',
  '../kotoba/vocab-05.js?v=7.0','../kotoba/vocab-13.js?v=6.0',
