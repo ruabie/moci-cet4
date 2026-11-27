@@ -6,7 +6,7 @@ const fs = require('node:fs');
 
 const BASE = 'https://ruabie.github.io/moci-cet4/kotoba/';
 const FILES = [
-  'book-data.js','vocab-03-page08.js','vocab-04.js','vocab-05.js','vocab-13.js','vocab-14.js','vocab-15.js',
+  'book-data.js','vocab-03-page08.js','vocab-04.js','vocab-05.js','vocab-06-07.js','vocab-13.js','vocab-14.js','vocab-15.js',
   'vocab-16.js','extra-words.js','app.js','styles.css'
 ];
 const LOCAL = fs.readFileSync('kotoba/index.html', 'utf8');
@@ -48,6 +48,7 @@ async function verify() {
     if (!body.trim()) throw new Error(file + ' returned empty content');
     if (file === 'app.js' && !body.includes('SUPPLEMENT_WORDS')) throw new Error('App missing SUPPLEMENT_WORDS');
     if (file === 'vocab-16.js' && !body.includes('KOTOBA_SUPPLEMENTS')) throw new Error('V16 missing supplements');
+    if (file === 'vocab-06-07.js' && (!body.includes('ラフカディオ・ハーン') && !body.includes('孝文化'))) throw new Error('New lessons 6/7 data not published');
   }
   await request(new URL('./sw.js', BASE));
 }
