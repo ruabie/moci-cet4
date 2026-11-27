@@ -1281,7 +1281,7 @@
       "focusedPrConclusion": "completed_success",
       "fullGodotPushCI": 45963560310,
       "fullGodotPrCI": 45963566993,
-      "fullGodotPushConclusion": "in_progress_at_snapshot",
+      "fullGodotPushConclusion": "completed_success",
       "fullGodotPrConclusion": "completed_success",
       "freeSupervisorPrCI": 45963567024,
       "freeSupervisorPrConclusion": "completed_success",
@@ -1333,7 +1333,8 @@
       "sourceAvatarSoleIKApproved": false,
       "professionalArtApproved": false,
       "publicWebPageExists": false,
-      "releaseReady": false
+      "releaseReady": false,
+      "fullGodotPushCompletedAt": "2026-11-27T08:15:09Z"
     },
     "webExportPilotV039_previous_failed_round": {
       "version": "V0.39 same-game real Web export build in isolated stacked draft; authentic Godot export completed, artifact delivery FAILED, Chromium SKIPPED",
@@ -1394,7 +1395,7 @@
     {
       "id": "Godot-functional-QA",
       "state": "passed_current_sha_pr_full_engine_plus_web_focused",
-      "why": "Original V0.39 core PR#53 full engine CI success #45025983134, current isolated Web PR#55 head df6d9f0f... full Godot PR CI #45963566993 completed/success, focused Web Push #45963560267 and PR #45963566921 both completed/success. Full engine Push #45963560310 pending at snapshot. All success is engine/automated browser only; no art/hardware approval."
+      "why": "Original V0.39 core PR#53 full engine CI success #45025983134, current isolated Web PR#55 head df6d9f0f... full Godot PR CI #45963566993 completed/success, focused Web Push #45963560267 and PR #45963566921 both completed/success. Full engine Push #45963560310 completed/success at 2026-11-27T08:15:09Z. All success is engine/automated browser only; no art/hardware approval."
     },
     {
       "id": "WebGL-browser",
@@ -1451,7 +1452,7 @@
     "NEXT: Fix V0.39 physically wall-safe near-wall third-person camera as the original HTML5 close-wall screenshot would still show the avatar head/hair obscuring view at 0.098m. Build a separately gated V0.40 shoulder/near-first-person transition without clipping, with true 3D original camera test and full browser near-wall screenshot; DO NOT expand map first.",
     "Diagnose real Chromium software-mode frame timing and character low observed W displacement (0.16m for 1.4s on final Push, 0.97m on a separate same-source PR), record frame-time FPS p95 and compare native GPU manual test before performance claims; avoid treating a threshold test as smooth gaming.",
     "Visual polish priorities: replace corrupt neon/shop signs, improve default bright storefront vs surrounding older dark facade aesthetics, furnish same V37 walkable shop with detailed shelves and believable modern retail; verify from original in-engine screenshot not just scripts.",
-    "Current V0.39 isolated downloadable actual ZIP from Push #45963560267 artifact #15182111335, SHA-verified with 14 files and build-info commit df6d9f0f..., browser actual W input images/metrics #15182036603, final Push/PR Web CIs both success. No further changes needed to unblock download. Keep full Godot Push #45963560310 under observation until complete.",
+    "Current V0.39 isolated downloadable actual ZIP from Push #45963560267 artifact #15182111335, SHA-verified with 14 files and build-info commit df6d9f0f..., browser actual W input images/metrics #15182036603, final Push/PR Web CIs both success. No further changes needed to unblock download. Full Godot Push #45963560310 already completed/success at same branch head; do not infer artistic release signoff.",
     "Use bundled OFL Noto CJK font already visibly readable in Web screenshots; original sign text still bad. Preserve source art/rig licenses and hashes, no runtime CDN, no automatic Pages publish, no main source merge, no expenses.",
     "Only after camera/art and acceptable performance verify real single-store work/money/save transaction; main HTML S0–S5 pending, full Windows Chrome RTX3060/human playthrough still unverified, original 11 lot/test-only north scene must not be confused with released city."
   ],
@@ -1459,9 +1460,9 @@
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "2026-11-27 exact current Web QA head df6d9f0f; focused Web Push #45963560267 and PR #45963566921 completed/success. Authoritative Push artifact #15182111335 downloaded and hash checked, original Chromium screenshots/metrics #15182036603 pass. Core V0.39 #53 still draft, close camera hair/clipped visual FAIL, sign glyphs garbled. Full engine PR #45963566993 completed/success, push #45963560310 pending at snapshot. Main never auto merged or published. User can download local preview and use Python3 localhost in desktop Chrome/Edge.",
+    "freshness": "2026-11-27 exact current Web QA head df6d9f0f; focused Web Push #45963560267 and PR #45963566921 completed/success. Authoritative Push artifact #15182111335 downloaded and hash checked, original Chromium screenshots/metrics #15182036603 pass. Core V0.39 #53 still draft, close camera hair/clipped visual FAIL, sign glyphs garbled. Full engine PR #45963566993 completed/success, push #45963560310 completed/success at 2026-11-27T08:15:09Z. Main never auto merged or published. User can download local preview and use Python3 localhost in desktop Chrome/Edge.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "2026-11-27 original Godot V0.39 same-game isolated Web preview draft PR#55 at exact head df6d9f0f6c3c0d1f9413339bb99aab5be2ec294c. Bounded fix 1 d1333e6 correct ZIP upload path; initial Push browser automation locator navigation wait timeout, same SHA PR Chromium success. Bounded fix 2 df6d9f0 changes only test mouse click to genuine page.mouse.click. Final Web Push #45963560267 and PR #45963566921 both completed/success. Original exact-head downloadable ZIP artifact #15182111335, extracted/verified 14 files and all SHA256 manifest checks, Chromium original source screenshots+JSON #15182036603 proves WebGL2/WASM 1280x720 boot, W moved CityPlayer 0.16m at software rendering (another run 0.97m), no errors, CJK readable. NOT public, not art or hardware approved. Full engine PR #45963566993 success, Push #45963560310 in_progress at last snapshot."
+    "latestRound": "2026-11-27 original Godot V0.39 same-game isolated Web preview draft PR#55 at exact head df6d9f0f6c3c0d1f9413339bb99aab5be2ec294c. Bounded fix 1 d1333e6 correct ZIP upload path; initial Push browser automation locator navigation wait timeout, same SHA PR Chromium success. Bounded fix 2 df6d9f0 changes only test mouse click to genuine page.mouse.click. Final Web Push #45963560267 and PR #45963566921 both completed/success. Original exact-head downloadable ZIP artifact #15182111335, extracted/verified 14 files and all SHA256 manifest checks, Chromium original source screenshots+JSON #15182036603 proves WebGL2/WASM 1280x720 boot, W moved CityPlayer 0.16m at software rendering (another run 0.97m), no errors, CJK readable. NOT public, not art or hardware approved. Full engine PR #45963566993 success, Push #45963560310 completed/success 2026-11-27T08:15:09Z at exact same source head."
   }
 }
