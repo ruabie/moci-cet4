@@ -1,0 +1,83 @@
+name: LifeSim V0.40 pages staging ONLY - verify authentic WASM assets without publishing
+on:
+  push:
+    branches:
+      - lifesim-v040-third-person-near-wall-visibility
+    paths:
+      - '.github/workflows/lifesim-pages-stage-v040.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: lifesim-v040-pages-staging
+  cancel-in-progress: false
+jobs:
+  stage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: lifesim-v040-pages-staging
+          fetch-depth: 1
+      - name: Retrieve separately tested exact V0.40 source-branch build; not the old V0.18 site
+        uses: actions/download-artifact@v4
+        with:
+          repository: ruabie/moci-cet4
+          run-id: 45992772271
+          name: lifesim-v040-isolated-browser-playtest
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/v040-release-source
+      - name: Reverify source SHA, each original Web file and Game WASM magic, stage only the new Pages path
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json, shutil
+          source=Path("/tmp/v040-release-source")
+          output=Path("lifesim/play-v40")
+          info=json.loads((source/"build-info.json").read_text(encoding="utf-8"))
+          expected="2b8b582cf4d68b2bc2537c81bd9a086621828bd6"
+          assert info["head_sha"]==expected, "Do not publish wrong game version"
+          assert info["version"]=="V0.40 isolated Web diagnostic preview"
+          assert info["public_deploy"] is False, "Original Web build must be isolated diagnostic"
+          files=info["web_files"]
+          assert all(p in files for p in ("index.html","index.js","index.wasm","index.pck"))
+          assert (source/"index.wasm").read_bytes()[:4] == b"\\x00asm"
+          assert len(files)==9, f"Unexpected exported Game Web file count: {list(files)}"
+          for name,record in files.items():
+              f=source/name
+              assert f.is_file() and f.stat().st_size==record["bytes"], name
+              assert hashlib.sha256(f.read_bytes()).hexdigest()==record["sha256"],name
+          if output.exists(): raise SystemExit("Refuse overwriting existing V0.40 Pages path")
+          output.mkdir(parents=True)
+          for name in files:
+              shutil.copy2(source/name,output/name)
+          for name in ("build-info.json","fonts-OFL-LICENSE.txt"):
+              shutil.copy2(source/name,output/name)
+          (output/"SITE_RELEASE_INFO.txt").write_text(
+            "LifeSim / 同频之城 V0.40 isolated public Web preview\n"
+            "Source: ruabie/moci-cet4 draft PR #56\n"
+            "Godot 4.7.2 Web single-threaded, local static runtime, no external CDN\n"
+            "Compiled build source SHA: "+expected+"\n"
+            "Not a commercial release. UI, shops, city art and save loop incomplete.\n",encoding="utf-8")
+          print("V040 PAGES ONLY NEW PATH: verified",len(files),"original Web runtime assets and original font license")
+          PY
+          git status --short
+          git add -f -- lifesim/play-v40/
+          python3 - <<'PY'
+          import subprocess
+          changed=subprocess.check_output(["git","diff","--cached","--name-only"],text=True).splitlines()
+          assert len(changed)>=10
+          assert all(p.startswith("lifesim/play-v40/") for p in changed), "Staging changed existing user app"
+          assert sum(1 for p in changed if p.endswith("index.wasm"))==1
+          assert sum(1 for p in changed if p.endswith("index.pck"))==1
+          print("V040 PUBLIC SITE ONLY ADDITIVE FILES",len(changed))
+          PY
+          git -c user.name='LifeSim Preview Stager' -c user.email='lifesim-ci@users.noreply.github.com' \
+            commit -m 'site(lifesim): stage original V040 standalone HTML5 Web preview, preserve all old apps'
+          git push origin HEAD:lifesim-v040-pages-staging
+          echo "STAGED_BRANCH_HEAD=$(git rev-parse HEAD)"
+          echo "STAGED_RUNTIME_TOTAL_BYTES=$(du -sb lifesim/play-v40 | cut -f1)"
