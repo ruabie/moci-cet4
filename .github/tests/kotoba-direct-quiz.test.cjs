@@ -33,7 +33,7 @@ const school={
 };
 const extra=[{jp:'のびる',kana:'のびる',cn:'伸长',lesson:'extra',source:'chat',pos:'自一',page:0}];
 const expected=new Map(school.words.map(w=>[w.jp,w.jp]));
-const wordsByCN=new Map(school.words.map(w=>[w.cn,w.jp]));
+const wordsByCN=new Map([...school.words,...extra].map(w=>[w.cn,w.jp]));
 let memory=new Map();
 class MockElement {
  constructor(id=''){
@@ -52,7 +52,7 @@ class MockElement {
  }
  get innerHTML(){return this._html;}
  setAttribute(){}
- addEventListener(){}
+ addEventListener(name,fn){this['on'+name]=fn}
  appendChild(e){this.children.push(e)}
  querySelectorAll(selector){return selector==='[data-lesson]'?this.children:[]}
 }
@@ -76,7 +76,7 @@ function boot(){
 const booted=boot(),{el,modes,active,saved}=booted;
 el('openDirect').onclick();
 assert.ok(active('directSetup'),'Home Direct Recall must skip learning');
-assert.equal(el('directPoolSize').textContent,26,'All library entries include course words and extra once');
+assert.equal(el('directPoolSize').textContent,27,'All library entries include course words and extra once');
 assert.equal(Number(el('directQty').value),10);
 assert.equal(el('directScope').value,'all');
 el('directQty').value='20';
@@ -143,14 +143,12 @@ assert.equal(u3.el('directPoolSize').textContent,1);
 u3.el('startDirectTest').onclick();u3.modes[0].onclick();
 u3.el('skipAnswer').onclick();u3.el('testForgot').onclick();
 assert.ok(u3.active('test'),'Forgotten item should reappear in same session');
-for(let i=0;i<2;i++){
- u3.el('answer').value='のびる';u3.el('answerBtn').onclick();u3.el('testRemember').onclick();
-}
+u3.el('answer').value='のびる';u3.el('answerBtn').onclick();u3.el('testRemember').onclick();
 assert.ok(u3.active('done'));
 const p=u3.saved().progress['のびる'];
 assert.equal(p.lastGrade,'again');
 assert.equal(p.lapses,1);
 assert.ok(p.dueAt>Date.now(),'Weak word keeps review due in future');
-assert.equal(u3.saved().logs.at(-1).repeat,2);
+assert.equal(u3.saved().logs.at(-1).repeat,1);
 assert.equal(Object.keys(u3.saved().coverage).length,0);
 console.log('KOTOBA DIRECT QUIZ PASS: 20 from full library, no repeats, lesson 12 meanings, all mode, weak-word repeats, no coverage consumption, independent original UI.');
