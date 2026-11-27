@@ -37,14 +37,14 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.40 original Godot camera near-wall visibility fix plus isolated HTML5/WebAssembly ZIP, REAL Chromium boot and W input PASS; NOT public/release/art acceptance",
+      "version": "V0.40 original Godot camera patch; Web build original source 2b8b582c published on public GitHub Pages 2026-11-27 and tested in actual public Chromium; preview only, not full game/art",
       "pr": 56,
       "url": "https://github.com/ruabie/moci-cet4/pull/56",
       "state": "open",
       "draft": true,
       "merged": false,
       "headBranch": "lifesim-v040-third-person-near-wall-visibility",
-      "headSha": "2b8b582cf4d68b2bc2537c81bd9a086621828bd6",
+      "headSha": "7917b562933c0b7d38dc186720f6d43ea74a5041",
       "baseBranch": "lifesim-v039-isolated-web-review",
       "baseHeadSha": "df6d9f0f6c3c0d1f9413339bb99aab5be2ec294c",
       "coreV039SHA": "0925394389eedacf4c1ce1c028922182ed60e5b1",
@@ -146,8 +146,17 @@
         "staticScreenshotManualReview": true,
         "windowsActualGpuOrUserTested": false,
         "publicDeployed": false,
-        "releaseReady": false
-      }
+        "releaseReady": false,
+        "publicWebsiteNowPublished": true,
+        "publicHttpsUrl": "https://ruabie.github.io/moci-cet4/lifesim/play-v40/?qa=1",
+        "publicPagesStagingSourceCommit": "f038993621f1ba99537ba8b6c473f01fbc019168",
+        "publicPagesSmokeId": 45995769212,
+        "publicPagesSmokeArtifactId": 15195608068,
+        "publicPagesMouseWMoveMetres": 0.2566661834716992,
+        "publicPagesChromiumVerified": true,
+        "crossOriginIsolatedOnPages": false
+      },
+      "webSourceBuildSha": "2b8b582cf4d68b2bc2537c81bd9a086621828bd6"
     },
     "issues": [
       {
@@ -1553,6 +1562,61 @@
       "windowsActualGpuOrUserTested": false,
       "publicDeployed": false,
       "releaseReady": false
+    },
+    "publicWebPreviewV040": {
+      "url": "https://ruabie.github.io/moci-cet4/lifesim/play-v40/?qa=1",
+      "version": "V0.40",
+      "publicPreviewOnline": true,
+      "originalSourceBuildSha": "2b8b582cf4d68b2bc2537c81bd9a086621828bd6",
+      "sourcePR": 56,
+      "sourceDraftHeadCurrent": "7917b562933c0b7d38dc186720f6d43ea74a5041",
+      "host": "Existing GitHub Pages source=main:/ legacy, not separately changed",
+      "pagesSourceUnmodified": true,
+      "publicMainStagedCommit": "f038993621f1ba99537ba8b6c473f01fbc019168",
+      "pagesStagingBranch": "lifesim-v040-pages-staging",
+      "pagesStagingWorkflowPushRun": 45995450354,
+      "pagesStagingConclusion": "completed_success",
+      "stagedCommitOnlyNewFilesUnder": "lifesim/play-v40/",
+      "stagedFilesAdded": 12,
+      "originalAppFilesChanged": 0,
+      "originalWebArtifactId": 15194202716,
+      "originalWebFilesSha256Checked": true,
+      "originalWebWasmBytes": 39514754,
+      "originalPckBytes": 41331896,
+      "publishedMainBranchFastForwardWithoutForce": true,
+      "pagesLiveDeploymentRun": 45995647385,
+      "pagesLiveDeploymentConclusion": "completed_success",
+      "publicHttpsHtml200": true,
+      "publicHttpsJs200": true,
+      "publicHttpsWasm200": true,
+      "publicHttpsPck200": true,
+      "publishedBuildInfoCorrectSourceSha": true,
+      "originalV018UrlStillHttp200": true,
+      "publicChromiumRun": 45995769212,
+      "publicChromiumConclusion": "completed_success",
+      "publicChromiumEvidenceArtifactId": 15195608068,
+      "publicChromiumResults": {
+        "engineBoot": true,
+        "wasmStarted": true,
+        "webGL2Available": true,
+        "crossOriginIsolated": false,
+        "originalCanvas": [
+          1280,
+          720
+        ],
+        "originalCityPlayer": true,
+        "initialX": -13.75,
+        "afterRealKeyboardW_X": -14.0066661834717,
+        "travelledMetres": 0.2566661834716992,
+        "actualBrowserScreenshots": 2,
+        "errors": [],
+        "pass": true
+      },
+      "siteRequiresDownloadOrPython": false,
+      "siteReleaseStatus": "public demo only, NOT full release",
+      "actualBrowserCloseWallCameraStressUnverified": true,
+      "nativeWindowsGpuUnverified": true,
+      "artAndEconomyAcceptanceBlocked": true
     }
   },
   "gates": [
@@ -1568,8 +1632,8 @@
     },
     {
       "id": "WebGL-browser",
-      "state": "passed_isolated_v040_original_chromium_boot_and_wasd_only",
-      "why": "Exact current V040 open draft PR#56 head 2b8b582cf4d68b2bc2537c81bd9a086621828bd6; Web Push #45992772271 completed/success and PR #45992780446 success, official Godot HTML/JS/WASM/PCK ZIP artifact #15194202716 downloaded 14 files testzip CRC and every manifest SHA256 PASS. Actual Chromium headless WebGL2 COOP/COEP boot 1280x720, original CityPlayer physical W from x -13.75 to -14.35444 (0.60444m), 2 real PNG, errors empty, proof #15195460250. V040 Web NOT independently stress-tested at shop back wall, Windows real hardware FPS, human usability and art/commerce still blocked. No public Pages website."
+      "state": "passed_public_v040_html_wasm_real_chromium_w_only",
+      "why": "V040 actual public URL https://ruabie.github.io/moci-cet4/lifesim/play-v40/?qa=1 published by main staging commit f0389936 only 12 new files; Pages Action #45995647385 success, old v18 200, all new index.html/JS/WASM/PCK HTTPS 200; original source Web build 2b8b582c SHA checked. Live GitHub Pages Chromium Action #45995769212 success, actual Godot WASM WebGL2 1280x720 W moved real CityPlayer 0.256666m errors=[]; crossOriginIsolated=false on Pages, single-thread engine works. Evidence #15195608068. Real browser near-wall stress, hardware FPS and full art/economy NOT verified."
     },
     {
       "id": "Art-and-animation",
@@ -1583,13 +1647,13 @@
     },
     {
       "id": "Release",
-      "state": "not_ready",
-      "why": "Latest V040 Web ZIP downloadable and Chromium startup/input smoke PASS but PR#56 remains draft/unmerged/unpublished, localhost HTTP required; GTA6-quality original street detail and shop/NPC routines absent, storefront signage corrupt, Windows hardware and full browser camera-wall scene not verified. No public link."
+      "state": "public_preview_online_full_game_not_ready",
+      "why": "Public V040 GitHub Pages URL is online and smoke-tested. This is explicitly an incomplete public test demo, not a polished/commercial full game; PR#56 draft unmerged, signage garbled, sparse interior and no audited life/work/shop/save loop or user hardware performance; full release NOT READY."
     },
     {
       "id": "Workflow-no-automatic-publication",
-      "state": "fixed_in_stacked_drafts_only",
-      "why": "V0.29 PR #43 remains unmerged draft on safe V0.19-descended branch. Old V0.18 branch still has unsafe push-to-main web deploy; do not push old branch."
+      "state": "isolated_public_v040_demo_explicit_user_requested",
+      "why": "User explicitly asked direct online webpage as before, so one-off Pages publication done via Pages original main branch, only 12 added files in lifesim/play-v40, legacy old site unchanged; no automated routine deploys PR #56 source code, no main merge of game source."
     },
     {
       "id": "V035-two-lot-architecture-qa",
@@ -1623,18 +1687,19 @@
     }
   ],
   "nextActions": [
-    "V040 local Web ZIP now available from official GitHub artifact #15194202716, sha 2b8b582cf4d68b2bc2537c81bd9a086621828bd6, with checked 14-file manifest. User may play only via extracted localhost Python3 server, NOT direct file://index.html. Original live Pages not published; do not confuse current local Web playable with public game.",
-    "NEXT real V040 Web browser QA: run actual mouse yaw into V37 solid shop rear wall and confirm camera transitions into avatar local mesh transparency/visibility and back after clearing with genuine rendered screenshots, not just prior V040 Godot native physical/Png QA; test game saves and FPS p95, plus Windows RTX3060 user play.",
-    "Then build original GTA6-inspired one-block coherent life-simulation vertical slice, not copied GTA VI IP; prioritize authentic store interior detail, realistic crossing/sidewalk layout, clear original facade signage, populated NPC daily routine, work/earn/spend/save loop. Do not enlarge low-quality city.",
-    "Keep both Godot engine PR and web QA passing, preserve source-asset licenses, pinned SHA and permission safety; no main merge, Pages deploy or new expenses without user authorization."
+    "V0.40 DIRECT PUBLIC WEB DEMO NOW LIVE: https://ruabie.github.io/moci-cet4/lifesim/play-v40/?qa=1 , no download or Python; source build SHA 2b8b582c, main publish commit f0389936, GitHub Pages #45995647385 success; actual public Chrome test #45995769212 pass, original CityPlayer W moved 0.256666m; old V018 remains HTTP 200. Do NOT describe this as not online.",
+    "NEXT: Test genuine public browser rotated camera against the same solid V37 shop rear wall, verify only local avatar render fade/hide and recovery under public WebGL, browser screenshots & real frame timing (p50/p95), original CJK HUD and signage; don't assume native Godot V040 proof covers this scenario.",
+    "Build only a compact original lived-in urban block with furnished shop, coherent sidewalk/crossing/facilities, believable readable signage, NPC daily work routines and work-earn-spend-save; GTA VI high-level principles only, no copying IP or map. Art and full functionality remain FAIL.",
+    "Maintain both public V040 path and old V018 path; do not merge draft game PR #56 into main. Only isolated static preview V040 files (12 additions) are in main. Keep license and immutable asset source verification, no new fees.",
+    "Actual Windows RTX3060 6GB Chrome FPS and human hand-operated gameplay still not tested; public Chromium CI uses software rendering and 0.257m W movement not evidence of smoothness. If regression arises, restore old status and investigate."
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "Current 2026-11-27 verified V040 PR#56 open/draft/unmerged head 2b8b582cf4d68b2bc2537c81bd9a086621828bd6. V040 Web CI Push #45992772271 and PR #45992780446 completed/success, real original source-branch Web ZIP #15194202716 verified 14 entries CRC and SHA, Chromium PNG/QA #15195460250 real Godot browser boot and W key movement 0.60444m (errors=[]). Last native real wall occlusion pass V040 e1b10a0; latest Web screenshot startup and W only, no wall-specific browser QA, user hardware, public Pages, city art or final game release.",
+    "freshness": "2026-11-27 live one-click V0.40 site published and tested, exact public URL https://ruabie.github.io/moci-cet4/lifesim/play-v40/?qa=1. Main published commit f038993621f1ba99537ba8b6c473f01fbc019168 plus documentation commits; original build SHA 2b8b582cf4d68b2bc2537c81bd9a086621828bd6, source PR#56 current head 7917b562933c0b7d38dc186720f6d43ea74a5041. Pages Action 45995647385 success, public Playwright 45995769212 success, evidence artifact 15195608068. Art, Windows hardware FPS, shop/save/work, pub close-wall test blocked; old V18 preserved.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "2026-11-27 V040 PR #56 same original gameplay/camera shader from e1b10a0, new build wiring V040 head 2b8b582cf4d68b2bc2537c81bd9a086621828bd6. Official Godot 4.7.2 HTML+WASM+PCK isolated Web ZIP artifact #15194202716, downloaded 50,218,577 byte/14-file ZIP CRC and manifest SHA256 PASS; actual Web Push CI #45992772271 and PR CI #45992780446 both success. Actual same-SHA headless Chromium WebGL2 1280x720, crossOriginIsolated true, W key physical input moved original CityPlayer 0.60444m, 2 original browser PNG, errors empty, proof artifact #15195460250. Existing V040 original Godot rear-wall screenshot/physics test passed prior and source unchanged, but Web specifically behind rear wall not tested, Windows hardware not tested, no public Pages. User has downloadable latest V040 local preview."
+    "latestRound": "2026-11-27 user requests direct online browser version. Verified existing Pages legacy main:/ and old V018 live 200; new V040 initially 404. Created staging branch from original main fd3592aa, Action #45995450354 verified original Web Artifact #15194202716 9 runtime files SHA256+WASM and added 12 files exclusively lifesim/play-v40. Compared branch ahead1 behind0 and only added, safely fast-forwarded main to f038993621f1ba99537ba8b6c473f01fbc019168. GitHub Pages official build #45995647385 completed/success. Public https://ruabie.github.io/moci-cet4/lifesim/play-v40/?qa=1 HTML/JS/WASM/PCK HTTPS 200, old V018 200. Real public Chrome #45995769212 completed/success: 1280x720 WASM/WebGL2 original CityPlayer x -13.75 to -14.006666, W 0.256666m, errors=[] screenshot 2, public crossOriginIsolated=false but single-thread engine works. Current development PR#56 draft head 7917b56 with only testing/publish workflow changes after source build 2b8b582c; no PR merged and art not approved."
   }
 }
