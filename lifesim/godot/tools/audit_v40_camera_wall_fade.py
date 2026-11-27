@@ -35,9 +35,9 @@ assert blocked["camera_distance_actual_m"]<data["wall_distance_m"]-.04
 assert open_view["camera_distance_actual_m"]>data["wall_distance_m"]+1.2
 assert blocked["camera_overlap_objects"]==0 and open_view["camera_overlap_objects"]==0
 assert blocked["avatar_camera_fade"]>=.97
-assert blocked["avatar_mesh_render_min_fade"]>=.97
+assert blocked["avatar_mesh_hidden_count"] == data["avatar_render_mesh_count"]
 assert open_view["avatar_camera_fade"]<=.02
-assert open_view["avatar_mesh_render_min_fade"]<=.02
+assert open_view["avatar_mesh_hidden_count"] == 0
 assert blocked["avatar_render_mesh_count"]==open_view["avatar_render_mesh_count"]
 assert data["real_human_mouse_verified"] is False
 assert data["windows_or_browser_performance_verified"] is False
@@ -103,6 +103,9 @@ report={
     "collision_activations":data["forced_occlusion_count"],
     "camera_overlap_max":data["peak_camera_shape_overlaps"],
     "avatar_meshes_unchanged":data["avatar_render_mesh_count"],
+    "compatibility_material_slots":data["compatibility_material_alpha_slot_count"],
+    "occluded_local_meshes_hidden":blocked["avatar_mesh_hidden_count"],
+    "recovered_local_meshes_hidden":open_view["avatar_mesh_hidden_count"],
     "occluded_avatar_fade":blocked["avatar_camera_fade"],
     "recovered_avatar_fade":open_view["avatar_camera_fade"],
     "original_hair_center_fraction":round(head_before,6),
