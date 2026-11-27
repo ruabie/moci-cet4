@@ -1,0 +1,327 @@
+name: LifeSim V0.39 isolated Web WASM build and authentic Chromium preview - no publish
+
+on:
+  push:
+    branches:
+      - lifesim-v039-isolated-web-review
+    paths:
+      - '.github/workflows/lifesim-v039-web-review.yml'
+      - 'lifesim/godot/tools/v039_isolated_web_server.py'
+      - 'lifesim/godot/tools/v039_isolated_web_browser_audit.mjs'
+  pull_request:
+    paths:
+      - '.github/workflows/lifesim-v039-web-review.yml'
+      - 'lifesim/godot/tools/v039_isolated_web_server.py'
+      - 'lifesim/godot/tools/v039_isolated_web_browser_audit.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: lifesim-v039-web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 33
+    env:
+      PROJECT_DIR: lifesim/godot
+      EXPORT_DIR: /tmp/lifesim-v039-web
+      PLAYWRIGHT_ROOT: /tmp/lifesim-browser
+      PREVIEW_EVIDENCE: v039-web-browser-evidence
+      PREVIEW_URL: http://127.0.0.1:8765/?qa=1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore historically SHA-verified offline GLBs only (do not overwrite new source)
+        uses: actions/download-artifact@v4
+        with:
+          repository: ruabie/moci-cet4
+          run-id: 44754419556
+          name: lifesim-v018-godot-source-verified
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/lifesim-v32-verified-source
+      - name: Copy build-time verified original assets, check UAL and Base SHA digests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s /tmp/lifesim-v32-verified-source/art/animations/v21/ual1_inplace.glb
+          test -s /tmp/lifesim-v32-verified-source/art/characters/v26/base_character_compatible.glb
+          mkdir -p "$PROJECT_DIR/art"
+          cp -a /tmp/lifesim-v32-verified-source/art/. "$PROJECT_DIR/art/"
+          python3 - <<'PY'
+          import hashlib
+          from pathlib import Path
+          a=Path("lifesim/godot/art/animations/v21/ual1_inplace.glb").read_bytes()
+          b=Path("lifesim/godot/art/characters/v26/base_character_compatible.glb").read_bytes()
+          assert len(a)==7618436 and hashlib.sha256(a).hexdigest()=="69591853d817488edaa8fd9bf8fc1d821eaeaf789f8627b3cd23b41c4ed67997"
+          assert len(b)==1085752 and hashlib.sha256(b).hexdigest()=="2d6792e77f337cf6fac3a81e1caf92798b898401140485b55307c9f14785ec25"
+          print("V36 RESTORED ARCHIVE DIGEST PASS: pinned CC0 UAL + Base")
+          PY
+          python3 "$PROJECT_DIR/tools/audit_north_district_v32.py" | tee v36-spatial-plan.log
+      - name: Resolve and cryptographically verify all 3 original external CC0 GLBs (build-time only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/fetch_v36_cc0.py" | tee v36-asset-audit.log
+          grep -F 'V36 PINNED CC0 SOURCE AUDIT PASS:' v36-asset-audit.log
+      - name: Decode pinned Meshopt + dequantize for Godot 4.7.2 import (original digests still preserved)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Author-provided GLBs are EXT_meshopt_compression+KHR_mesh_quantization.
+          # Godot's importer rejects them. Never strip extension names
+          # without decoding actual data; convert with a maintained library.
+          npm install --prefix /tmp/v36-gltf-tool --no-audit --no-fund --ignore-scripts @gltf-transform/cli@4.5.0
+          mkdir -p /tmp/v36-original-pinned
+          for slug in housing-facade-shop housing-facade-window housing-facade-balcony; do
+            mv "$PROJECT_DIR/art/third_party/tevy_v36/$slug.glb" "/tmp/v36-original-pinned/$slug.glb"
+            /tmp/v36-gltf-tool/node_modules/.bin/gltf-transform dequantize \
+              "/tmp/v36-original-pinned/$slug.glb" \
+              "$PROJECT_DIR/art/third_party/tevy_v36/$slug.glb" | tee -a v36-conversion.log
+          done
+          python3 - <<'PY'
+          import json, struct
+          from pathlib import Path
+          root=Path("lifesim/godot/art/third_party/tevy_v36")
+          slugs=["housing-facade-shop","housing-facade-window","housing-facade-balcony"]
+          for slug in slugs:
+              data=(root/(slug+".glb")).read_bytes()
+              assert data[:4]==b"glTF" and struct.unpack_from("<I",data,4)[0]==2
+              length,tag=struct.unpack_from("<II",data,12)
+              assert tag==0x4e4f534a
+              obj=json.loads(data[20:20+length])
+              required=obj.get("extensionsRequired",[])
+              assert "EXT_meshopt_compression" not in required, (slug,required)
+              assert "KHR_mesh_quantization" not in required, (slug,required)
+              assert obj.get("meshes") and obj.get("materials"),slug
+              print("V36 CONVERTED GODOT GLB PASS",slug,"meshes",len(obj["meshes"]),"required",required)
+          PY
+      - name: Install official engine, Mesa and Pillow for genuine pixel audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri libgl1 libglu1-mesa
+          python3 -m venv /tmp/v36-art-python
+          /tmp/v36-art-python/bin/pip install --quiet 'pillow>=10,<12'
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip" \
+            -o /tmp/godot-v36.zip
+          mkdir -p /tmp/godot-v36
+          unzip -q /tmp/godot-v36.zip -d /tmp/godot-v36
+          chmod +x /tmp/godot-v36/Godot_v4.7.2-stable_linux.x86_64
+      - name: Download verified-commit open-license Chinese glyph font (build-time; no runtime CDN)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The exact immutable upstream commit was verified through GitHub.
+          # Do not use an unpinned main branch. Include OFL license with export.
+          SRC="https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans"
+          mkdir -p "$PROJECT_DIR/art/fonts"
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "$SRC/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf" \
+            -o "$PROJECT_DIR/art/fonts/NotoSansCJKsc-Regular.otf"
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "$SRC/LICENSE" -o "$PROJECT_DIR/art/fonts/OFL-LICENSE.txt"
+          test "$(stat -c%s "$PROJECT_DIR/art/fonts/NotoSansCJKsc-Regular.otf")" -gt 1000000
+          grep -Fq 'SIL OPEN FONT LICENSE' "$PROJECT_DIR/art/fonts/OFL-LICENSE.txt"
+          sha256sum "$PROJECT_DIR/art/fonts/NotoSansCJKsc-Regular.otf" | tee web-font.sha256
+          # Avoid old Linux system-font tofu in authentic browser screenshots.
+      - name: Restore authentic V0.18 baseline build prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/build_assets.py"
+          python3 "$PROJECT_DIR/tools/build_street_v07.py"
+          python3 "$PROJECT_DIR/tools/build_street_v08.py"
+          python3 "$PROJECT_DIR/tools/build_coffee_v09.py"
+          python3 -m venv /tmp/lifesim-v039-web-deps
+          /tmp/lifesim-v039-web-deps/bin/pip install --quiet 'trimesh==4.11.1' 'numpy<3' 'pillow>=10,<12'
+          /tmp/lifesim-v039-web-deps/bin/python "$PROJECT_DIR/tools/build_upper_cafe_v14.py"
+          /tmp/lifesim-v039-web-deps/bin/python "$PROJECT_DIR/tools/build_upper_mart_v15.py"
+          python3 "$PROJECT_DIR/tools/build_landscape_v10.py"
+          python3 "$PROJECT_DIR/tools/build_art_v13.py"
+          python3 "$PROJECT_DIR/tools/build_interiors_v12.py"
+          /tmp/lifesim-v039-web-deps/bin/python "$PROJECT_DIR/tools/build_mart_v16.py"
+          /tmp/lifesim-v039-web-deps/bin/python "$PROJECT_DIR/tools/build_mart_v17.py"
+          python3 "$PROJECT_DIR/tests/check_structure.py"
+          python3 "$PROJECT_DIR/tests/check_delimiters.py"
+      - name: Explicit Web-preview-only opt-in for V0.39 north shop (no production default changes)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("lifesim/godot/project.godot")
+          s=p.read_text(encoding="utf-8")
+          assert s.count("[application]\n")==1
+          assert "config/v38_real_player_route_qa" not in s
+          opts=''.join(f"config/{key}={str(value).lower()}\n" for key,value in [
+            ("v32_spatial_preview",True),
+            ("v33_streetscape_preview",False),
+            ("v35_architecture_preview",True),
+            ("v36_pinned_facade_preview",True),
+            ("v37_walkable_shop_preview",True),
+            ("v38_real_player_route_qa",True),
+          ])
+          s=s.replace("[application]\n","[application]\n"+opts,1)
+          p.write_text(s,encoding="utf-8")
+          assert "config/v37_walkable_shop_preview=true" in p.read_text()
+          print("V039 EXPLICIT WEB PREVIEW BUILD FLAGS PASS: opt-in V32,35,36,37; V38 QA starting street spawn, production branch unchanged")
+          PY
+      - name: Install exact official single-threaded Godot Web templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 \
+            'https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz' \
+            -o /tmp/v039-web-templates.tpz
+          DEST="$HOME/.local/share/godot/export_templates/4.7.2.stable"
+          mkdir -p "$DEST"
+          for name in web_nothreads_release.zip web_nothreads_debug.zip; do
+            unzip -p /tmp/v039-web-templates.tpz "templates/$name" > "$DEST/$name"
+            test -s "$DEST/$name"
+            unzip -tq "$DEST/$name" >/dev/null
+          done
+      - name: Genuine Godot editor import and GDScript build parse at exact SHA
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          GODOT=/tmp/godot-v36/Godot_v4.7.2-stable_linux.x86_64
+          "$GODOT" --headless --editor --path "$PROJECT_DIR" --import --quit 2>&1 | tee v039-web-import.log
+          if grep -E 'SCRIPT ERROR|Parse Error|ERROR:.*Parse' v039-web-import.log; then exit 1; fi
+      - name: Export V0.39 fully assembled REAL original scene to isolated WebAssembly/HTML5
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          mkdir -p "$EXPORT_DIR"
+          GODOT=/tmp/godot-v36/Godot_v4.7.2-stable_linux.x86_64
+          "$GODOT" --headless --path "$PROJECT_DIR" --export-release Web \
+            "$EXPORT_DIR/index.html" 2>&1 | tee v039-web-export.log
+          if grep -E 'SCRIPT ERROR|Parse Error|ERROR:.*Parse|ERROR: Cannot export' v039-web-export.log; then exit 1; fi
+          cp "$PROJECT_DIR/tools/v039_isolated_web_server.py" "$EXPORT_DIR/serve_preview.py"
+          cat > "$EXPORT_DIR/start_preview_windows.bat" <<'BAT'
+          @echo off
+          cd /d "%~dp0"
+          where py >nul 2>&1
+          if not errorlevel 1 (
+            start "" "http://127.0.0.1:8765/?qa=1"
+            py -3 serve_preview.py
+            pause
+            exit /b
+          )
+          where python >nul 2>&1
+          if not errorlevel 1 (
+            start "" "http://127.0.0.1:8765/?qa=1"
+            python serve_preview.py
+            pause
+            exit /b
+          )
+          echo Python 3 was not found. Install Python 3 or run this folder using any static localhost HTTP server that supports WebAssembly and COOP/COEP headers.
+          pause
+          BAT
+          cat > "$EXPORT_DIR/READ_THIS_FIRST.txt" <<'TEXT'
+          LifeSim / 同频之城 — V0.39 ISOLATED diagnostic Web preview (NOT RELEASED)
+          SOURCE: ruabie/moci-cet4, based on exact V0.39 PR #53 plus an isolated Web-build workflow.
+          CHECK build-info.json for the exact full commit.
+          This build deliberately activates QA-only V32 north district, V35/V36 CC0 facade,
+          V37 physically walkable storefront and V38 initial street spawn next to shop.
+          Controls: W/A/S/D to walk; click within game for mouse look; Shift run;
+          Esc frees cursor. Device time/saving are from the original game.
+          This preview may contain game defects: near-wall camera backs into avatar hair,
+          the store interior is visually sparse, and other gameplay areas are unfinished.
+          Do NOT treat this as a shipped game, tested RTX3060 performance or an art signoff.
+          No public website deployed. To try it on Windows:
+            (1) Unzip all files into ONE folder; do NOT open index.html via file://.
+            (2) Double-click start_preview_windows.bat (requires Python 3) then open
+                http://127.0.0.1:8765/?qa=1 in Chrome or Edge.
+            (3) Close the command window or press Ctrl+C to stop the server.
+          No cloud payments, account logins or public publishing involved.
+          Font: Noto Sans CJK SC, SIL Open Font License — see fonts-OFL-LICENSE.txt.
+          TEXT
+          cp "$PROJECT_DIR/art/fonts/OFL-LICENSE.txt" "$EXPORT_DIR/fonts-OFL-LICENSE.txt"
+          python3 - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          p=Path(os.environ["EXPORT_DIR"])
+          meta={"version":"V0.39 isolated Web diagnostic preview",
+                "head_sha":os.environ["GITHUB_SHA"],
+                "branch":os.environ["GITHUB_REF_NAME"],
+                "source_candidate":"V0.39 draft PR 53, head 0925394389eedacf4c1ce1c028922182ed60e5b1",
+                "godot":"4.7.2 stable, Web single-threaded",
+                "world_flags":["v32_spatial_preview","v35_architecture_preview",
+                               "v36_pinned_facade_preview","v37_walkable_shop_preview",
+                               "v38_real_player_route_qa"],
+                "web_artifact_only":True,"public_deploy":False,
+                "browser_verified":False,"native_windows_fps_verified":False,
+                "font_license":"SIL Open Font License",
+                "web_files":{}}
+          for f in sorted(p.glob("index.*")):
+              meta["web_files"][f.name]={"bytes":f.stat().st_size,
+                  "sha256":hashlib.sha256(f.read_bytes()).hexdigest()}
+          (p/"build-info.json").write_text(json.dumps(meta,indent=2)+"\n",encoding="utf-8")
+          assert (p/"index.html").stat().st_size>1000
+          assert (p/"index.wasm").stat().st_size>10000000
+          assert (p/"index.pck").stat().st_size>10000000
+          assert (p/"index.js").stat().st_size>100000
+          assert (p/"index.wasm").read_bytes()[:4]==b"\x00asm"
+          assert 'Godot' in (p/"index.html").read_text(encoding="utf-8")
+          print("V039 FULL OFFLINE HTML WASM PCK JS AND ASSET MANIFEST PASS",json.dumps(meta["web_files"]))
+          PY
+      - name: Archive genuine complete V0.39 Web preview without modifying main or GitHub Pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v039-isolated-browser-playtest
+          path: /tmp/lifesim-v039-web/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Start same downloadable local server and verify real Chromium Canvas + keyboard W
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          set -euo pipefail
+          npm install --prefix "$PLAYWRIGHT_ROOT" --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          "$PLAYWRIGHT_ROOT/node_modules/.bin/playwright" install --with-deps chromium
+          python3 "$EXPORT_DIR/serve_preview.py" --port 8765 > v039-web-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" || true' EXIT
+          python3 - <<'PY'
+          from urllib.request import urlopen
+          import time
+          for i in range(40):
+              try:
+                  with urlopen("http://127.0.0.1:8765/index.html",timeout=2) as r:
+                      assert r.status==200
+                      assert r.headers.get("Cross-Origin-Embedder-Policy")=="require-corp"
+                  break
+              except Exception:
+                  time.sleep(.5)
+          else: raise SystemExit("isolated localhost Godot server failed health test")
+          print("LOCALHOST COOP COEP WEBSERVER PASS")
+          PY
+          node "$PROJECT_DIR/tools/v039_isolated_web_browser_audit.mjs" | tee v039-web-chromium.log
+          grep -F 'V039 REAL CHROMIUM GODOT WEB BOOT AND W KEY PASS:' v039-web-chromium.log
+      - name: Archive honest browser PNG, telemetry and error logs even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifesim-v039-chromium-boot-or-failure
+          path: |
+            v039-web-browser-evidence/
+            v039-web-server.log
+            v039-web-chromium.log
+            v039-web-import.log
+            v039-web-export.log
+            v36-asset-audit.log
+            v36-conversion.log
+            web-font.sha256
+          retention-days: 14
+          if-no-files-found: warn
