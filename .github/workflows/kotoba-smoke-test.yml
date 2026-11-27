@@ -25,6 +25,7 @@ jobs:
           for f in kotoba/app.js kotoba/book-data.js kotoba/vocab-03-page08.js kotoba/vocab-{04,05,13,14,15,16}.js kotoba/extra-words.js kotoba/sw.js; do node --check "$f"; done
           node .github/tests/kotoba-rotation.test.cjs
           node .github/tests/kotoba-catalog-v6.test.cjs
+          node .github/tests/kotoba-direct-quiz.test.cjs
       - name: Verify currently published HTML and its versioned assets
         if: ${{ github.event_name != 'pull_request' }}
         shell: bash
