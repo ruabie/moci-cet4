@@ -279,7 +279,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lifesim-v039-isolated-browser-playtest
-          path: ${{ runner.temp }}/lifesim-v039-web/
+          path: /tmp/lifesim-v039-web/
           if-no-files-found: error
           retention-days: 14
       - name: Start same downloadable local server and verify real Chromium Canvas + keyboard W
