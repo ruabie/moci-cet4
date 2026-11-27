@@ -20,6 +20,14 @@ var camera_collision_activations: int = 0
 var camera_collision_shape: SphereShape3D
 var camera_sweep_query: PhysicsShapeQueryParameters3D
 var character_visual: Node3D
+# V0.40: local third-person render only. Physical avatar collision/rig remain.
+# Fades the original skinned mesh at very short camera radius to prevent
+# the model's face/hair covering the entire picture at a real solid wall.
+var avatar_render_meshes: Array[MeshInstance3D] = []
+var avatar_fade_materials: Array[Dictionary] = []
+var avatar_camera_fade: float = 0.0
+const CAMERA_FADE_OUTER_RADIUS: float = 1.25
+const CAMERA_FADE_INNER_RADIUS: float = 0.48
 var rig: Skeleton3D
 var anim_clock: float = 0.0
 var anim_weight: float = 0.0
@@ -68,6 +76,11 @@ func _ready() -> void:
         if not CharacterArtV18.has_bone(rig, required_bone):
             push_error("glTF character is missing bone " + required_bone)
             return
+    # Capture only the current local player's original imported avatar meshes.
+    # We never hide buildings, walls, NPCs, physics shapes, or animation rig.
+    _collect_avatar_render_meshes(character_visual)
+    if avatar_render_meshes.is_empty():
+        push_error("V40 near-camera visibility needs original skinned avatar geometry")
     animation_verified = true
     resting_foot_height = _lowest_foot_height_relative_to_body()
     camera = Camera3D.new()
@@ -87,6 +100,82 @@ func _ready() -> void:
     if not OS.has_feature("web"):
         Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
     _update_camera(0.0)
+
+# Godot Web uses the Compatibility renderer. GeometryInstance3D.transparency
+# is silently ignored there (unlike Forward+). Use actual per-surface ORIGINAL
+# StandardMaterial3D alpha duplicates, and safely hide ONLY the local skinned
+# avatar's MeshInstance3D when the camera retreats inside the player's head.
+# Neither solution touches collider, Skeleton3D, other NPCs nor building meshes.
+func _collect_avatar_render_meshes(node: Node) -> void:
+    if node is MeshInstance3D:
+        var mesh_instance: MeshInstance3D = node as MeshInstance3D
+        avatar_render_meshes.append(mesh_instance)
+        mesh_instance.visible = true
+        if mesh_instance.mesh != null:
+            if mesh_instance.material_override is BaseMaterial3D:
+                _register_avatar_fade_material(mesh_instance, -1, mesh_instance.material_override)
+            else:
+                for surface_index in range(mesh_instance.mesh.get_surface_count()):
+                    var old_override: Material = mesh_instance.get_surface_override_material(surface_index)
+                    var source: Material = old_override
+                    if source == null:
+                        source = mesh_instance.mesh.surface_get_material(surface_index)
+                    if source is BaseMaterial3D:
+                        _register_avatar_fade_material(mesh_instance, surface_index, source, old_override)
+    for child in node.get_children():
+        _collect_avatar_render_meshes(child)
+
+
+func _register_avatar_fade_material(
+        mesh_instance: MeshInstance3D, surface: int, base: Material,
+        original_override: Material = null) -> void:
+    # Clone only the local player's material. Do NOT mutate a shared GLB
+    # resource, since that would fade every NPC using the original asset.
+    var original: BaseMaterial3D = base as BaseMaterial3D
+    if original == null:
+        return
+    var faded: BaseMaterial3D = original.duplicate() as BaseMaterial3D
+    if faded == null:
+        return
+    faded.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    avatar_fade_materials.append({
+        "mesh":mesh_instance, "surface":surface,
+        "original_override":original_override if surface >= 0 else base,
+        "material":faded, "base_alpha":original.albedo_color.a
+    })
+
+
+func _update_avatar_camera_fade(actual_radius_m: float) -> void:
+    var x: float = clampf(
+        (CAMERA_FADE_OUTER_RADIUS - actual_radius_m)
+        / (CAMERA_FADE_OUTER_RADIUS - CAMERA_FADE_INNER_RADIUS),
+        0.0, 1.0)
+    avatar_camera_fade = x * x * (3.0 - 2.0 * x)
+    # At radius <0.48m the camera is literally inside the face/hair geometry:
+    # disable only this local model's GPU draw, never gameplay collision.
+    # At normal third-person distance the original unmodified GLB surfaces
+    # are fully restored, avoiding the slow transparency render pipeline.
+    for mesh_instance in avatar_render_meshes:
+        if is_instance_valid(mesh_instance):
+            mesh_instance.visible = avatar_camera_fade < .995
+    for binding in avatar_fade_materials:
+        var mesh_instance: MeshInstance3D = binding["mesh"] as MeshInstance3D
+        if mesh_instance == null or not is_instance_valid(mesh_instance):
+            continue
+        var surface_index: int = int(binding["surface"])
+        var original: Material = binding["original_override"] as Material
+        var replacement: Material = original
+        if avatar_camera_fade > .001 and avatar_camera_fade < .999:
+            var faded: BaseMaterial3D = binding["material"] as BaseMaterial3D
+            var albedo: Color = faded.albedo_color
+            albedo.a = float(binding["base_alpha"]) * (1.0 - avatar_camera_fade)
+            faded.albedo_color = albedo
+            replacement = faded
+        if surface_index < 0:
+            mesh_instance.material_override = replacement
+        else:
+            mesh_instance.set_surface_override_material(surface_index, replacement)
+
 
 func _pose(name: String, x: float, y: float = 0.0) -> void:
     CharacterArtV18.pose(rig, name, x, y)
@@ -221,3 +310,4 @@ func _update_camera(delta: float) -> void:
             camera_collision_activations += 1
     camera.global_position = candidate
     camera.look_at(pivot + Vector3.UP * .02)
+    _update_avatar_camera_fade(pivot.distance_to(camera.global_position))
