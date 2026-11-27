@@ -1,7 +1,7 @@
-const CACHE='kotoba-v7.2-20261127-direct-quiz';
+const CACHE='kotoba-v7.3-20261127-lessons-6-7';
 const FILES=['./','./index.html','./styles.css?v=7.2','./book-data.js?v=5.1',
   './vocab-03-page08.js?v=7.0','./vocab-04.js?v=7.0','./vocab-05.js?v=7.0',
-  './vocab-13.js?v=6.0','./vocab-14.js?v=6.0','./vocab-15.js?v=6.0','./vocab-16.js?v=6.0',
+  './vocab-06-07.js?v=1.0','./vocab-13.js?v=6.0','./vocab-14.js?v=6.0','./vocab-15.js?v=6.0','./vocab-16.js?v=6.0',
   './extra-words.js?v=6.1','./app.js?v=7.2','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()));
