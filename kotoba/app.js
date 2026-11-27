@@ -288,7 +288,12 @@
     $('directAllQty').classList.toggle('selected',count>0&&val===count);
   }
   $('directScope').onchange=()=>{$('directQty').value=10;refreshDirectSetup();};
-  $('directQty').addEventListener('input',refreshDirectSetup);
+  $('directQty').addEventListener('input',()=>{
+    const val=Math.floor(Number($('directQty').value));
+    document.querySelectorAll('[data-direct-qty]').forEach(btn=>btn.classList.toggle('selected',Number(btn.dataset.directQty)===val));
+    $('directAllQty').classList.toggle('selected',val>0&&val===getPool(currentDirectScope().type,currentDirectScope().lesson).length);
+  });
+  $('directQty').addEventListener('change',refreshDirectSetup);
   document.querySelectorAll('[data-direct-qty]').forEach(btn=>btn.onclick=()=>{
     $('directQty').value=btn.dataset.directQty;refreshDirectSetup();
   });
