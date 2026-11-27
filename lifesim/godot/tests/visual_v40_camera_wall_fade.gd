@@ -61,15 +61,14 @@ func _camera_overlap(player:CityPlayer)->int:
     query.exclude=[player.get_rid()]
     return player.get_world_3d().direct_space_state.intersect_shape(query,8).size()
 
-func _lowest_render_transparency(player:CityPlayer)->float:
-    if player.avatar_render_meshes.is_empty():
-        return -1.0
-    var low:float=INF
+func _count_hidden_local_avatar_meshes(player:CityPlayer)->int:
+    var hidden:int=0
     for mesh_instance in player.avatar_render_meshes:
-        if mesh_instance==null or not is_instance_valid(mesh_instance):
-            return -1.0
-        low=minf(low,mesh_instance.transparency)
-    return low
+        if not is_instance_valid(mesh_instance):
+            return -1
+        if not mesh_instance.visible:
+            hidden+=1
+    return hidden
 
 
 func _snapshot(player:CityPlayer,section:String)->Dictionary:
@@ -86,7 +85,7 @@ func _snapshot(player:CityPlayer,section:String)->Dictionary:
         "yaw":player.camera_yaw,
         "avatar_on_real_ground":player.is_on_floor(),
         "avatar_camera_fade":player.avatar_camera_fade,
-        "avatar_mesh_render_min_fade":_lowest_render_transparency(player),
+        "avatar_mesh_hidden_count":_count_hidden_local_avatar_meshes(player),
         "avatar_render_mesh_count":player.avatar_render_meshes.size()
     }
 
@@ -206,7 +205,7 @@ func _run()->void:
         _fail("actual third person camera remained across collidable shop wall");return
     if int(now["camera_overlap_objects"])!=0 or peak_overlap>0:
         _fail("camera near plane sphere crossed a solid wall during occlusion");return
-    if float(now["avatar_camera_fade"])<.97 or float(now["avatar_mesh_render_min_fade"])<.97:
+    if float(now["avatar_camera_fade"])<.97 or int(now["avatar_mesh_hidden_count"])!=player.avatar_render_meshes.size():
         _fail("original avatar hair/face is still rendered opaque close behind real wall");return
     if not await _camera_frame(player,"inside_occluded"):
         _fail("actual occluded original third person camera image missing");return
@@ -223,7 +222,7 @@ func _run()->void:
         _fail("occlusion-cleared camera stuck against a wall");return
     if int(recovered["camera_overlap_objects"])>0:
         _fail("camera penetrates solid building after obstruction cleared");return
-    if float(recovered["avatar_camera_fade"])>.02 or float(recovered["avatar_mesh_render_min_fade"])>.02:
+    if float(recovered["avatar_camera_fade"])>.02 or int(recovered["avatar_mesh_hidden_count"])!=0:
         _fail("original third-person avatar remains faded after exiting tight wall camera");return
     if not await _camera_frame(player,"inside_recovered"):
         _fail("original recovered third-person camera image missing");return
@@ -249,6 +248,7 @@ func _run()->void:
         _fail("actual return street third person camera image missing");return
     result["screenshots"].append("v40_street_exit.png")
     result["avatar_render_mesh_count"]=player.avatar_render_meshes.size()
+    result["compatibility_material_alpha_slot_count"]=player.avatar_fade_materials.size()
     result["camera_near_avatar_fade_proof"]=true
     result["real_solid_collision_preserved"]=true
     result["ok"]=true
