@@ -37,14 +37,14 @@
       "isolatedPreviewBrowserVerified": false
     },
     "developmentCandidate": {
-      "version": "V0.40 genuine original CityPlayer near-wall visibility repair from GTA6-inspired third-person camera legibility; GODOT physical+pixel QA PASS, standalone V040 Web UNVERIFIED, full art FAIL",
+      "version": "V0.40 original Godot camera near-wall visibility fix plus isolated HTML5/WebAssembly ZIP, REAL Chromium boot and W input PASS; NOT public/release/art acceptance",
       "pr": 56,
       "url": "https://github.com/ruabie/moci-cet4/pull/56",
       "state": "open",
       "draft": true,
       "merged": false,
       "headBranch": "lifesim-v040-third-person-near-wall-visibility",
-      "headSha": "e1b10a0ca8e385a10dbb2a260b3ba299f20a44bf",
+      "headSha": "2b8b582cf4d68b2bc2537c81bd9a086621828bd6",
       "baseBranch": "lifesim-v039-isolated-web-review",
       "baseHeadSha": "df6d9f0f6c3c0d1f9413339bb99aab5be2ec294c",
       "coreV039SHA": "0925394389eedacf4c1ce1c028922182ed60e5b1",
@@ -103,7 +103,51 @@
       "realHumanMouseTested": false,
       "actualWindowsRtx3060FpsVerified": false,
       "wholeCityExpansionAllowed": false,
-      "commercialReleaseReady": false
+      "commercialReleaseReady": false,
+      "previousHeadSha": "e1b10a0ca8e385a10dbb2a260b3ba299f20a44bf",
+      "browserWebBuildEvidence": {
+        "pr": 56,
+        "headSha": "2b8b582cf4d68b2bc2537c81bd9a086621828bd6",
+        "webWorkflow": ".github/workflows/lifesim-v040-web-review.yml",
+        "pushRun": 45992772271,
+        "prRun": 45992780446,
+        "pushConclusion": "completed_success",
+        "prConclusion": "completed_success",
+        "artifactId": 15194202716,
+        "artifactUrl": "https://github.com/ruabie/moci-cet4/actions/runs/45992772271/artifacts/15194202716",
+        "zipFileSizeBytes": 50218577,
+        "files": 14,
+        "zipCrcPassed": true,
+        "buildInfoHeadShaMatch": true,
+        "allManifestSHA256Match": true,
+        "wasmBytes": 39514754,
+        "pckBytes": 41331896,
+        "godotVersion": "4.7.2 stable, Web single-threaded",
+        "realBrowserEvidenceId": 15195460250,
+        "realBrowserEvidenceUrl": "https://github.com/ruabie/moci-cet4/actions/runs/45992772271/artifacts/15195460250",
+        "browser": "Playwright real Chromium headless / Mesa software",
+        "errors": [],
+        "godotEngineBoot": true,
+        "wasmStarted": true,
+        "webGL2": true,
+        "crossOriginIsolated": true,
+        "actualCanvas": [
+          1280,
+          720
+        ],
+        "actualScreenshots": 2,
+        "actualKeyboardPhysicalW": true,
+        "initialX": -13.75,
+        "afterKeyX": -14.3544435501099,
+        "actualMovedMetres": 0.6044435501099006,
+        "observedChineseHudReadable": true,
+        "checkedRealCloseWallInBrowser": false,
+        "webRigAnimationQualitySignoff": false,
+        "staticScreenshotManualReview": true,
+        "windowsActualGpuOrUserTested": false,
+        "publicDeployed": false,
+        "releaseReady": false
+      }
     },
     "issues": [
       {
@@ -1466,6 +1510,49 @@
       "renderingCompatibilityFix": "Original player-only BaseMaterial3D alpha clones and MeshInstance visibility guard, restore on open",
       "fixedCameraHairCloseWall": true,
       "artQualityApproved": false
+    },
+    "v040WebReview": {
+      "pr": 56,
+      "headSha": "2b8b582cf4d68b2bc2537c81bd9a086621828bd6",
+      "webWorkflow": ".github/workflows/lifesim-v040-web-review.yml",
+      "pushRun": 45992772271,
+      "prRun": 45992780446,
+      "pushConclusion": "completed_success",
+      "prConclusion": "completed_success",
+      "artifactId": 15194202716,
+      "artifactUrl": "https://github.com/ruabie/moci-cet4/actions/runs/45992772271/artifacts/15194202716",
+      "zipFileSizeBytes": 50218577,
+      "files": 14,
+      "zipCrcPassed": true,
+      "buildInfoHeadShaMatch": true,
+      "allManifestSHA256Match": true,
+      "wasmBytes": 39514754,
+      "pckBytes": 41331896,
+      "godotVersion": "4.7.2 stable, Web single-threaded",
+      "realBrowserEvidenceId": 15195460250,
+      "realBrowserEvidenceUrl": "https://github.com/ruabie/moci-cet4/actions/runs/45992772271/artifacts/15195460250",
+      "browser": "Playwright real Chromium headless / Mesa software",
+      "errors": [],
+      "godotEngineBoot": true,
+      "wasmStarted": true,
+      "webGL2": true,
+      "crossOriginIsolated": true,
+      "actualCanvas": [
+        1280,
+        720
+      ],
+      "actualScreenshots": 2,
+      "actualKeyboardPhysicalW": true,
+      "initialX": -13.75,
+      "afterKeyX": -14.3544435501099,
+      "actualMovedMetres": 0.6044435501099006,
+      "observedChineseHudReadable": true,
+      "checkedRealCloseWallInBrowser": false,
+      "webRigAnimationQualitySignoff": false,
+      "staticScreenshotManualReview": true,
+      "windowsActualGpuOrUserTested": false,
+      "publicDeployed": false,
+      "releaseReady": false
     }
   },
   "gates": [
@@ -1481,8 +1568,8 @@
     },
     {
       "id": "WebGL-browser",
-      "state": "passed_isolated_v039_only_v040_unverified",
-      "why": "V039 source Web artifact #15182111335 real Chromium W input/render passed at SHA df6d9f..., but new V040 camera material alpha/near-wall mesh visibility has NOT yet been exported to HTML5 or checked in a real browser. Must not offer old V039 zip as latest V040 camera fix."
+      "state": "passed_isolated_v040_original_chromium_boot_and_wasd_only",
+      "why": "Exact current V040 open draft PR#56 head 2b8b582cf4d68b2bc2537c81bd9a086621828bd6; Web Push #45992772271 completed/success and PR #45992780446 success, official Godot HTML/JS/WASM/PCK ZIP artifact #15194202716 downloaded 14 files testzip CRC and every manifest SHA256 PASS. Actual Chromium headless WebGL2 COOP/COEP boot 1280x720, original CityPlayer physical W from x -13.75 to -14.35444 (0.60444m), 2 real PNG, errors empty, proof #15195460250. V040 Web NOT independently stress-tested at shop back wall, Windows real hardware FPS, human usability and art/commerce still blocked. No public Pages website."
     },
     {
       "id": "Art-and-animation",
@@ -1497,7 +1584,7 @@
     {
       "id": "Release",
       "state": "not_ready",
-      "why": "V040 draft #56 unmerged/unpublished; original V039 local Web ZIP existing but does not include V040 camera. GTA6-inspired high-density design not implemented, modern shop art/signs/NPCs/commerce/performance and manual hardware QA still blocked."
+      "why": "Latest V040 Web ZIP downloadable and Chromium startup/input smoke PASS but PR#56 remains draft/unmerged/unpublished, localhost HTTP required; GTA6-quality original street detail and shop/NPC routines absent, storefront signage corrupt, Windows hardware and full browser camera-wall scene not verified. No public link."
     },
     {
       "id": "Workflow-no-automatic-publication",
@@ -1536,20 +1623,18 @@
     }
   ],
   "nextActions": [
-    "NEXT V0.41: Export the actual stacked V040 original Godot game into a NEW ISOLATED downloadable HTML5 Web ZIP (do not overwrite V039 or Pages) and prove in true Chromium WebGL2 original CityPlayer W input, camera rotate close real shop wall, original screenshots with clean viewport, gradual intermediate transparency and restored third-person avatar. Record real frame timings (p50,p95) rather than assume FPS, confirm bundled Noto CJK works.",
-    "User permits GTA VI as broad design reference: borrow human scale, readable third-person cinematic camera, spatially coherent city blocks, varied facade/ground texture/detail, visible pedestrian routines and environmental storytelling. Do NOT reproduce GTA VI Vice City/Leonida map, soundtrack, trade dress, models, characters, NPC dialogue, UI or game footage, or switch core from life-simulation to crime.",
-    "After V040 real-camera patch and new Web export, prioritize ONE original detailed lived-in street/convincing walkable mart/crossing vertical slice with plausible sidewalks, visible shelves and items, readable signs, varied window interiors and authentic props instead of expanding the 11 blocky lots. Add a measurable NPC everyday routine and actual earning/spend/save loop, with before-after original rendered screenshots.",
-    "Validate performance explicitly on user's Windows RTX3060 6GB and mobile WebGL before target fidelity/LOD budgets; V040 CI uses CPU Mesa Xvfb with no real Windows GPU. Prior V039 1.4s W key movement 0.16m under software rendering demonstrated load sensitivity. Don't equate successful engine tests with smooth gameplay.",
-    "Original V039 Web preview 14-file playable ZIP artifact #15182111335 remains last proven Web; V040 source PR#56 HEAD e1b10a0c has genuine Godot engine and original wall-photo QA PASS but no V040 Web export yet. Keep both drafts open and follow chained PR, don't auto-merge/publish, no new fees, keep fixed source GLB hash/CC0 licenses and retain artifact evidence.",
-    "Fix Linux Godot CJK font squares and misplaced/neon storefront text separately with correctly licensed fonts included in the actual native/Web package, true screenshot verification. Preserve physical 0-overlap proof and avoid hiding any wall or third-party NPC."
+    "V040 local Web ZIP now available from official GitHub artifact #15194202716, sha 2b8b582cf4d68b2bc2537c81bd9a086621828bd6, with checked 14-file manifest. User may play only via extracted localhost Python3 server, NOT direct file://index.html. Original live Pages not published; do not confuse current local Web playable with public game.",
+    "NEXT real V040 Web browser QA: run actual mouse yaw into V37 solid shop rear wall and confirm camera transitions into avatar local mesh transparency/visibility and back after clearing with genuine rendered screenshots, not just prior V040 Godot native physical/Png QA; test game saves and FPS p95, plus Windows RTX3060 user play.",
+    "Then build original GTA6-inspired one-block coherent life-simulation vertical slice, not copied GTA VI IP; prioritize authentic store interior detail, realistic crossing/sidewalk layout, clear original facade signage, populated NPC daily routine, work/earn/spend/save loop. Do not enlarge low-quality city.",
+    "Keep both Godot engine PR and web QA passing, preserve source-asset licenses, pinned SHA and permission safety; no main merge, Pages deploy or new expenses without user authorization."
   ],
   "handoff": {
     "entry": "lifesim/HANDOFF.md",
     "protocol": "lifesim/HANDOFF_PROTOCOL.md",
     "state": "lifesim/HANDOFF_STATE.json",
-    "freshness": "Current GitHub verified 2026-11-27 V040 PR#56 draft/open/unmerged head e1b10a0ca8e385a10dbb2a260b3ba299f20a44bf on #55 df6d9f0f; same exact HEAD focused Push/PR and full Godot engine Push/PR all completed/success, 5 actual Godot PNG and original archived comparison PASS, camera wall 0 sphere overlaps, all 4 avatar MeshInstances recovered. Original same-scene human art/interactive browser V040 unverified, last downloadable Web V039 #55, no automatic deployment. User wants GTA VI-level *principles* as original life-sim, do not copy Rockstar IP.",
+    "freshness": "Current 2026-11-27 verified V040 PR#56 open/draft/unmerged head 2b8b582cf4d68b2bc2537c81bd9a086621828bd6. V040 Web CI Push #45992772271 and PR #45992780446 completed/success, real original source-branch Web ZIP #15194202716 verified 14 entries CRC and SHA, Chromium PNG/QA #15195460250 real Godot browser boot and W key movement 0.60444m (errors=[]). Last native real wall occlusion pass V040 e1b10a0; latest Web screenshot startup and W only, no wall-specific browser QA, user hardware, public Pages, city art or final game release.",
     "monitorIntegration": "enabled_read_only_check_in_existing_6_hour_supervisor",
     "monitorConstraint": "Supervisor only reads and reports snapshot drift; it does not modify main, merge PRs or auto-update HANDOFF files.",
-    "latestRound": "2026-11-27 V040 PR#56 stacked on V039 Web #55 exact head e1b10a0ca8e385a10dbb2a260b3ba299f20a44bf. Initial true Godot pixel QA negative FAIL: GeometryInstance3D.transparency ignored in Web GL Compatibility, head 99.2661% still occluded in original image (failed CI #45966404475 artifact #15183910226). Bounded repair 1/2 clones original player-only alpha materials and near face hides local avatar render meshes not colliders/NPCs. Final genuine original Godot 5 PNG/JSON artifact #15184010364 demonstrates old 0.992661 -> new 0.0 hair brown fraction, 42 actual physical camera obstruction activations and zero overlaps, 4 meshes restored after wall. Focused Push #45966944903 and PR #45966952160 both success, full Godot engine Push #45966944970 and PR #45966952033 both success. No new Web V040 zip / Chrome / Windows QA. GTA VI only reference for spatial density/third-person fidelity, no copying."
+    "latestRound": "2026-11-27 V040 PR #56 same original gameplay/camera shader from e1b10a0, new build wiring V040 head 2b8b582cf4d68b2bc2537c81bd9a086621828bd6. Official Godot 4.7.2 HTML+WASM+PCK isolated Web ZIP artifact #15194202716, downloaded 50,218,577 byte/14-file ZIP CRC and manifest SHA256 PASS; actual Web Push CI #45992772271 and PR CI #45992780446 both success. Actual same-SHA headless Chromium WebGL2 1280x720, crossOriginIsolated true, W key physical input moved original CityPlayer 0.60444m, 2 original browser PNG, errors empty, proof artifact #15195460250. Existing V040 original Godot rear-wall screenshot/physics test passed prior and source unchanged, but Web specifically behind rear wall not tested, Windows hardware not tested, no public Pages. User has downloadable latest V040 local preview."
   }
 }
