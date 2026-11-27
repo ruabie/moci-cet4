@@ -192,7 +192,7 @@
   if(supportedSpeech){getSpeechVoices();speechSynthesis.addEventListener?.('voiceschanged',getSpeechVoices);}
   else {$('voiceSelect').disabled=true;$('voiceNotice').textContent='浏览器不支持系统语音朗读';}
   function updateHome(){let words=allWords();$('totalWords').textContent=words.length;$('reviewCount').textContent=words.filter(isDue).length;$('weakCount').textContent=words.filter(isWeak).length;}
-  const views=['home','lessons','setup','summary','choose','done','library','stats','guide','study','test'];
+  const views=['home','lessons','setup','directSetup','summary','choose','done','library','stats','guide','study','test'];
   function view(name){stopSpeech();views.forEach(id=>$(id).classList.toggle('hidden',id!==name));document.body.classList.toggle('fake-landscape',false);window.scrollTo({top:0,left:0,behavior:'instant'});if(name==='home')updateHome();if(name==='lessons')renderLessons();if(name==='library')renderLibrary();if(name==='stats')renderStats();}
   document.querySelectorAll('[data-nav]').forEach(btn=>btn.addEventListener('click',()=>view(btn.dataset.nav)));
   $('openGuide').onclick=()=>view('guide');
@@ -200,10 +200,11 @@
   $('lessonToAll').onclick=()=>openSetup('all');
   $('openAll').onclick=()=>openSetup('all');
   $('openExtra').onclick=()=>openSetup('extra');
+  $('openDirect').onclick=()=>openDirectSetup();
   $('openRandom').onclick=()=>{
     const words=randomize(allWords()).slice(0,Math.min(10,allWords().length));
     if(!words.length){toast('目前没有可抽查的词语');return;}
-    session={queue:words.map(w=>w.jp),unique:words.map(w=>w.jp),cursor:0,visited:new Set(),kind:'random',lesson:null,revealed:false};
+    session={queue:words.map(w=>w.jp),unique:words.map(w=>w.jp),cursor:0,visited:new Set(),kind:'random',lesson:null,revealed:false,direct:true,directOrigin:'home'};
     activeLesson=null;
     view('choose');
   };
@@ -253,6 +254,66 @@
   $('qty').addEventListener('input',()=>{setup.qtyTouched=true;refreshQtyPills();});
   document.querySelectorAll('[data-qty]').forEach(b=>b.onclick=()=>{setup.qtyTouched=true;$('qty').value=Math.min(+b.dataset.qty,setup.pool.length);refreshQtyPills();});
   $('allQty').onclick=()=>{setup.qtyTouched=true;$('qty').value=setup.pool.length;refreshQtyPills();};
+  // Direct recall is independent of the unstudied-word rotation.
+  // It samples the entire requested course or collection and only updates memory after grading.
+  function populateDirectScopes(){
+    const group=volume=>BOOK.lessons.filter(l=>Number(l.volume)===volume)
+      .map(l=>`<option value="lesson:${esc(l.id)}">${esc(lessonLabel(l.id))} · ${esc(l.name)}</option>`).join('');
+    $('directScope').innerHTML=
+      '<option value="all">总词汇库 · 全部词语</option>'+
+      '<option value="extra">课外词 · 全部词语</option>'+
+      '<option value="due">已到期复习词</option>'+
+      '<option value="weak">薄弱单词</option>'+
+      '<optgroup label="第三册">'+group(3)+'</optgroup>'+
+      '<optgroup label="第二册">'+group(2)+'</optgroup>';
+  }
+  function currentDirectScope(){
+    const value=$('directScope').value;
+    return value.startsWith('lesson:')?{type:'lesson',lesson:value.slice('lesson:'.length)}
+      :{type:['extra','due','weak'].includes(value)?value:'all',lesson:null};
+  }
+  function refreshDirectSetup(){
+    const {type,lesson}=currentDirectScope();
+    const count=getPool(type,lesson).length;
+    $('directPoolSize').textContent=count;
+    $('directQty').max=Math.max(1,count);
+    const requested=Math.floor(Number($('directQty').value));
+    $('directQty').value=count?Math.min(count,Number.isFinite(requested)&&requested>0?requested:10):0;
+    $('startDirectTest').disabled=!count;
+    $('directHint').textContent=count
+      ?`此范围共有 ${count} 个不重复单词。本轮随机出题，不会消耗“未学新词”进度。`
+      :'这个范围目前没有可考核的词语，请切换其他课次或词库。';
+    const val=Number($('directQty').value);
+    document.querySelectorAll('[data-direct-qty]').forEach(btn=>btn.classList.toggle('selected',Number(btn.dataset.directQty)===val));
+    $('directAllQty').classList.toggle('selected',count>0&&val===count);
+  }
+  $('directScope').onchange=()=>{$('directQty').value=10;refreshDirectSetup();};
+  $('directQty').addEventListener('input',refreshDirectSetup);
+  document.querySelectorAll('[data-direct-qty]').forEach(btn=>btn.onclick=()=>{
+    $('directQty').value=btn.dataset.directQty;refreshDirectSetup();
+  });
+  $('directAllQty').onclick=()=>{$('directQty').value=$('directPoolSize').textContent;refreshDirectSetup();};
+  function openDirectSetup(type='all',lesson=null,from='home'){
+    populateDirectScopes();
+    $('directScope').value=type==='lesson'?'lesson:'+lesson:type;
+    if(!$('directScope').value)$('directScope').value='all';
+    $('directQty').value=from==='setup'?Number($('qty').value)||10:10;
+    refreshDirectSetup();
+    $('directBack').onclick=()=>view(from==='setup'?'setup':'home');
+    view('directSetup');
+  }
+  $('directFromSetup').onclick=()=>openDirectSetup(setup.type,setup.lesson,'setup');
+  $('startDirectTest').onclick=()=>{
+    const {type,lesson}=currentDirectScope(),pool=getPool(type,lesson);
+    if(!pool.length){toast('此范围暂无可考核的词语');return;}
+    const requested=Math.floor(Number($('directQty').value));
+    const qty=Math.min(pool.length,Number.isFinite(requested)&&requested>0?requested:10);
+    const selected=randomize(pool).slice(0,qty);
+    session={queue:selected.map(w=>w.jp),unique:selected.map(w=>w.jp),cursor:0,
+      visited:new Set(),kind:type,lesson,revealed:false,direct:true,directOrigin:'directSetup'};
+    activeLesson=type==='lesson'?lesson:(type==='extra'?'extra':null);
+    view('choose');
+  };
   let session=null, quiz=null, lastWrong=[], batchQty=10;
   function beginSession(wordJPs,kind='all',lesson=null){
     if(!wordJPs.length){toast('暂无词语');return;}
@@ -319,6 +380,8 @@
   }
   $('exitStudy').onclick=()=>finishSession();
   $('goTest').onclick=()=>{if(session)view('choose');};
+  $('chooseBack').onclick=()=>view(session?.direct
+    ?(session.directOrigin==='home'?'home':'directSetup'):'summary');
   $('repeatWeak').onclick=()=>{if(session)beginSession([...session.unique],session.kind,session.lesson);};
   $('landscapeBtn').onclick=()=>{
     if(document.body.classList.contains('fake-landscape')){document.body.classList.remove('fake-landscape');return;}
@@ -403,7 +466,7 @@
     return {remaining:remainingNewWords(pool,coverageScope(session.kind,session.lesson)),kind:session.kind,lesson:session.lesson};
   }
   function refreshContinueSession(){
-    const btn=$('continueSession'),status=$('continueStatus'),next=pendingNextBatch();
+    const btn=$('continueSession'),status=$('continueStatus'),next=session?.direct?null:pendingNextBatch();
     btn.classList.toggle('hidden',!next);
     status.classList.toggle('hidden',!next);
     if(!next)return;
@@ -433,7 +496,7 @@
     const original=[...uniqueFirst.values()];
     const right=original.filter(r=>r.ok).length,total=original.length;
     lastWrong=uniq([...quiz.forgotSet,...original.filter(x=>!x.ok).map(x=>x.jp)]);
-    db.logs.push({date:Date.now(),mode:quiz.mode,total,right,lesson:session?.lesson||null,forgot:quiz.forgotSet.size,repeat:quiz.results.length-total});
+    db.logs.push({date:Date.now(),mode:quiz.mode,total,right,lesson:session?.lesson||null,direct:!!session?.direct,forgot:quiz.forgotSet.size,repeat:quiz.results.length-total});
     db.logs=db.logs.slice(-500);save();
     $('score').textContent=`${total?Math.round(100*right/total):0}%`;
     $('scoreDetails').textContent=`原始题 ${total} · 答对 ${right} · 标记不记得 ${quiz.forgotSet.size} · 额外重现 ${Math.max(0,quiz.results.length-total)}`;
@@ -523,7 +586,7 @@
     const words=allWords();
     $('attemptsCount').textContent=db.logs.reduce((a,x)=>a+(Number(x.total)||0),0);
     $('learnedCount').textContent=words.filter(w=>progressFor(w.jp).seen>0).length;
-    $('logsList').innerHTML=db.logs.length?[...db.logs].reverse().slice(0,35).map(x=>`<div class="log-row"><span>${esc(typeof x.date==='number'?dateText(x.date):x.date)}<small>${x.mode==='cn-jp'?'中文 → 日语':'日语 → 中文'}${x.lesson?' · '+esc(lessonLabel(x.lesson)):''}</small></span><strong>${Number(x.right)||0} / ${Number(x.total)||0}</strong></div>`).join(''):'<div class="empty-state">暂时还没有默写记录。</div>';
+    $('logsList').innerHTML=db.logs.length?[...db.logs].reverse().slice(0,35).map(x=>`<div class="log-row"><span>${esc(typeof x.date==='number'?dateText(x.date):x.date)}<small>${x.mode==='cn-jp'?'中文 → 日语':'日语 → 中文'}${x.lesson?' · '+esc(lessonLabel(x.lesson)):''}${x.direct?' · 直接考核':''}</small></span><strong>${Number(x.right)||0} / ${Number(x.total)||0}</strong></div>`).join(''):'<div class="empty-state">暂时还没有默写记录。</div>';
   }
   if('serviceWorker' in navigator&&location.protocol==='https:'){
     window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
