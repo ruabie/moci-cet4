@@ -45,7 +45,7 @@ jobs:
           assert info["public_deploy"] is False, "Original Web build must be isolated diagnostic"
           files=info["web_files"]
           assert all(p in files for p in ("index.html","index.js","index.wasm","index.pck"))
-          assert (source/"index.wasm").read_bytes()[:4] == b"\\x00asm"
+          assert (source/"index.wasm").read_bytes()[:4] == bytes((0,97,115,109)), "Invalid WASM magic"
           assert len(files)==9, f"Unexpected exported Game Web file count: {list(files)}"
           for name,record in files.items():
               f=source/name
