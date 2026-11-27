@@ -1,0 +1,57 @@
+{
+  "version": "V0.40 isolated Web diagnostic preview",
+  "head_sha": "2b8b582cf4d68b2bc2537c81bd9a086621828bd6",
+  "branch": "lifesim-v040-third-person-near-wall-visibility",
+  "source_candidate": "V0.40 PR #56, branched from V0.39 Web PR #55 at e1b10a0ca8e385a10dbb2a260b3ba299f20a44bf",
+  "godot": "4.7.2 stable, Web single-threaded",
+  "world_flags": [
+    "v32_spatial_preview",
+    "v35_architecture_preview",
+    "v36_pinned_facade_preview",
+    "v37_walkable_shop_preview",
+    "v38_real_player_route_qa"
+  ],
+  "web_artifact_only": true,
+  "public_deploy": false,
+  "browser_verified": false,
+  "native_windows_fps_verified": false,
+  "font_license": "SIL Open Font License",
+  "web_files": {
+    "index.apple-touch-icon.png": {
+      "bytes": 6274,
+      "sha256": "db2379b1b50819d8a483d3021a4929707704eb522703930d497d472a31822fb4"
+    },
+    "index.audio.position.worklet.js": {
+      "bytes": 2973,
+      "sha256": "be33985bc7160d6bf9646f259cd86b259cd67b02ccb297ee5c44f8ac84327bc8"
+    },
+    "index.audio.worklet.js": {
+      "bytes": 7298,
+      "sha256": "5b476a9c9ce642c0ee4256436d1bc31d9c38f868aca0f9a8e2a57c18d2dec2a3"
+    },
+    "index.html": {
+      "bytes": 5476,
+      "sha256": "6915babf8f9087766f59983a9ec2c7728aeca520a506b1eff9bcdd6fa647a0b8"
+    },
+    "index.icon.png": {
+      "bytes": 2701,
+      "sha256": "9764ec2bec9853abda7da1e9f359628be143906bb8b04ca33036a725777ee2fc"
+    },
+    "index.js": {
+      "bytes": 279815,
+      "sha256": "33c94cb3175f3333b82e2a3be5e8e86f77986f0aa2042b1631f6367a4e5bb6ba"
+    },
+    "index.pck": {
+      "bytes": 41331896,
+      "sha256": "604028175f66aed26dcf4e78a78c69538bea483c9f50efcab205edab5b028352"
+    },
+    "index.png": {
+      "bytes": 21443,
+      "sha256": "3cb4495c0b98dfbe4b663cbf2b6836473572339beb66d902367893162a70be0e"
+    },
+    "index.wasm": {
+      "bytes": 39514754,
+      "sha256": "fc74679e3b97f76878947fcd4fbe1268cbfa6188182a2e33bbc3f5dc9bfa57d0"
+    }
+  }
+}

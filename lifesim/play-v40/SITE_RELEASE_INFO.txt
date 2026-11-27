@@ -1,0 +1,5 @@
+LifeSim / 同频之城 V0.40 isolated public Web preview
+Source: ruabie/moci-cet4 draft PR #56
+Godot 4.7.2 Web single-threaded, local static runtime, no external CDN
+Compiled build source SHA: 2b8b582cf4d68b2bc2537c81bd9a086621828bd6
+Not a commercial release. UI, shops, city art and save loop incomplete.
