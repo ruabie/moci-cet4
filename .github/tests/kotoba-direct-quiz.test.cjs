@@ -14,7 +14,7 @@ assert.match(html,/id="testForgot"/);
 assert.match(html,/id="testRemember"/);
 assert.match(html,/styles\.css\?v=7\.2/);
 assert.match(html,/app\.js\?v=7\.2/);
-assert.match(sw,/kotoba-v7\.2/);
+assert.match(sw,/kotoba-v7\.3/);
 assert.match(css,/V7\.2: Direct recall controls/);
 assert.doesNotMatch(css,/\.ios-tabbar/);
 assert.match(html,/SLOW LEARNING \/ DEEP MEMORY/);
