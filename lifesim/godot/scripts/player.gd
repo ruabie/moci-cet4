@@ -20,6 +20,13 @@ var camera_collision_activations: int = 0
 var camera_collision_shape: SphereShape3D
 var camera_sweep_query: PhysicsShapeQueryParameters3D
 var character_visual: Node3D
+# V0.40: local third-person render only. Physical avatar collision/rig remain.
+# Fades the original skinned mesh at very short camera radius to prevent
+# the model's face/hair covering the entire picture at a real solid wall.
+var avatar_render_meshes: Array[GeometryInstance3D] = []
+var avatar_camera_fade: float = 0.0
+const CAMERA_FADE_OUTER_RADIUS: float = 1.25
+const CAMERA_FADE_INNER_RADIUS: float = 0.48
 var rig: Skeleton3D
 var anim_clock: float = 0.0
 var anim_weight: float = 0.0
@@ -68,6 +75,11 @@ func _ready() -> void:
         if not CharacterArtV18.has_bone(rig, required_bone):
             push_error("glTF character is missing bone " + required_bone)
             return
+    # Capture only the current local player's original imported avatar meshes.
+    # We never hide buildings, walls, NPCs, physics shapes, or animation rig.
+    _collect_avatar_render_meshes(character_visual)
+    if avatar_render_meshes.is_empty():
+        push_error("V40 near-camera visibility needs original skinned avatar geometry")
     animation_verified = true
     resting_foot_height = _lowest_foot_height_relative_to_body()
     camera = Camera3D.new()
@@ -87,6 +99,32 @@ func _ready() -> void:
     if not OS.has_feature("web"):
         Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
     _update_camera(0.0)
+
+# GeometryInstance3D.transparency is a render-only material multiplier.
+# Keep mesh nodes in scene throughout: animation, physics and shadows do not
+# depend on a disabled collider or a detached character.
+func _collect_avatar_render_meshes(node: Node) -> void:
+    if node is MeshInstance3D:
+        var geom: GeometryInstance3D = node as GeometryInstance3D
+        avatar_render_meshes.append(geom)
+        geom.transparency = 0.0
+    for child in node.get_children():
+        _collect_avatar_render_meshes(child)
+
+
+func _update_avatar_camera_fade(actual_radius_m: float) -> void:
+    # Smoothstep fade acts only when a real wall retracts the camera into the
+    # player's head/face. Once clearance returns, full third-person body
+    # automatically reappears; no persistent first-person hidden state.
+    var x: float = clampf(
+        (CAMERA_FADE_OUTER_RADIUS - actual_radius_m)
+        / (CAMERA_FADE_OUTER_RADIUS - CAMERA_FADE_INNER_RADIUS),
+        0.0, 1.0)
+    avatar_camera_fade = x * x * (3.0 - 2.0 * x)
+    for mesh_instance in avatar_render_meshes:
+        if is_instance_valid(mesh_instance):
+            mesh_instance.transparency = avatar_camera_fade
+
 
 func _pose(name: String, x: float, y: float = 0.0) -> void:
     CharacterArtV18.pose(rig, name, x, y)
@@ -221,3 +259,4 @@ func _update_camera(delta: float) -> void:
             camera_collision_activations += 1
     camera.global_position = candidate
     camera.look_at(pivot + Vector3.UP * .02)
+    _update_avatar_camera_fade(pivot.distance_to(camera.global_position))
