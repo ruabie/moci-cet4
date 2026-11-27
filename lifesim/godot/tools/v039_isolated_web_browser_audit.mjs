@@ -42,7 +42,7 @@ try{
   await page.screenshot({path:dir+"/v039_chromium_loaded.png",timeout:40000});
   outcome.actualWebScreenshot=fs.statSync(dir+"/v039_chromium_loaded.png").size>12000;
   // Dispatch via actual browser key input to canvas. No direct state writes.
-  await page.locator("canvas").click({position:{x:580,y:330},timeout:20000});
+  // Godot pointer-lock click can trigger browser navigation scheduling.\n  // Send a real physical browser pointer event without locator navigation waits.\n  await page.mouse.click(580,330);
   await page.keyboard.down("w");
   await page.waitForTimeout(1400);
   await page.keyboard.up("w");
