@@ -5,12 +5,12 @@ const vm=require('node:vm');
 const read=p=>fs.readFileSync(p,'utf8');
 const dataContext={window:{}};
 vm.createContext(dataContext);
-for(const p of ['kotoba/book-data.js','kotoba/vocab-03-page08.js','kotoba/vocab-04.js','kotoba/vocab-05.js','kotoba/vocab-13.js','kotoba/vocab-14.js','kotoba/vocab-15.js','kotoba/vocab-16.js'])vm.runInContext(read(p),dataContext,{filename:p});
+for(const p of ['kotoba/book-data.js','kotoba/vocab-03-page08.js','kotoba/vocab-04.js','kotoba/vocab-05.js','kotoba/vocab-06-07.js','kotoba/vocab-13.js','kotoba/vocab-14.js','kotoba/vocab-15.js','kotoba/vocab-16.js'])vm.runInContext(read(p),dataContext,{filename:p});
 const source=dataContext.window.KOTOBA_BOOK;
 const added=dataContext.window.KOTOBA_SUPPLEMENTS;
 assert.ok(Array.isArray(source.words)&&source.words.length>=250,'Original textbook corpus retained');
-assert.equal(added.length,543,'All supplementary entries must be present');
-const lessonCounts={'3':18,'4':61,'5':92,'13':118,'14':37,'15':79,'16':138};
+assert.equal(added.length,667,'All supplementary entries must be present including lessons 6/7');
+const lessonCounts={'3':18,'4':61,'5':92,'6':36,'7':88,'13':118,'14':37,'15':79,'16':138};
 for(const [lesson,count] of Object.entries(lessonCounts))assert.equal(added.filter(x=>x.lesson===lesson).length,count,'unexpected number of '+lesson+' entries');
 const printed=new Set();
 for(const w of added){
@@ -20,6 +20,17 @@ for(const w of added){
   printed.add(identity);
 }
 const byJP=(lesson,jp)=>added.filter(x=>x.lesson===lesson&&x.jp===jp);
+assert.equal(byJP('6','架け橋')[0].cn,'桥梁');
+assert.equal(byJP('6','不幸')[0].pos,'名・ナ形');
+assert.equal(byJP('6','転々')[0].cn,'转来转去；翻来覆去');
+assert.equal(byJP('6','愛読')[0].kana,'あいどく');
+assert.equal(byJP('7','頷く')[0].kana,'うなずく');
+assert.equal(byJP('7','独り善がり')[0].cn,'自以为是');
+assert.equal(byJP('7','以心伝心')[0].cn,'心领神会，心意相通');
+assert.equal(byJP('7','栗餅')[0].cn,'板栗糯米饼');
+assert.equal(byJP('7','孝文化')[0].cn,'孝敬文化，孝文化');
+assert.equal(added.filter(x=>x.lesson==='7'&&x.page===20).length,4,'Lesson 8 words must not leak into lesson 7');
+assert.equal(byJP('7','雨傘').length,0,'Lesson 8 not included');
 assert.equal(byJP('13','メニュー')[0].cn,'菜单');
 assert.equal(byJP('13','鍵')[0].cn,'关键');
 assert.deepEqual(Array.from(byJP('13','上げる').map(x=>x.cn)),['举，抬','发出（声音）']);
@@ -40,7 +51,7 @@ const validVersion=ref=>{
   const v=ref.split('?v=')[1];
   return !!v&&v.split('.').every(part=>part.length>0&&[...part].every(ch=>ch>='0'&&ch<='9'));
 };
-for(const file of ['book-data.js','vocab-03-page08.js','vocab-04.js','vocab-05.js','vocab-13.js','vocab-14.js','vocab-15.js','vocab-16.js','extra-words.js','app.js','styles.css']){
+for(const file of ['book-data.js','vocab-03-page08.js','vocab-04.js','vocab-05.js','vocab-06-07.js','vocab-13.js','vocab-14.js','vocab-15.js','vocab-16.js','extra-words.js','app.js','styles.css']){
   assert.ok(assetRefs.some(ref=>ref.startsWith(file+'?v=')&&validVersion(ref)),
     'Missing versioned script or stylesheet '+file);
 }
@@ -95,11 +106,13 @@ const el=boot();
 const c3=course(el,'3');
 const c4=course(el,'4');
 const c5=course(el,'5');
+const c6=course(el,'6');
+const c7=course(el,'7');
 const c13=course(el,'13');
 const c14=course(el,'14');
 const c15=course(el,'15');
 const c16=course(el,'16');
-assert.ok(c4.size===61&&c5.size===92,'Lesson 4/5 photograph corpus incomplete');
+assert.ok(c4.size===61&&c5.size===92&&c6.size===36&&c7.size===88,'Lesson 4–7 photograph corpus incomplete');
 assert.equal(c4.get('異なる').cn,'不同，不一样');
 assert.equal(c4.get('物産').cn,'物产；特产');
 assert.equal(c4.get('海水浴').cn,'海水浴');
@@ -109,6 +122,14 @@ assert.equal(c5.get('幕藩').cn,'幕藩（体制）');
 assert.equal(c5.get('明').kana,'みん');
 assert.equal(c5.get('羅針盤').cn,'罗盘，指南针');
 assert.equal(c5.get('話が弾む').cn,'聊得起劲');
+assert.equal(c6.get('著作').cn,'著作');
+assert.equal(c6.get('観察記').kana,'かんさつき');
+assert.equal(c6.get('悔しい').cn,'后悔，内疚');
+assert.equal(c7.get('末').cn,'最末；最小');
+assert.equal(c7.get('あっという間').cn,'一瞬间');
+assert.equal(c7.get('帰省').cn,'回老家');
+assert.equal(c7.get('世代間').cn,'隔代');
+assert.equal(c7.get('孝文化').cn,'孝敬文化，孝文化');
 assert.equal(c3.get('立春').cn,'立春');
 assert.ok(c13.size>=110&&c14.size>=35&&c15.size>=70&&c16.size>=125,'Lesson corpus unexpectedly small');
 assert.equal(c13.get('メニュー').cn,'菜单','Previous approximate gloss must be replaced by new photo');
@@ -121,5 +142,5 @@ assert.equal(c16.get('住民票').cn,'居民卡');
 const totalUnique=new Set([...source.words,...added].map(x=>x.jp));
 assert.equal(Number(el('totalWords').textContent),totalUnique.size,'Large library must dedupe words');
 console.log('Catalog V7 verified: original '+source.words.length+', photo records '+added.length+
- ', unique total '+totalUnique.size+', course cards '+[c4.size,c5.size,c13.size,c14.size,c15.size,c16.size].join('/')+
+ ', unique total '+totalUnique.size+', course cards '+[c4.size,c5.size,c6.size,c7.size,c13.size,c14.size,c15.size,c16.size].join('/')+
  ', source Chinese gloss, POS study-only, cross-lesson meanings and prior words preserved.');
