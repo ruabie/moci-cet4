@@ -1,0 +1,26 @@
+name: LifeSim public Pages routing and source diagnostic (read only)
+on:
+  push:
+    branches: [lifesim-v040-third-person-near-wall-visibility]
+    paths:
+      - '.github/workflows/lifesim-pages-source-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Read official Pages source configuration without changing settings
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/pages"             --jq '{url,html_url,status,build_type,source,https_enforced,cname}'             || echo "PAGES API unavailable - no guessing configuration"
+          for path in / /lifesim/play-v18/ /lifesim/play-v18/index.html /lifesim/play-v40/; do
+            echo "PUBLIC_CHECK: $path"
+            curl -L -sSI --connect-timeout 6 --max-time 12               -o /tmp/pages-headers.txt               -w 'HTTP_STATUS=%{http_code} REDIRECT=%{url_effective}\n'               "https://ruabie.github.io/moci-cet4$path" || true
+            grep -iE '^(content-type:|location:|content-length:|server:)' /tmp/pages-headers.txt | head -n 8 || true
+          done
