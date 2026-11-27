@@ -9,6 +9,8 @@
   const SUPPLEMENT_WORDS=Array.isArray(window.KOTOBA_SUPPLEMENTS)?window.KOTOBA_SUPPLEMENTS.filter(w=>w&&w.jp&&w.cn&&w.lesson):[];
   for(const entry of [
     {id:'4',name:'日本－東と西－',cn:'日本——东与西',pages:'8–11',isPartial:false},
+    {id:'6',name:'ラフカディオ・ハーン',cn:'拉夫卡迪奥·赫恩',pages:'15–16',isPartial:false},
+    {id:'7',name:'丘の上の父',cn:'山丘上的父亲',pages:'16–20',isPartial:false},
     {id:'5',name:'戦国武将の天下統一',cn:'战国武将的天下统一',pages:'11–14',isPartial:true},
     {id:'14',name:'研修',cn:'研修',pages:'38–39',isPartial:false},
     {id:'15',name:'ゼミ',cn:'研讨课',pages:'39–42',isPartial:false},
