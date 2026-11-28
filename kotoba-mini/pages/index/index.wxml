@@ -1,0 +1,153 @@
+<view class="shell">
+  <view class="topbar">
+    <view class="brand" bindtap="refreshHome">ことば。<text class="brand-sub">WORD JOURNAL</text></view>
+    <text class="tag">VOL. 01 · MINI</text>
+  </view>
+  <block wx:if="{{screen === 'home'}}">
+    <view class="hero"><text class="eyebrow">SLOW LEARNING / DEEP MEMORY</text>
+      <view class="hero-title">每天一点，<text>慢慢记住。</text></view>
+      <text class="hero-desc">像翻阅一本安静的手帖。每次专注一个词，把记忆交给时间与主动回忆。</text>
+    </view>
+    <view class="stat-bar">
+      <view><text class="stat-number">{{total}}</text><text class="stat-desc">收录词语</text></view>
+      <view><text class="stat-number">{{due}}</text><text class="stat-desc">到期复习</text></view>
+      <view><text class="stat-number">{{weak}}</text><text class="stat-desc">薄弱单词</text></view>
+    </view>
+    <view class="section-title">开始学习 <text>SELECT A PATH</text></view>
+    <view class="entry" bindtap="showLessons"><text class="entry-index">01</text><view class="entry-main"><text>按课次学习</text><text class="entry-desc">第三册与第二册分别管理</text></view><text class="arrow">↗</text></view>
+    <view class="entry" bindtap="openKind" data-kind="extra"><text class="entry-index">02</text><view class="entry-main"><text>课外词</text><text class="entry-desc">保留词汇来源与共同记忆进度</text></view><text class="arrow">↗</text></view>
+    <view class="entry" bindtap="openKind" data-kind="all"><text class="entry-index">03</text><view class="entry-main"><text>总词汇库</text><text class="entry-desc">所有词汇去重后一起学习</text></view><text class="arrow">↗</text></view>
+    <view class="entry" bindtap="openKind" data-kind="due"><text class="entry-index">04</text><view class="entry-main"><text>间隔复习</text><text class="entry-desc">优先复习到期或薄弱的单词</text></view><text class="arrow">↗</text></view>
+    <view class="entry" bindtap="openKind" data-kind="random"><text class="entry-index">05</text><view class="entry-main"><text>随机抽查</text><text class="entry-desc">随时检测已收录的词汇</text></view><text class="arrow">↗</text></view>
+    <view class="foot-links"><text bindtap="showLibrary">管理词库</text><text bindtap="showStats">学习记录</text><text bindtap="showHelp">使用说明</text></view>
+  </block>
+
+  <block wx:elif="{{screen === 'lessons'}}">
+    <text class="back" bindtap="goBack">← 返回首页</text>
+    <view class="page-title">每一课，<text>都有自己的节奏。</text></view>
+    <block wx:for="{{volumeGroups}}" wx:for-item="group" wx:key="volume">
+      <view class="volume-title">{{group.label}} <text>共 {{group.lessons.length}} 课</text></view>
+      <view class="lesson-row" wx:for="{{group.lessons}}" wx:for-item="lesson" wx:key="id" bindtap="openLesson" data-id="{{lesson.id}}">
+        <text class="lesson-index">{{lesson.id}}</text>
+        <view class="lesson-text"><text class="lesson-name">{{lesson.name}}</text><text class="lesson-desc">{{lesson.cn}}{{lesson.isPartial ? ' · 仅有部分词汇' : ''}}</text></view>
+        <view class="lesson-count"><text>{{lesson.left}}</text><text>待学 / {{lesson.total}}</text></view>
+      </view>
+    </block>
+  </block>
+
+  <block wx:elif="{{screen === 'setup'}}">
+    <text class="back" bindtap="goBack">← 返回</text>
+    <text class="eyebrow">STUDY SESSION</text>
+    <view class="page-title">{{setupTitle}}<text>准备开始。</text></view>
+    <text class="muted">{{setupNotice}}</text>
+    <view class="sheet">
+      <view class="sheet-top">可用词语 <text class="big-number">{{available}}</text></view>
+      <text class="field-label">本轮学习数量</text>
+      <input class="qty-input" type="number" value="{{qty}}" bindinput="onQtyInput"/>
+      <view class="pill-bar"><text bindtap="chooseQty" data-qty="10">10 个</text><text bindtap="chooseQty" data-qty="20">20 个</text><text bindtap="chooseQty" data-qty="0">全部</text></view>
+      <button class="primary" bindtap="startStudy">开始翻页　→</button>
+    </view>
+  </block>
+
+  <block wx:elif="{{screen === 'study'}}">
+    <view class="studybar"><text bindtap="finishStudy">× 结束</text><text>{{studyPosition}}</text></view>
+    <view class="progress-track"><view class="progress-fill" style="width:{{progressPercent}}%;"></view></view>
+    <view class="flashcard" bindtap="revealCard" bindtouchstart="touchStart" bindtouchend="touchEnd">
+      <text class="card-jp">{{current.jp}}</text>
+      <block wx:if="{{cardRevealed}}">
+        <text class="card-kana">{{current.kana}}</text><text class="card-cn">{{current.cn}}</text>
+        <text class="card-pos">词性 · {{current.pos}}</text>
+      </block>
+      <text wx:else class="reveal-hint">轻触显示假名、释义和词性</text>
+    </view>
+    <view class="study-nav"><text bindtap="prevCard">‹ 上一词</text><text bindtap="nextCard">下一词 ›</text></view>
+    <text class="study-hint">也可以左右滑动切换词语</text>
+  </block>
+
+  <block wx:elif="{{screen === 'summary'}}">
+    <text class="eyebrow">STUDY COMPLETED</text>
+    <view class="page-title">先看过了，<text>再来检验。</text></view>
+    <view class="sheet center"><text class="muted">本轮学习</text><text class="big-number">{{summaryCount}} 词</text><text class="muted">学习阶段不评分，接下来通过默写与记忆自评安排复习。</text></view>
+    <button class="primary" bindtap="toChoice">开始默写　→</button>
+    <button class="secondary" bindtap="repeatStudy">再看一遍这组词</button>
+    <text class="center-link" bindtap="refreshHome">返回首页</text>
+  </block>
+
+  <block wx:elif="{{screen === 'choice'}}">
+    <text class="back" bindtap="goBack">← 返回</text>
+    <text class="eyebrow">ACTIVE RECALL</text>
+    <view class="page-title">来检验一下，<text>记得多少。</text></view>
+    <view class="entry" bindtap="startQuiz" data-mode="cn-jp"><text class="entry-index">01</text><view class="entry-main"><text>中文 → 日语</text><text class="entry-desc">填写日语词语或假名</text></view><text class="arrow">↗</text></view>
+    <view class="entry" bindtap="startQuiz" data-mode="jp-cn"><text class="entry-index">02</text><view class="entry-main"><text>日语 → 中文</text><text class="entry-desc">填写中文含义，支持手动核对</text></view><text class="arrow">↗</text></view>
+  </block>
+
+  <block wx:elif="{{screen === 'quiz'}}">
+    <view class="studybar"><text bindtap="goBack">← 暂停</text><text>{{quizPosition}}</text></view>
+    <text class="eyebrow">{{quizDirection}}</text>
+    <view class="quiz-word">{{quizPrompt}}</view>
+    <block wx:if="{{!answered}}">
+      <textarea class="answer" auto-height="{{true}}" maxlength="180" placeholder="在这里输入回忆的答案…" value="{{answerInput}}" bindinput="onAnswerInput"/>
+      <button class="primary" bindtap="checkAnswer">核对答案　→</button>
+      <button class="secondary" bindtap="skipAnswer">想不起来，显示答案</button>
+    </block>
+    <block wx:else>
+      <view class="feedback"><text class="feedback-header">{{feedbackTitle}}</text><text class="feedback-jp">{{feedbackJP}}</text><text>{{feedbackKana}}</text><text class="feedback-cn">{{feedbackCN}}</text></view>
+      <button wx:if="{{!answerOK && !answerForced}}" class="secondary" bindtap="overrideAnswer">答案合理，我手动判定正确</button>
+      <text class="muted small-gap">核对后，请按实际记忆情况自评。</text>
+      <button class="primary" bindtap="markRemember" disabled="{{!answerOK}}">记得了</button>
+      <button class="secondary" bindtap="markForgot">不记得了</button>
+    </block>
+  </block>
+
+  <block wx:elif="{{screen === 'done'}}">
+    <text class="eyebrow">PRACTICE FINISHED</text>
+    <view class="page-title">比昨天，<text>又记住了一些。</text></view>
+    <view class="sheet center"><text>首次默写正确率</text><text class="score">{{testScore}}</text><text class="muted">{{testDetails}}</text></view>
+    <button class="primary" bindtap="continueStudy" disabled="{{!canContinue}}">{{continueLabel}}　→</button>
+    <text class="muted center-link">{{continueStatus}}</text>
+    <button class="secondary" bindtap="swapDirection">换个方向再测</button>
+    <button class="secondary" bindtap="reviewWrong">复习本轮错词</button>
+    <text class="center-link" bindtap="refreshHome">返回首页</text>
+  </block>
+
+  <block wx:elif="{{screen === 'library'}}">
+    <text class="back" bindtap="goBack">← 返回</text>
+    <view class="page-title">我的词库。<text>随时可以查阅。</text></view>
+    <input class="search" placeholder="搜索日语、假名或中文释义" value="{{search}}" bindinput="onSearch"/>
+    <view class="pill-bar filter"><text bindtap="setFilter" data-filter="all">全部</text><text bindtap="setFilter" data-filter="textbook">课内词</text><text bindtap="setFilter" data-filter="extra">课外词</text></view>
+    <text class="muted">共 {{libraryCount}} 条匹配词汇，最多显示前120条</text>
+    <view class="word-row" wx:for="{{libraryRows}}" wx:key="jp">
+      <view><text class="word-jp">{{item.jp}}</text><text class="word-kana">{{item.kana}}</text></view>
+      <text>{{item.cn}}</text><text class="word-origin">{{item.category}}</text>
+    </view>
+    <view class="sheet"><text class="field-label">添加个人单词（每行一条）</text>
+      <text class="muted">日语 | 假名 | 中文释义 | 词性</text>
+      <textarea class="custom-area" value="{{customInput}}" bindinput="onCustomInput" placeholder="経験 | けいけん | 经验 | 名词"/>
+      <button class="secondary" bindtap="importCustom">加入课外词库</button>
+    </view>
+    <view class="sheet"><text class="field-label">学习记录备份</text>
+      <text class="muted">微信版不会自动读取浏览器数据。先在原网页版导出 JSON，再通过微信聊天文件导入。</text>
+      <button class="secondary" bindtap="exportBackup">导出并分享微信版备份</button>
+      <button class="secondary" bindtap="importBackup">导入网页版 / 微信版 JSON 备份</button>
+    </view>
+  </block>
+
+  <block wx:elif="{{screen === 'stats'}}">
+    <text class="back" bindtap="goBack">← 返回</text>
+    <view class="page-title">学习记录。<text>把努力留在时间里。</text></view>
+    <view class="stat-bar"><view><text class="stat-number">{{learnedCount}}</text><text class="stat-desc">开始记忆的词</text></view><view><text class="stat-number">{{attemptsCount}}</text><text class="stat-desc">累计首次默写题</text></view></view>
+    <view class="word-row" wx:for="{{logRows}}" wx:key="index"><view><text>{{item.date}}</text><text class="word-origin">{{item.mode}}</text></view><text>{{item.right}} / {{item.total}}</text></view>
+    <text wx:if="{{logRows.length===0}}" class="muted">暂无默写记录。</text>
+  </block>
+
+  <block wx:elif="{{screen === 'help'}}">
+    <text class="back" bindtap="goBack">← 返回</text>
+    <view class="page-title">慢慢记住。<text>把每次回忆变得简单。</text></view>
+    <view class="help-block"><text>01 / 学习</text><text>每屏一个词，轻触展示假名、中文释义和词性。学完后进入检测。</text></view>
+    <view class="help-block"><text>02 / 检测</text><text>可以中文→日语、日语→中文。自动判错时允许手动修正，再选择记得或不记得。</text></view>
+    <view class="help-block"><text>03 / 复习</text><text>记住的词依次安排 1、3、7、14、30、60、90 天复习；遗忘后10分钟到期，并在本轮最多额外出现两次。</text></view>
+    <view class="help-block"><text>04 / 数据</text><text>当前仅保存在本机微信存储中，不要求登录、不传输学习记录。卸载微信或清理数据可能造成丢失，请导出备份。</text></view>
+    <view class="help-block"><text>05 / 发音</text><text>浏览器系统语音不兼容微信小程序。本测试版本暂不提供朗读，后续须使用可合法分发的日语音频资源。</text></view>
+  </block>
+  <view class="footer">KOTOBA — A WORD AT A TIME.</view>
+</view>
